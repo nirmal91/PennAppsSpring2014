@@ -18,7 +18,7 @@ public class CallerClass {
 		String line = null;
 		try 
 		{
-			for(int i=1;i<=19;i++)
+			for(int i=1;i<=2;i++)
 			{
 				BufferedReader br = new BufferedReader(new FileReader("resources/Kriti19Files/"+i+".txt"));
 				while((line = br.readLine())!= null)
@@ -49,8 +49,8 @@ public class CallerClass {
 		{
 			
 		}
-		int[] modes = new int[19];
-		for(int i=0;i<19;i++)
+		int[] modes = new int[2];
+		for(int i=0;i<2;i++)
 			modes[i] = 1;
 		String summary = SkipItMainClass.APICall(inputFromDhyanam, numberOfLinesFromDhyanam, modes);
 		System.out.println(summary);
