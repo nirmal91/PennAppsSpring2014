@@ -11,11 +11,11 @@ import java.util.HashMap;
 import com.aliasi.tokenizer.*;
 
 public class SkipItMainClass {
-	public static void main(String args[])
+	public static void APICall(ArrayList<String> inputFromDhyanam, int numberOfLinesFromDhyanam)
 	{
-		/*
+/*		
 		 * Prepare input from the previous part
-		 */
+		 
 		ArrayList<String> inputFromDhyanam = new ArrayList<String>();		
 
 		StringBuffer information = new StringBuffer();
@@ -28,13 +28,13 @@ public class SkipItMainClass {
 			}
 			inputFromDhyanam.add(new String(information));
 			
-/*			br = new BufferedReader(new FileReader("resources/war.txt"));
+			br = new BufferedReader(new FileReader("resources/war.txt"));
 			while((line = br.readLine())!=null)
 			{
 				information.append(line+"\n");				
 			}
 			inputFromDhyanam.add(new String(information));
-*/
+
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -47,7 +47,7 @@ public class SkipItMainClass {
 		
 		
 		int numberOfLinesFromDhyanam = 20;
-		
+*/		
 		/*
 		 * Prepare the IDF hashMap
 		 */
@@ -148,9 +148,9 @@ public class SkipItMainClass {
 		{
 			importantSentences.add(allInformation.get(i));
 		}
-		System.out.println(importantSentences);
-		System.out.println("Reduced number of sentences");
-		System.out.println(importantSentences.size());
+//		System.out.println(importantSentences);
+//		System.out.println("Reduced number of sentences");
+//		System.out.println(importantSentences.size());
 		try
 		{
 			Thread.sleep(1000);
