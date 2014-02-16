@@ -1,0 +1,36 @@
+The burials received the most attention when the dot-com bubble burst nearly four years ago, but some companies stuck it out, retooling, reinventing and repackaging themselves, sometimes painfully, to survive in an industry of short product cycles. One was Intranets.com of Woburn, Mass.
+Intranets.com went through two makeovers, and two names, before it hit on what appears to be a winning formula.
+Along the way, the firm also found some unusual uses for its Web-based data-and-document management system: helping NASA keep track of the data after the Columbia space shuttle disaster, and providing a community Web site to a consortium that aids families and survivors of the 2001 terrorist attack.
+Intranets.com was born in 1997 as Intranetics, offering a software package to help businesses manage their daily activities like sharing documents and posting their company calendars.
+When sales of its shrink-wrapped software lagged in mid-1999, the company changed its name to Intranets.com to call attention to its core service, the setting up and running of company intranet sites.
+It also began giving away its online services and relying solely on Internet advertising for revenue. That did not work. Subscriber numbers soared but red ink gushed, and the dot-com crash forced the company to switch strategies again -- this time to a paid online service.
+Such nimble change from one model to another is standard practice in the dot-com world.
+While complete data on the fate of Internet companies are hard to come by, a 2002 report by Webmergers Inc., now part of the 451 Group, found that nearly 5,000 dot-coms -- half or more of the estimated 7,000 to 10,000 start-ups -- were either acquired or shut as the sector consolidated.
+And the financing drought of 2001 created a virtual frenzy of adaptive behavior, whether redefining their customer base, offering new products or entering new markets, according to Tim R. Miller, a 451 Group analyst in San Francisco.
+NewRiver, a company in Andover, Mass., that made compact disks loaded with legal disclosure documents for insurance companies, expanded its customer base to a whole range of financial institutions, for example. Now nine years old, the company had 2003 revenues of $34 million.
+United Online of Westlake Village, Calif., simply started charging for its NetZero Internet service after advertising revenue shriveled up in early 2001. Mark Goldston, chief executive of United Online, said he made the decision while on a chairlift at a Colorado ski resort.
+And ObjectVideo, a provider of video streaming based in Reston, Va., aimed at a new market, the security industry, gaining customers like the Customs Service, seaports and airports, according to Dr. Alan Lipton, the chief technology officer.
+Intranets.com switched strategies twice before getting it right. In its original incarnation as Intranetics, it sold its software package to about 200 customers for $5,000 each, racking up about $1 million in sales.
+The software, which had to be installed on a company's server, enabled the users to manage data and documents and to communicate with employees in scattered locations.
+Demand stagnated, however, so Intranetics changed course in 1999, renaming itself Intranets.com and offering its software free.
+Within 90 days, it had signed up 60,000 people, companies or organizations. That number grew to 1.3 million users spread around the world, using 50 million on-line minutes a month doing everything from sending e-mail messages, checking company data or taking part in company discussion groups.
+Intranets.com grew to 70 employees and began a similar service in Japan. Though the company was losing $1 million a month by early 2001 (with revenue of $100,000 a month), nobody seemed to mind.
+Market share, after all, was the holy grail of dot-com start-ups; actual earnings could wait.
+Like so many other Internet startups, Intranets.com figured that the number of its customers would skyrocket, allowing the company to go public or be sold within a few years.
+''That was in vogue then,'' said Rick H. Faulk, who became chief executive in August 2001. ''If you weren't losing that much, you weren't an official dot-com.''
+But by the time Mr. Faulk, 54, a veteran of PictureTel, a videoconferencing firm based in Andover, Mass., took the helm, he said, ''We knew we had to scrap what we were doing and start all over again.''
+Mr. Faulk's challenge was to convert free users into paying customers. But because the company's two previous business models were so different, it was not clear that customers would go along. ''We were worried because this was tried by a lot of companies, and it didn't work,'' he said.
+Still, he knew many small businesses wanted intranet sites but could not afford to create their own. So Intranets.com asked its 600,000 most active users to start paying $3 a month for the services.
+The company's employees were skeptical. They held a contest to see who could correctly predict the number of customers who would sign up. Most predicted a number far short of the 75,000 who did.
+Suddenly, the company was bringing in subscription revenue of $175,000 a month after accounting for late payments and nonpayments. Revenue rose to $6 million last year from $1 million in 2001 and from $3.7 million in 2002.
+Today, with 175,000 customers from nearly 7,000 companies and organizations, the company says it has one of the largest paid Web subscriber sites.
+The company's services have been used by the United Services Group, a consortium of 39 organizations, to allow the Salvation Army, the Red Cross and other groups to talk over issues instantly and share information to help their clients after the Sept. 11, 2001, attacks.
+''This has been a critical tool to help us to focus on the need of those affected,'' said Lauren Rosen, the coalition's program director.
+One of Intranets.com's biggest clients is NASA, with 4,500 users, which relied on the company as the central data repository when the Columbia space shuttle broke up over Texas in February 2003. All data, including video and photography, of the shuttle's failure was logged into a site for members of the Columbia Accident Investigation Group to study from any location.
+Shunning advertising does not always make sense for a dot-com business, of course.
+Ganthead, a Fairfax, Va., online community for technology project managers, had the misfortune of starting one month before the Internet bubble burst.
+''We couldn't get subscribers fast enough to generate revenue,'' said the founder, David Garrett. His company turned to advertising and prospered.
+Intranets.com, however, says it will stick with its subscription fees. It plans to expand its overseas presence by marketing versions of its software in France, Germany and Spain, and it also plans to add a host of new products in this country. Mr. Faulk projects revenue of $10 million this year, with $1.5 million in earnings.
+Last week, in an e-mail message shortly before he rushed off to the Super Bowl, Mr. Faulk acknowledged that his company had been on a roller coaster ride.
+It paid off, he said, because ''we stuck with it.''
+SMALL BUSINESS

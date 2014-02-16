@@ -1,0 +1,19 @@
+America Online will give its customers built-in software to detect and remove ''spyware,'' hidden tools that can monitor Web surfers' online habits for marketing purposes, company executives said yesterday.
+The AOL move, which is to be announced today, steps up a battle between consumers and makers of so-called adware and spyware, which have become increasingly popular marketing tools for advertisers seeking to reach Internet users in a variety of ways that many consider unduly intrusive.
+The spyware-removal program that AOL will use is made by another company, Aluria Software. It will be bundled with the next version of AOL's software, which will be released soon. AOL customers using older software will be able to download the program separately, executives said.
+The AOL software will work automatically on the customer's computer, scanning it once a week and identifying the adware and spyware packages it finds, the company said. Users will then decide whether they want to remove the products.
+''We're trying to inform and empower the consumer,'' said Jeff Kimball, vice president for new products at AOL, which is a unit of Time Warner. ''If you want it, that's your choice. If you don't, here's a simple and easy way to get it out of your life.''
+Jerry Grasso, a spokesman for Earthlink, a competitor to AOL, said the company welcomed the initiative. ''We applaud any Internet service provider that's trying to help their customers better protect their Internet experience,'' he said. ''We, of course, did it last quarter.''
+Earthlink's software, however, must be activated by users.
+Microsoft's MSN operation offers spyware protection as part of its security software for subscribers to its premium online services, a spokesman for the company said.
+Microsoft will also offer ''baseline'' spyware detection tools in the next upgrade, or service pack, for its Windows XP operating system.
+The AOL announcement could affect the business of companies that sell antispyware products, but the top executive of one company said he was not concerned.
+''It's nice to see big players taking spyware seriously,'' said Ed English, the chief executive of Intermute, which makes products to detect and remove adware and spyware.
+''I think this will help educate the public,'' he said, ''that there is a serious threat out there affecting their computers.''
+But Mr. English added that he thought scanning on a weekly basis, as AOL is planning, might not be effective against spyware.
+''If you wait a week,'' he said, ''your information has already been taken, and sent out on the Internet.''
+At least one online advertising company said that the AOL move would not interfere with its business. Avi Naider, the chief executive of WhenU, said that he did not know whether his company's software would be picked out by AOL.
+He said, however, that his company disclosed its practices and already gave consumers, who receive free software and offers of deals in return for viewing ads, the ability to remove the software.
+Nearly 100 million people have WhenU software on their machines, Mr. Naider said.
+''We're very confident that this type of product will not have a significant effect,'' he said. ''I cannot say the same for other companies that do not abide by the standards we have set in the marketplace.''
+TECHNOLOGY

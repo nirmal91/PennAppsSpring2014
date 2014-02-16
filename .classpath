@@ -4,5 +4,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="/Users/nirmalutwani/Documents/StudyNotes/PennAppsSpring2014/lib/dropbox-core-sdk-1.7.6.jar"/>
 	<classpathentry kind="lib" path="/Users/nirmalutwani/Documents/StudyNotes/PennAppsSpring2014/lib/jackson-core-2.2.3.jar"/>
+	<classpathentry kind="lib" path="/Users/nirmalutwani/Documents/StudyNotes/PennAppsSpring2014/lib/lingpipe-4.1.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

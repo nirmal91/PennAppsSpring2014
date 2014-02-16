@@ -1,0 +1,7 @@
+The problem of spam e-mail messages will be gone within two years, Bill Gates promised Friday.
+Speaking at a late-night session of the World Economic Forum, Mr. Gates, the chairman of the Microsoft Corporation, said the company was working on three ways to enable e-mail users to keep spam out of their computers.
+The first two, he said, would involve having computers reply automatically to any e-mail messages from senders not known to that computer -- that is, not in the mail list of the e-mail program installed on the computer -- with a request to solve a problem that could be handled by a person but not by a computer. The problem could be visual or computational, but having to reply would presumably deter those who send out millions of junk e-mail messages.
+The third way, which Mr. Gates said was likely to arrive later but be the long-term solution, would require that e-mail messages sent by strangers come with postage attached, the equivalent of a postage stamp.
+''If the sender is your long-lost brother,'' he said, the payment can be declined, costing the sender nothing.
+But recipients who want to fight spam would always accept the payment if the incoming mail appeared to be spam, making the sending of such messages uneconomic.
+Mr. Gates made the forecast during an interview with Charlie Rose, the television talk show host.

@@ -1,0 +1,20 @@
+In a few days, NASA's two rovers on Mars may actually be roving.
+One rover, the Spirit, disabled by a software glitch last week, could resume its explorations early next week, mission managers said Wednesday at a news conference here at the National Aeronautics and Space Administration's Jet Propulsion Laboratory.
+On Wednesday, the Spirit successfully communicated via its high-speed antenna and sent back a photograph, the first since the malfunction, showing its instrument arm pressed up against the rock nicknamed Adirondack. The rover was in the middle of experiments on Adirondack when the troubles began.
+''Everything is right where we left it,'' said Dr. Mark Adler, a mission manager.
+The deployment of the other rover, the Opportunity, which landed early on Sunday Eastern time, continues smoothly. As early as this Sunday, it could start moving from its landing site.
+Scientists continue to marvel at the small, shallow crater they see around the Opportunity. For now, the chocolate-brown soil and the outcropping of bedrock about 25 feet away offer far more intriguing questions than answers.
+The soil appears to be covered by dark gravel and pebbles. But in places where the rover's air bags bounced during its landing, the surface is a more vivid red and almost completely smooth, the pebbles and gravel seemingly vanished into thin Martian air.
+Some science team members like Dr. Matthew Golombek believe that the gravel is still there, just out of sight.
+''When the air bags were pressed against them, they actually drove those pebbles into that dust,'' Dr. Golombek said. ''That's my bias.''
+Dr. James F. Bell III, a professor of astronomy at Cornell and the lead scientist for the panoramic camera, said that some layers of exposed bedrock looked like a conglomerate of similar pebbles and grains and that they might fall loose as the rocks erode.
+A second theory is that the pebbles are clods of dust and that the force of the air bag pressing down simply pulverized them.
+In several places, the seams of the air bags left sharply defined impressions, like those of a beach ball.
+''These marks are telling us something about the physical properties of the material,'' Dr. Bell said.
+The scientists still do not know exactly where the Opportunity is. They know it is in a shallow crater about 20 yards wide, but photographs taken by the spacecraft as it neared the surface showed several craters about that size.
+The rim of the crater obscures most of the surrounding landscape, and in spots where the rim is low enough to reveal the horizon beyond, no landmarks are visible.
+''You can see in the distance how smooth and flat it is,'' Dr. Golombek said.
+When the Spirit suddenly fell silent on Jan. 21, mission controllers initially feared that a catastrophic failure in its power system, antenna or heating systems might have killed the rover entirely. The problem now appears to be a fixable flaw in the computer programming that controls part of the rover's memory.
+That memory, known as flash memory, which handles information after the power is turned off, serves the same role as the hard disk in a personal computer.
+''If we're on the right track, we would hope to, at the earliest, be back to doing science early next week,'' Jennifer Trosper, a mission manager, said.
+On Tuesday, NASA named the three hills seen in the distance at the Spirit's landing site after the crew members of Apollo 1 -- Virgil I. Grissom, Edward H. White 2nd and Roger B. Chaffee -- who were killed in a fire that broke out during a test on the launching pad at Cape Canaveral on Jan. 27, 1967.

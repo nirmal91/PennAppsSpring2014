@@ -1,0 +1,4 @@
+To the Editor:
+Providing a printout of the voter's ballot is a step in the right direction for verifying that an electronic vote is accurate (''Fixing Democracy,'' editorial, Jan. 18), but it is not the whole answer.
+It is a simple task for a malicious or politically corrupt programmer to write a code that would issue a correct printout to the voter, but change the way the ballot was recorded for a small but significant number of votes. This could be enough to swing an election in a close race. Constant vigilance and paper trails are only part of the answer. Independent oversight of the voting machine's programming code is essential.
+WILLIAM ZEPH GINSBERG  New York, Jan. 20, 2004

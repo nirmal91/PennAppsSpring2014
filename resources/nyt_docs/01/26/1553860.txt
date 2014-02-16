@@ -1,0 +1,24 @@
+To Dr. Steven W. Squyres, the dark, surreal landscape encircling the Mars rover Opportunity resembled only one other place.
+''This is exactly what it looked like in my wildest dreams,'' said Dr. Squyres, a professor of astronomy at Cornell University who is principal investigator for the two NASA rovers currently on Mars.
+Four hours after it first bounced on the Martian surface at 12:05 a.m. Eastern time Sunday, Opportunity sent a 360-degree black-and-white photograph of its surroundings, transmitted via the Mars Odyssey spacecraft orbiting overhead.
+In contrast to the cases of previous Mars landings -- the two Viking spacecraft in 1970's, Mars Pathfinder in 1997 and Opportunity's twin, Spirit, which landed three weeks ago -- Opportunity's landing site is devoid of boulders. Instead, about 10 yards away, some large slabs of rock jut out -- the first exposed bedrock seen on Mars.
+''I will attempt no science analysis, because it looks like nothing I've ever seen before,'' Dr. Squyres said. ''I've got no words for this.''
+The image of another new vista brought more amazement.
+''Holy smokes,'' Dr. Squyres said. ''I'm just blown away by this.''
+The first color photograph shows grayish-brown soil with a pebbly texture, reflecting about half as much light as the surfaces at previous landing sites. But in areas where air bags cushioned the rover's landing, the surface is rubbed smooth, indicating the soil consists of very fine particles, like talcum powder, and is a vivid reddish tone.
+In one area, Dr. Squyres spotted the impression left by a seam of one of the air bags. The images also show ripples, perhaps caused by wind.
+Dr. Larry Soderblom of the United States Geological Survey, one of the project scientists, called Opportunity's landing site ''Martian pay dirt.''
+At the first news conference after the landing, the atmosphere at NASA's Jet Propulsion Laboratory here was like the locker-room celebration of Super Bowl winner combined with speeches at the Academy Awards. Members of the landing team whooped, cheered and exchanged high-fives. Richard Cook, the deputy project manager, thanked everyone from the landing team members to Lockheed Martin, which built the Mars Odyssey, to everyone's friends and family.
+''Anybody I left out, I apologize,'' he said.
+Initial estimates indicate Opportunity overshot its target slightly, landing 15 miles to the east of where flight controllers were aiming, but well within the area hoped for.
+When Odyssey passed over Opportunity a second time later Sunday morning, mission controllers received the three pictures that the rover had taken on its descent.
+''I keep thinking this can't possibly be getting any better, and it just does,'' Dr. Squyres said.
+Data from orbiting spacecraft indicate this region, known as Meridiani Planum, consists of a thick layer of rocks topped by a layer of iron oxide that is thin but as expansive as Oklahoma. On Earth, at least, this type of iron oxide, gray hematite, usually forms in the presence of water, either in hot springs or at the bottom of a lake or ocean. NASA's explorations of Mars have focused on water, because of the possibility that Mars might have once been warm, wet and hospitable for life.
+However, this section of Meridiani Planum, as seen from orbit, is bland, with few impact craters that might reveal the underlying bedrock. Dr. Squyres said he had expected Opportunity, at best, to land close enough to reach a crater.
+''Instead, what has happened is that we have scored a 300-million-mile interplanetary hole in one,'' he said Sunday afternoon. Opportunity, he said, appears to be inside a shallow crater about 20 yards wide and a couple of yards deep. The rover should have no trouble driving out of it, he said.
+The scientists have not yet figured out which crater it landed in, but the descent images show a 150-yard-wide crater about half a mile away, which could offer even more surprises.
+In the coming days, as engineers check equipment, Opportunity will take a color panoramic photograph with much higher resolution than the initial black-and-white picture. Opportunity probably will not start its drive for a week and a half to two weeks.
+Meanwhile, the engineers who are working to repair Spirit, which has been malfunctioning since Wednesday, reported progress Sunday.
+''Spirit is still serious, but we're moving toward guarded condition now,'' said Peter Theisinger, the project manager.
+While the engineers first thought some hardware had failed, causing problems with part of the rover's memory, they now think the problem is most likely just with the software.
+Two other theories are being investigated. One is that there is a problem with the electronics controlling the rover's motors (the malfunction started during a test of one of the motors). The other theory is that a burst of particles from the sun corrupted the computer memory.

@@ -1,0 +1,605 @@
+
+<!-- saved from url=(0083)http://www.coderanch.com/t/380076/java/java/Sorting-Java-Comparator-predefined-list -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="-1">
+        <link rel="alternate" type="application/rss+xml" title="JavaRanch: Sorting-Java Comparator-predefined list" href="http://www.coderanch.com/forums/rss/topicPosts/380076">
+    <meta name="description" content="I want to sort the items in my list with a predefined order....Is it possible? I can sort my List using a natural sort as in the below example. But th">
+        <meta name="keywords" content="comparator,array,arraylist,class,collection,collections,implements,import,int,integer">
+
+<style type="text/css">@import url( /templates/default/styles/style.css?1391974910327 );</style>
+
+
+<title>Sorting-Java Comparator-predefined list (Java in General forum at JavaRanch)</title>
+
+    <link rel="canonical" href="./Sorting-Java Comparator-predefined list (Java in General forum at JavaRanch)_files/Sorting-Java Comparator-predefined list (Java in General forum at JavaRanch).html">
+    <link rel="alternate" media="handheld" href="http://www.coderanch.com/mobile/t/380076/java/java/Sorting-Java-Comparator-predefined-list?foo=a">
+<link rel="search" type="application/opensearchdescription+xml" href="http://www.coderanch.com/how-to/javaranch-saloon-os.xml" title="JavaRanch Saloon">
+<link rel="search" type="application/opensearchdescription+xml" href="http://www.coderanch.com/how-to/javaranch-faq-os.xml" title="JavaRanch FAQ">
+<style type="text/css"></style><style type="text/css"></style></head>
+
+<body class="en_US"><div id="WzTtDiV" style="visibility: hidden; position: absolute; overflow: hidden; padding: 0px; width: 0px; left: 0px; top: 0px;"></div>
+<script type="text/javascript" src="./Sorting-Java Comparator-predefined list (Java in General forum at JavaRanch)_files/jquery.min.js"></script>
+
+
+    <div align="center" class="shngl">
+        <center><table width="55%" vspace="30" border="1" cellpadding="15"><tbody><tr bgcolor="#f0e6d5"><td><center><font size="2"> 
+
+<b>File APIs for Java Developers</b><br>
+Manipulate DOC, XLS, PPT, PDF and many others from your application.<br>
+<b><a href="http://www.coderanch.com/forums/banner/redirect/551" target="_blank">http://aspose.com/file-tools</a></b>
+</font>
+</center></td></tr></tbody></table></center>
+    </div>
+
+
+
+<table width="100%" border="0">
+    <tbody><tr>
+        <td>
+            <table cellspacing="0" cellpadding="0" width="100%" border="0">
+                <tbody><tr>
+                    <td align="center">
+
+                            <img src="./Sorting-Java Comparator-predefined list (Java in General forum at JavaRanch)_files/moosefly.gif" vspace="1" border="0" alt="The moose likes Java in General and the fly likes Sorting-Java Comparator-predefined list" title="">
+                    </td>
+                    <td class="logo" valign="middle">
+                        A friendly place for programming greenhorns!
+                    </td>
+
+                    <td width="100%" align="center" valign="middle">
+                        <span class="boardtitle">Big Moose Saloon</span>
+                        <table cellspacing="0" cellpadding="2" border="0">
+                            <tbody><tr>
+                                <td valign="top" nowrap="nowrap" align="center">&nbsp;
+                                    <a id="search" class="mainmenu" href="http://www.coderanch.com/forums/search/filters/1"><b>Search</b></a>
+                                    | <a id="faq" class="mainmenu nonForumLink" href="http://www.coderanch.com/how-to/java/Java-FAQ"><b>Java FAQ</b></a>
+                                    | <a id="latest" class="mainmenu" href="http://www.coderanch.com/forums/recentTopics/list">Recent Topics</a>
+                                    | <a id="flagged" class="mainmenu" href="http://www.coderanch.com/forums/posts/flagged">Flagged Topics</a>
+                                    | <a id="hottest" class="mainmenu" href="http://www.coderanch.com/forums/hottestTopics/list">Hot Topics</a>
+
+                                    <br>
+
+
+
+                                        <a id="login" class="mainmenu" href="http://www.coderanch.com/forums/user/login">Register / Login</a>
+                                        <br>
+
+                                    </td>
+                                </tr>
+                        </tbody></table>
+                    </td>
+                </tr>
+            </tbody></table>
+        </td>
+    </tr>
+    <tr>
+        <td>
+
+<script type="text/javascript" src="./Sorting-Java Comparator-predefined list (Java in General forum at JavaRanch)_files/userLocalTime.js"></script>
+<script type="text/javascript" src="./Sorting-Java Comparator-predefined list (Java in General forum at JavaRanch)_files/jquery.jeditable.pack.js"></script>
+<script type="text/javascript" src="./Sorting-Java Comparator-predefined list (Java in General forum at JavaRanch)_files/post_show.js"></script>
+<script type="textcomme/javascript" src="./Sorting-Java Comparator-predefined list (Java in General forum at JavaRanch)_files/post.js"></script>
+<script type="text/javascript" src="./Sorting-Java Comparator-predefined list (Java in General forum at JavaRanch)_files/pagination.js"></script>
+<script type="text/javascript" src="./Sorting-Java Comparator-predefined list (Java in General forum at JavaRanch)_files/wz_tooltip.js"></script>
+
+
+<script type="text/javascript">
+var CONTEXT_PATH = "";
+function showEmail(beforeAt, afterAt)
+{
+	return beforeAt + "@" + afterAt;
+}
+
+function addBookmark(relationType, relationId)
+{
+	var w = window.open('/forums/bookmarks/insert/' + relationType + '/' + relationId + '', 'bookmark_add', 'width=700, height=200, scrollbars=auto, resizable=true');
+	w.focus();
+}
+var forumUrlPrefix = "/forums";
+var imagesServedFrom = "http://cache-www.coderanch.com";
+
+
+    function reportToModerationPrompt(postId, topicId) {
+        var reason = prompt("Please explain why you feel this post is either abusive or in violation of forum policies or needs to be copied or moved to a different forum:");
+
+        if (reason == null || reason == "") {
+            alert("You have cancelled reporting this thread or missed providing a reason.  If you still want to report this thread, please click report again.");
+            return false;
+        } else {
+        	var link = '/jforum?module=posts&action=reportToModerator&post_id=' + postId + '&topic_id=' + topicId;
+            link += "&reason=" + encodeURIComponent(reason);
+        }
+        submitForm(link);
+
+        return true;
+    }
+
+    var watchImage = "http://cache-www.coderanch.com/templates/default/images/watch_topic_start.gif";
+    var unwatchImage = "http://cache-www.coderanch.com/templates/default/images/stop_watching.gif";
+    var watchURL = "/forums/posts/watch/0/380076";
+    var unwatchURL = "/forums/posts/unwatch/0/380076";
+    var unwatchHandler = function() { turnOn=false; toggleWatch(); return false; };
+    var watchHandler = function() { turnOn=true; toggleWatch(); return false; };
+    var turnOn, remove;
+
+    function toggleWatch () {
+        $.ajax({
+            url: turnOn ? watchURL : unwatchURL,
+            type: 'POST',
+            dataType: 'json',
+            headers: {'OWASP_CSRFTOKEN': '1K84-WRSS-EOIK-911D-G0SU-X18X-7NA2-9K7V'},
+            success: function (data) {
+                //$("#messages").html(data.message);
+                if (turnOn) {
+                    $(".toggleWatchImage")[0].src = unwatchImage;
+                    $(".toggleWatchImage")[1].src = unwatchImage;
+                    $(".toggleWatchLink")[0].href = unwatchURL;
+                    $(".toggleWatchLink")[1].href = unwatchURL;
+                    $(".toggleWatchLink")[0].onclick = unwatchHandler;
+                    $(".toggleWatchLink")[1].onclick = unwatchHandler;
+                } else {
+                    if (remove) {
+                        // for unwatching locked topics
+                        $(".toggleWatchImage")[0].style.visibility = "hidden";
+                        $(".toggleWatchImage")[1].style.visibility = "hidden";
+                        $(".toggleWatchLink")[0].href = "#";
+                        $(".toggleWatchLink")[1].href = "#";
+                        $(".toggleWatchLink")[0].onclick = "return false;";
+                        $(".toggleWatchLink")[1].onclick = "return false;";
+                    } else {
+                        $(".toggleWatchImage")[0].src = watchImage;
+                        $(".toggleWatchImage")[1].src = watchImage;
+                        $(".toggleWatchLink")[0].href = watchURL;
+                        $(".toggleWatchLink")[1].href = watchURL;
+                        $(".toggleWatchLink")[0].onclick = watchHandler;
+                        $(".toggleWatchLink")[1].onclick = watchHandler;
+                    }
+                }
+            }
+        });
+    }
+
+
+</script>
+
+
+<script>
+function submitForm(newAction) {
+	var form = document.helperForm;
+	form.action = newAction;
+	helperForm.submit();
+}</script>
+<form id="helperForm" name="helperForm" action="http://www.coderanch.com/t/380076/java/java/Sorting-Java-Comparator-predefined-list#" method="post"><input type="hidden" name="OWASP_CSRFTOKEN" value="1K84-WRSS-EOIK-911D-G0SU-X18X-7NA2-9K7V"></form>
+
+<table cellspacing="0" cellpadding="10" width="97%" align="center" border="0">
+    <tbody><tr>
+        <td class="bodyline">
+        <span class="nav">
+            <a class="maintitle" href="http://www.javaranch.com/">JavaRanch</a> » <a class="maintitle" href="http://www.coderanch.com/forums">Java Forums</a> »
+            <a class="maintitle" href="http://www.coderanch.com/forums/c/1/java">Java</a> »
+            <a class="maintitle" href="http://www.coderanch.com/forums/f-1/java">Java in General</a>
+        </span>
+
+
+
+            
+<table cellspacing="2" cellpadding="2" width="100%" border="0" class="threadbar">
+  <tbody><tr>
+    <td align="left" valign="middle">
+    			<img class="opaque" title="You must login or register" src="./Sorting-Java Comparator-predefined list (Java in General forum at JavaRanch)_files/bookmark_it.gif" alt="Bookmark &quot;Sorting-Java Comparator-predefined list&quot;" width="82" height="25">
+		<img class="opaque" title="You must login or register" src="./Sorting-Java Comparator-predefined list (Java in General forum at JavaRanch)_files/watch_topic_start.gif" alt="Watch &quot;Sorting-Java Comparator-predefined list&quot;" width="82" height="25">
+    </td>
+    <td align="right">
+      	<img class="opaque" title="You must login or register" alt="New topic" src="./Sorting-Java Comparator-predefined list (Java in General forum at JavaRanch)_files/post.gif" width="82px" height="25px">
+    </td>    
+  </tr>
+</tbody></table>
+
+            <a name="1660222">
+
+
+                </a><table id="postTable" class="forumline" cellspacing="0" cellpadding="0" width="100%" border="0">
+                                <tbody><tr>
+                    <th class="author" nowrap="nowrap" width="18%">Author</th>
+                    <th class="subject">
+                        <h1>                            <span id="topicSubject">Sorting-Java Comparator-predefined list</span>
+                        </h1>
+                    </th>
+                </tr>
+
+
+
+
+
+                    <tr class="firstRowOfPost">
+
+
+
+                        <td class="row1 userPostInfo" valign="top" align="left" rowspan="2">
+                            <a name="1660222"></a>
+<span class="authorName"><a href="http://www.coderanch.com/forums/user/profile/125204">suresh saro</a></span>
+
+
+<br>
+
+<span class="gensmall">
+    Greenhorn
+    <br>
+
+<br>
+
+
+    Joined: May 22, 2006<br>
+    Posts: 4
+<br>
+
+
+</span>
+
+
+
+
+                        </td>
+
+                        <td colspan="1" class="row1" valign="top">
+<div class="postinfo row1">
+	<div class="date">
+		<span class="postdetails">posted <script>"Jun 05, 2006 22:55:00".toLocaleDateTime();</script>6/5/2006 5:55 PM<noscript>&lt;span class="lastPostTime"&gt;Jun 05, 2006 16:55:00&lt;/span&gt;</noscript></span>
+
+		<img class="opaque" alt="purple mooseage" title="You must login or register" src="./Sorting-Java Comparator-predefined list (Java in General forum at JavaRanch)_files/icon_pm.gif" width="59px" height="18px">
+
+
+    </div>
+	<div class="action">
+			<div id="like_message_1660222" class="likesHiddenDiv">
+				<img src="./Sorting-Java Comparator-predefined list (Java in General forum at JavaRanch)_files/thumbs-up.gif">
+				0        
+			</div>
+	</div>
+</div>
+                        </td>
+                    </tr>
+
+
+                    <tr class="messageRow">
+
+                        <td class="row1 postbody" valign="top" id="post_text_1660222">
+
+                            <span class="postbody">
+                                    I want to sort the items in my list with a predefined order....Is it possible? I can sort my List using a natural sort as in the below example. But that is not am looking for.....Am looking for sorting my list using an already defined order which i can hold using another list. IS IT POSSIBLE USING Comparator<br>  <br> import java.util.*;<br>  <br> public class TestUsingMe {<br> static class AppComparator implements <br> Comparator {<br> public int compare(Object o1, Object o2) { <br> int cc = ((Integer)o1).compareTo(o2);<br> return (cc &lt; 0 ? 1 : cc &gt; 0 ? -1 : 0);<br> }<br> }<br>  <br> static Comparator appcomparator = <br> new AppComparator();<br>  <br> static void sort(List list1) {<br> Collections.sort(list1, appcomparator);<br> }<br>  <br> public static void main(<a href="http://www.coderanch.com/t/410859/java/java/String-StringBuffer-StringBuilder-Performance" class="api" title="String vs. StringBuilder/StringBuffer" target="_new">String</a>[] args) {<br> List list1 = new <a href="http://docs.oracle.com/javase/7/docs/api/java/util/ArrayList.html" class="api" title="Java API" target="_new">ArrayList</a>();<br> list1.add(new Integer(90));<br> list1.add(new Integer(43));<br> list1.add(new Integer(21));<br>  <br> sort(list1);<br>  <br> System.out.println(list1);<br> }<br> }<br>  <br> Please reply................<br>  <br> [ June 05, 2006: Message edited by: suresh saro ]<br> [ June 09, 2006: Message edited by: suresh saro ]<br> 
+                            </span>
+
+
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td class="spacerow row1" colspan="2" height="1"><img src="./Sorting-Java Comparator-predefined list (Java in General forum at JavaRanch)_files/spacer.gif" alt="" width="1" height="1"></td>
+                    </tr>
+
+
+
+                    <tr class="firstRowOfPost">
+
+
+
+                        <td class="row2 userPostInfo" valign="top" align="left" rowspan="2">
+                            <a name="1660223"></a>
+<span class="authorName"><a href="http://www.coderanch.com/forums/user/profile/50417">Purushoth Thambu</a></span>
+
+
+<br>
+
+<span class="gensmall">
+    Ranch Hand
+    <br>
+
+<br>
+
+
+    Joined: May 24, 2003<br>
+    Posts: 425
+<br>
+
+
+</span>
+
+
+
+
+                        </td>
+
+                        <td colspan="1" class="row2" valign="top">
+<div class="postinfo row2">
+	<div class="date">
+		<span class="postdetails">posted <script>"Jun 06, 2006 00:06:00".toLocaleDateTime();</script>6/5/2006 7:06 PM<noscript>&lt;span class="lastPostTime"&gt;Jun 05, 2006 18:06:00&lt;/span&gt;</noscript></span>
+
+		<img class="opaque" alt="purple mooseage" title="You must login or register" src="./Sorting-Java Comparator-predefined list (Java in General forum at JavaRanch)_files/icon_pm.gif" width="59px" height="18px">
+
+
+    </div>
+	<div class="action">
+			<div id="like_message_1660223" class="likesHiddenDiv">
+				<img src="./Sorting-Java Comparator-predefined list (Java in General forum at JavaRanch)_files/thumbs-up.gif">
+				0        
+			</div>
+	</div>
+</div>
+                        </td>
+                    </tr>
+
+
+                    <tr class="messageRow">
+
+                        <td class="row2 postbody" valign="top" id="post_text_1660223">
+
+                            <span class="postbody">
+                                    It would help if you refine your question. Are you looking to have the elements in the collection presorted (sorted while inserting)? <a href="http://docs.oracle.com/javase/7/docs/api/java/util/ArrayList.html" class="api" title="Java API" target="_new">ArrayList</a> do not implement internal sort. If you want your elements to be sorted you have to use <a href="http://docs.oracle.com/javase/7/docs/api/java/util/TreeSet.html" class="api" title="Java API" target="_new">TreeSet</a> or Hashtable. <a href="http://docs.oracle.com/javase/7/docs/api/java/util/TreeSet.html" class="api" title="Java API" target="_new">TreeSet</a> can take Comparator as an argument.
+                            </span>
+
+
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td class="spacerow row2" colspan="2" height="1"><img src="./Sorting-Java Comparator-predefined list (Java in General forum at JavaRanch)_files/spacer.gif" alt="" width="1" height="1"></td>
+                    </tr>
+
+
+
+                    <tr class="firstRowOfPost">
+
+
+
+                        <td class="row1 userPostInfo" valign="top" align="left" rowspan="2">
+                            <a name="1660224"></a>
+<span class="authorName"><a href="http://www.coderanch.com/forums/user/profile/21266">Mr. C Lamont Gilbert</a></span>
+
+
+<br>
+
+<span class="gensmall">
+    Ranch Hand
+    <br>
+
+<br>
+
+
+    Joined: Oct 05, 2001<br>
+    Posts: 1170
+<br>
+
+
+</span>
+
+
+<br>
+
+<div class="bumperStickers">
+    <a class="nonForumLink" href="http://www.coderanch.com/how-to/java/BumperStickers" target="_blank">I like...</a><br>
+        <img src="./Sorting-Java Comparator-predefined list (Java in General forum at JavaRanch)_files/16_eclipse.gif" alt="Eclipse IDE" title="Eclipse IDE" border="0">
+        <img src="./Sorting-Java Comparator-predefined list (Java in General forum at JavaRanch)_files/16_hibernate.gif" alt="Hibernate" title="Hibernate" border="0">
+        <img src="./Sorting-Java Comparator-predefined list (Java in General forum at JavaRanch)_files/16_ubuntu.gif" alt="Ubuntu" title="Ubuntu" border="0">
+</div>
+
+
+                        </td>
+
+                        <td colspan="1" class="row1" valign="top">
+<div class="postinfo row1">
+	<div class="date">
+		<span class="postdetails">posted <script>"Jun 06, 2006 14:06:00".toLocaleDateTime();</script>6/6/2006 9:06 AM<noscript>&lt;span class="lastPostTime"&gt;Jun 06, 2006 08:06:00&lt;/span&gt;</noscript></span>
+
+		<img class="opaque" alt="purple mooseage" title="You must login or register" src="./Sorting-Java Comparator-predefined list (Java in General forum at JavaRanch)_files/icon_pm.gif" width="59px" height="18px">
+
+
+    </div>
+	<div class="action">
+			<div id="like_message_1660224" class="likesHiddenDiv">
+				<img src="./Sorting-Java Comparator-predefined list (Java in General forum at JavaRanch)_files/thumbs-up.gif">
+				0        
+			</div>
+	</div>
+</div>
+                        </td>
+                    </tr>
+
+
+                    <tr class="messageRow">
+
+                        <td class="row1 postbody" valign="top" id="post_text_1660224">
+
+                            <span class="postbody">
+                                    Sure if your comparator has a reference to that other list.  However it gets tricky because some collections don't like their sort order changing after items are entered and wont respect that change.  You may have to sort as you put them into a new sorted list if the order will change after the insert.
+                            </span>
+
+
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td class="spacerow row1" colspan="2" height="1"><img src="./Sorting-Java Comparator-predefined list (Java in General forum at JavaRanch)_files/spacer.gif" alt="" width="1" height="1"></td>
+                    </tr>
+
+
+
+                    <tr class="firstRowOfPost">
+
+
+
+                        <td class="row2 userPostInfo" valign="top" align="left" rowspan="2">
+                            <a name="1660225"></a>
+<span class="authorNameNoLink" title="You must login or register">suresh saro</span>
+
+
+<br>
+
+<span class="gensmall">
+    Greenhorn
+    <br>
+
+<br>
+
+
+    Joined: May 22, 2006<br>
+    Posts: 4
+<br>
+
+
+</span>
+
+
+
+
+                        </td>
+
+                        <td colspan="1" class="row2" valign="top">
+<div class="postinfo row2">
+	<div class="date">
+		<span class="postdetails">posted <script>"Jun 09, 2006 19:06:00".toLocaleDateTime();</script>6/9/2006 2:06 PM<noscript>&lt;span class="lastPostTime"&gt;Jun 09, 2006 13:06:00&lt;/span&gt;</noscript></span>
+
+		<img class="opaque" alt="purple mooseage" title="You must login or register" src="./Sorting-Java Comparator-predefined list (Java in General forum at JavaRanch)_files/icon_pm.gif" width="59px" height="18px">
+
+
+    </div>
+	<div class="action">
+			<div id="like_message_1660225" class="likesHiddenDiv">
+				<img src="./Sorting-Java Comparator-predefined list (Java in General forum at JavaRanch)_files/thumbs-up.gif">
+				0        
+			</div>
+	</div>
+</div>
+                        </td>
+                    </tr>
+
+
+                    <tr class="messageRow">
+
+                        <td class="row2 postbody" valign="top" id="post_text_1660225">
+
+                            <span class="postbody">
+                                    Yes, I managed to sort.......as in the program below....But my requirement is, I have the List that needs to be sorted, which is a list of DTO's with an attribute inside that DTO. This attribute is the criteria for sorting my List and this list needs to be sorted as predefined in the list2...as in the program....Is it possible. If possible, how is it?? Can anyone please help me.......<br>  <br> import java.util.*;<br> public class TestUsingMe {<br>     public static void main(String[] args) {<br>         List list1 = new <a href="http://docs.oracle.com/javase/7/docs/api/java/util/ArrayList.html" class="api" title="Java API" target="_new">ArrayList</a>();<br>         list1.add("Named Non-Owner");<br>         list1.add("Restored");<br>         list1.add("Antique/Classic");<br>  <br>         List list2 = new <a href="http://docs.oracle.com/javase/7/docs/api/java/util/ArrayList.html" class="api" title="Java API" target="_new">ArrayList</a>();<br>         list2.add("Private Passenger");<br>         list2.add("Restored");<br>         list2.add("Antique/Classic");<br>         list2.add("Named Non-Owner");<br>         list2.add("Trailer");<br>  <br>         AppComparator appcomparator = new AppComparator(list2);<br>         Collections.sort(list1, appcomparator);<br>  <br>         System.out.println(list1);<br>         System.out.println(list2);<br>     }<br>  <br>     static class AppComparator implements Comparator {<br>         private List list;<br>  <br>         public AppComparator(List list) {<br>             this.list = list;<br>         }<br>  <br>         public int compare(Object o1, Object o2) {<br>             return list.indexOf(o1) - list.indexOf(o2);<br>         }<br>     }<br> }
+                            </span>
+
+
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td class="spacerow row2" colspan="2" height="1"><img src="./Sorting-Java Comparator-predefined list (Java in General forum at JavaRanch)_files/spacer.gif" alt="" width="1" height="1"></td>
+                    </tr>
+
+            <tr>
+            <td width="18%" bgcolor="#DEC7A4"><img src="./Sorting-Java Comparator-predefined list (Java in General forum at JavaRanch)_files/bunkhouse_smoke.gif"></td>
+            <td width="82%" align="left" valign="top" bgcolor="#DEC7A4">
+                &nbsp;<br>
+                    <div align="left" class="shngl">
+                        <span style="font-size: 12px; line-height: 1.5em;">
+I agree.  Here's the link:  <a href="http://www.coderanch.com/forums/banner/redirect/593">http://aspose.com/file-tools</a></span>
+                    </div>
+                &nbsp;<br>
+                </td>
+                </tr>
+                <tr class="postbody" align="left">
+                    <td colspan="2">
+                    subject: Sorting-Java Comparator-predefined list
+                    </td>
+                </tr>
+
+                <tr align="center">
+                    <td class="catbottom" colspan="2" height="28">
+                        <table cellspacing="0" cellpadding="0" border="0">
+                            <tbody><tr>
+                                <td align="center"><span class="gensmall">&nbsp;</span></td>
+                            </tr>
+                        </tbody></table>
+                    </td>
+                </tr>
+            </tbody></table>
+
+
+            <table width="100%" align="center">
+
+
+                    <tbody><tr class="subject"><th>Similar Threads</th></tr>
+                    <tr>
+                            </tr><tr align="center">
+                                <td class="row1 gen"><a href="http://www.coderanch.com/t/340972/GUI/java/TableSorter-Selection-problems">
+                                    TableSorter and Selection gives problems</a>
+                                </td>
+                            </tr>
+                            <tr align="center">
+                                <td class="row2 gen"><a href="http://www.coderanch.com/t/404271/java/java/Sorting-java-lang-objects">
+                                    Sorting java.lang.objects</a>
+                                </td>
+                            </tr>
+                            <tr align="center">
+                                <td class="row1 gen"><a href="http://www.coderanch.com/t/410917/java/java/sorting-arrays-descending-order">
+                                    sorting arrays in descending order</a>
+                                </td>
+                            </tr>
+                            <tr align="center">
+                                <td class="row2 gen"><a href="http://www.coderanch.com/t/449546/java-programmer-SCJP/certification/comparable-comparator-interface">
+                                    comparable and comparator interface</a>
+                                </td>
+                            </tr>
+                            <tr align="center">
+                                <td class="row1 gen"><a href="http://www.coderanch.com/t/346386/GUI/java/Sorting-Rows-JTable-Component-Based">
+                                    Sorting the Rows in a JTable Component Based on a Column</a>
+                                </td>
+                            </tr>
+                    
+            </tbody></table>
+        </td>
+    </tr>
+</tbody></table>
+
+
+<a name="quick"></a>
+
+
+		</td>
+	</tr>
+</tbody></table>
+<div class="gensmall center">
+<script>
+document.write("All times above are in your local time zone & format.");
+document.write("The current ranch time (not your local time) is ");
+document.write("Feb 15, 2014 19:47:22".bold() + ".");
+</script>All times above are in your local time zone &amp; format.The current ranch time (not your local time) is <b>Feb 15, 2014 19:47:22</b>.<noscript>All times are in JavaRanch time: GMT-6 in summer, GMT-7 in winter</noscript>
+</div>
+
+
+
+<script type="text/javascript">
+	var gaJsHost = (("https:" == document.location.protocol) ?  "https://ssl." : "http://www.");
+	document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script><script src="./Sorting-Java Comparator-predefined list (Java in General forum at JavaRanch)_files/ga.js" type="text/javascript"></script>
+<script type="text/javascript">
+if (typeof _gat !== "undefined") {
+	var pageTracker = _gat._getTracker("UA-2371260-2");
+	pageTracker._trackPageview();
+
+	dt = new Date();
+	pageTracker._setVar("hour: " + dt.getHours());
+}
+</script>
+
+<br>
+<div class="float-divider"></div>
+<div id="footer">
+ <div class="footerLinksDiv center">
+	<a class="nonForumLink" href="http://www.coderanch.com/how-to/code/ContactUs">Contact Us</a>
+	| Powered by <a href="http://www.jforum.net/" target="_blank">JForum</a>
+	| <span class="copyrightOwner">Copyright © 1998-2014 <a href="http://www.javaranch.com/paul-wheaton.jsp">Paul Wheaton</a></span>
+ </div>
+</div>
+<div class="float-divider"></div>
+
+
+
+
+
+</body></html>

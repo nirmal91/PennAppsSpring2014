@@ -1,0 +1,8 @@
+When two or more computer users are sharing a networked peripheral like a printer, there can be a turf war of sorts, since peripherals that connect using U.S.B. cables must be situated no more than about five yards from at least one of the computers on the network.
+The Keyspan U.S.B. Server, however, provides a way to locate up to four U.S.B. devices in neutral territory -- or at least somewhere more convenient.
+''You have much more freedom of location with this device,'' said Mike Ridenhour, president of Keyspan (www.keyspan.com).
+The server, which is expected to reach stores by the end of March with a suggested price of $130, connects to any wired network by means of a standard Ethernet cable. It can also be used with wireless networks whose base stations have a port for an Ethernet cable.
+The server supports all common networking standards, but is compatible only with computers using Windows 2000 or XP, or version 10.2.8 or later of the Macintosh operating system.
+In practice, Mr. Ridenhour said, most people will probably use the servers to move noisy devices like printers or scanners to places where they will not bother people. He also said the server provides a handy way for Wi-Fi-based laptop owners to connect to several remote U.S.B. devices without a single cable.
+Ian Austen
+NEWS WATCH: CONNECTIVITY

@@ -1,0 +1,7 @@
+A technology called Digital ICE has long been used in professional film scanners and digital photo finishing labs to remove scratches and dust marks on film without creating blurriness.
+Now, the Epson Perfection 4870 Photo brings the technology, developed by Eastman Kodak, to a $500 flatbed scanner designed for serious amateur photographers.
+Epson says the scanner's exceptionally high maximum resolution, 4,800 dots per inch, along with the use of Digital ICE means that amateurs no longer have to turn to dedicated film scanners for high-quality results. ''People no longer have to think of buying two scanners,'' said Ali Atash, Epson's product manager for professional and consumer scanners.
+As with professional scanners, the Digital ICE system in the 4870 makes two complete scans at slightly different angles, using both visible and infrared light, of a negative or slide. Software compares the two images to locate dust and scratches, then blots them out digitally.
+Often flatbed scanners for consumers are equipped with flimsy negative holders that can be difficult to use or fail to hold the film flat, resulting in a blurry scan. Mr. Atash said the negative guides for the new scanner were as substantial as those on professional models. ''We were thinking of the pro user,'' he said.
+Ian Austen
+NEWS WATCH: SCANNERS

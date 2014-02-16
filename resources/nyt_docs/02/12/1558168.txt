@@ -1,0 +1,6 @@
+How can you be sure that a digital print will look the same as the image you see on your computer screen? Correcting the screen image by eye is tricky, even with software to help. Instruments can do the job more accurately and consistently, but until now they have had high prices.
+Pantone ColorVision's Spyder system ($150, including Adobe Photoshop Album) can solve the problem. Plug its three-legged colorimeter into the U.S.B. port of your PC or Mac and let it hang it over your monitor screen for a few minutes while Spyder checks the monitor's performance and changes the computer's color settings to display images accurately.
+After that, you will know in advance what your images will look like in a print.
+That will save you not only time but also money since you won't be wasting paper on printouts, a good thing to know if you need to justify the Spyder's cost.
+Ivan Berger
+NEWS WATCH: DISPLAY

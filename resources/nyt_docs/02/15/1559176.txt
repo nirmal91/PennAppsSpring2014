@@ -1,0 +1,15 @@
+The world champions have always been the greatest players of their epochs. It is only the current titleholder, Vladimir Kramnik of Russia, who fails to uphold this honor. Kramnik brilliantly defeated Garry Kasparov in their title match in 2000, winning two games, losing none, but he has not shown what he can do since.
+In his entire reign as champion, Kramnik has not contested another championship match, nor has he equaled Kasparov's No. 1 mathematical ranking, occupying second place on the list of the best on the contemporary scene -- until now.
+In the Corus Wijk aan Zee International Tournament a few weeks ago, he lost three games and finished in a tie for sixth. In the February Professional Chess Rankings, he has dropped to third place behind Viswanathan Anand. For almost anyone else that would be a stellar perch, but not for a world champion.
+He has taken a step toward regaining his standing, though. In late September, he plans to play a 14-game title match with the Hungarian grandmaster Peter Leko.
+In Wijk aan Zee, Kramnik did not blunder, but rather was outplayed by all three opponents in his losses. In his game with Ivan Sokolov of the Netherlands in Round 12, he just seemed to drift while his adversary prepared and carried through a nice attack. He did manage to make it into the endgame, but he was lost there too, against accurate maneuvers by Sokolov.
+Against the Queen's Indian Defense, 4 a3 was popularized by Tigran Petrosian and later fine-tuned into a weapon of attack by Kasparov. It is remarkable how important preventing a pin with 4 Bb4 can be in this line of play.
+In a Sakaev/Grischuk game, St. Petersburg-Moscow, 2002, White played 10 Bb2 but wound up only with a draw.
+The key to Sokolov's getting a strong attacking position is 11 d5! For that reason, Kramnik might have tried 10 cd.
+After 17 Ba3, it would not be wise for Sokolov to take the bishop with 18 Qa3 because 18 Re4 19 Kf1 Qd5 20 Bd3 Rf4 gives Black a lot of counterplay.
+After 21 Nd4, Sokolov's advantage lay in the strength of his center pawns, which cut the black queen bishop out of play.
+With 26 b5, Kramnik gave up a pawn looking for counterplay. He was already in difficulties.
+After 31 Bc7 32 Rc1 Qb6, Sokolov gave up the exchange with 33 Rc7 Qc7 to win another pawn with 34 Rf6 Rf6 35 Qf6.
+It would have been useless for Kramnik to try 35 a6 36 Be2 Rf8 37 Qb2 Rc8 38 Bd1 Ba8 39 d6 Qc3 40 Qb3 Qb3 41 Bb3 Kf8 42 Ng5 Ke8 43 Nh7 because the white passed pawns win easily.
+But 35 Rf8 was no better. After 36 Qb2 Rc8 37 d6 Qc1 38 Qc1 Rc1 39 Ke2 Rc8 40 Ng5 a6 41 Ba4, Kramnik gave up.
+CHESS

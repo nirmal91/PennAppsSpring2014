@@ -1,0 +1,7 @@
+A GAS-GUZZLER riddle: If the Rolls-Royce Phantom has an E.P.A. rating of 13 miles per gallon in town and 19 on the highway, and is subject to a $3,000 guzzler tax, how much is the tax on a Maybach, with an economy rating of 12/17?
+Answer: absolutely nothing.
+At a glance, it would seem that both cars would incur the penalty, since the combined fuel economy of each falls below the tax threshold of 21.5 m.p.g. (Warning: Do not attempt to compute this at home. The E.P.A. bases its calculations on a combined figure that is not a simple average of the city and highway numbers. Nor are those figures listed on the E.P.A.'s fuel economy Web site.)
+The distinction is weight. The Maybachs are too heavy to be taxed.
+An empty Rolls weighs 5,577 pounds. The short-wheelbase Maybach 57 weighs 6,050 pounds, and the longer 62 is 6,340. I.R.S. rules exempt passenger cars that weigh more than 6,000 pounds.
+To verify the numbers, you might click www.fueleconomy.gov, but as of Friday the site listed the Maybach as being taxed -- an error, said David Deegan, an E.P.A. spokesman, who added that a correction would be made.
+NORMAN MAYERSOHN

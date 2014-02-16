@@ -1,0 +1,6 @@
+If you're like me, you may feel a bit unnerved when a $10 children's toy appears to read your mind, but Radica's 20Q does something very much like that. A palm-sized plastic device with a digital display and few buttons, 20Q promises that it can name the object you are thinking about based on your answers to 20 questions. You can answer ''yes,'' ''no,'' ''sometimes'' or ''unknown'' to questions like ''Is it flat?'' and ''Is it heavier than a pound of butter?''
+20Q will sometimes stop to taunt you, displaying messages like ''You can't beat me'' or ''You thought you were tricky.'' After 20 questions, it will name the object, although if it guesses wrong it will ask five more questions and take a second guess before admitting defeat.
+Available at Kmart and Target for $9.99, 20Q uses the same software that powers the Web site www.20q.net, although unlike the site, which is part of an ongoing artificial intelligence project that records and learns from its failures, 20Q cannot learn from its mistakes.
+It is amazing that a simple electronic device can deduce a thought. But while 20Q can easily guess objects like a guitar, a frying pan or a loaf of bread, there is at least one thing that tricks it into giving such incorrect answers as a Magic 8 Ball or an MP3 player. The object that stumps it? The 20Q.
+Charles Herold
+NEWS WATCH: TOYS

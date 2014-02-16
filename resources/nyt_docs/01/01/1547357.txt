@@ -1,0 +1,22 @@
+SEVERAL companies have jumped onto the legal-music bandwagon (with more to come), and most have followed the trail blazed by Apple Computer with its iTunes Music Store last spring: thousands of songs available, freedom to play the music on multiple computers and portable audio players, and the ability to burn the purchased tracks onto a compact disc.
+Compared with services that allow only streaming -- the digital equivalent of hearing a song on the radio any time you wish -- a file-download service is more like buying the single and taking it with you to play wherever you go.
+A high-speed Internet connection is advised, and if you want music on the go, an MP3 player that can play song files encoded with Windows Media Digital Rights Management software is needed for many of the PC-based services. That's because they use features of the Windows Media Audio format to restrict unauthorized copying and sharing of song files, the practice that got the original Napster and other file-sharing services into legal hot water.
+J.D. Biersdorfer
+MusicMatch
+www.musicmatch.com
+FILE FORMAT -- Copy-protected Windows Media Audio (W.M.A.) files. PRICES -- About 99 cents per track or $10 per album. SUBSCRIPTION -- Not required, but available for $5 a month for streaming and music-finding services. FEATURES -- Catalog of 360,000 songs, which can be burned onto a CD and downloaded to many compatible Creative, Dell and Rio portable audio players. Three computers at a time can play the purchased tracks. (For Windows 98SE and later.)
+Napster 2.0
+www.napster.com
+FILE FORMAT -- Copy-protected W.M.A. files. PRICES -- Tracks are 99 cents each; albums cost around $10. SUBSCRIPTION -- Not required, but offered as a streaming service for an extra $10 a month. FEATURES -- Once the first name in illegal downloads, it has been reborn as a legal service with half a million songs, which can be played on three PC's and burned to disc. Downloading to a portable player is easiest if you have the $350 Samsung Napster YP-910GS 20-gigabyte jukebox; otherwise you need Windows Media Player software. (For Windows 2000 and later.)
+Wal-Mart
+musicdownloads.walmart.com
+FILE FORMAT -- Copy-protected W.M.A. files. PRICES -- 88 cents per song; about $9 for an album. SUBSCRIPTION -- None. FEATURES -- Relies on Windows Media Player 9 to play the music once downloaded. Songs can be played on three computers, burned to CD and transferred to compatible audio players. As with CD's sold in Wal-Mart stores, edited versions -- songs with explicit lyrics removed -- are often available. (For Windows 98SE and later.)
+BuyMusic
+www.buymusic.com
+FILE FORMAT -- Copy-protected W.M.A. files. PRICES -- Songs begin at 79 cents, albums at $8. SUBSCRIPTION -- None. FEATURES -- Uses Windows Media Player 9 as the jukebox program for managing the music. Thousands of major-label songs, but legal rights (like whether you can burn songs to a CD or transfer them to a portable player) vary according to record label, frustrating many users. (For Windows 98 and later.)
+Rhapsody
+www.listen.com
+FILE FORMAT -- No downloads; streaming music and CD burning only. PRICES -- 79 cents per song to burn onto a disc. SUBSCRIPTION -- Required; $10 a month, including unlimited streaming. FEATURES -- Rhapsody is not so much an online store as a virtual concert hall where you listen to the company's 400,000 songs as often as you want. Not all songs are available for CD burning. (For Windows 98SE and later.)
+iTunes Music Store
+www.apple.com/itunes
+FILE FORMAT -- Copy-protected Advanced Audio Coding (A.A.C.) files. PRICES -- 99 cents per song; album prices start at $10. SUBSCRIPTION -- None. FEATURES -- The site, an integrated part of Apple's iTunes jukebox software, offers 400,000 tracks, 5,000 audio books from Audible.com and allowance accounts for those too young for credit cards. Songs can be played on up to three computers, burned to a CD and downloaded to any portable player as long as it is an iPod. (For Macintosh OS X and Windows 2000 and later.)

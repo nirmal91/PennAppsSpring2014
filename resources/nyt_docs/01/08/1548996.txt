@@ -1,0 +1,9 @@
+The Lightglove, a computer controller that uses light to create virtual buttons and control the cursor, makes the hand more powerful than ever before. It is also a boon to computer users who cannot manipulate a conventional keyboard or mouse.
+Worn on the wrist, the controller allows you to use your hand as a wireless mouse, virtual typist or remote control. It scans the underside of your hand to detect physical motion, then radios that information to a base station plugged into a computer's U.S.B. port.
+Bruce Howard, an electrical engineer in Catharpin, Va., designed the Lightglove to help his mother, a graphic artist who developed carpal tunnel syndrome.
+''Her case was severe,'' Mr. Howard said. ''I knew there had to be a better way. So I developed the Lightglove to act as a virtual mouse that adjusts to the size and shape of your hand.'' Like any mouse, the Lightglove can also be used to hunt and peck on a keyboard on the computer's screen.
+The Lightglove is expected to become available in May for $399 at www.lightglove.com.
+Mr. Howard said he expects to adapt the Lightglove to work with telephones, entertainment centers, gaming platforms, household appliances, electronic musical instruments and ATM's.
+The device may also prove useful for medical workers who use computers in sterile environments, he added.
+Adam Baer
+NEWS WATCH: PERIPHERALS

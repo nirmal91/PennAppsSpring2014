@@ -1,0 +1,24 @@
+Microsoft said yesterday that it was repositioning its money-losing MSN Internet service operation to compete more directly with Yahoo's personalized Web portal and America Online's broadband premium service.
+At the same time, it is planning a new MSN premium service, priced at $9.95 monthly and modeled after Apple Computer's .Mac Internet-based customer support service.
+The strategy shift was announced by Microsoft's chairman, Bill Gates, in a speech in Las Vegas on the opening night of the annual Consumer Electronics Show.
+The shift represents a concession by Microsoft, which has invested billions trying to unseat America Online as the leading Internet service provider.
+The company, based in Redmond, Wash., makes a profit from its Windows and Office products, but lost $299 million in its MSN business in 2003.
+Both Microsoft and AOL are struggling with customers who are moving away from dial-up Internet connections to high-speed broadband connections. Industry analysts said that Microsoft started a $300 million marketing campaign 14 months ago to attract dial-up users, and has decided to abandon that effort.
+Microsoft will continue to provide dial-up Internet access to subscribers, but it is now focused on competing against Yahoo's Web portal business, as well as AOL's new broadband services. Microsoft's executives said that the company planned to revamp its Internet search service later this year to compete more effectively with Google, the Internet search engine company.
+''This is not a business that our research and development power could bring anything to,'' Mr. Gates said, referring to the Internet access business in a telephone interview before his presentation.
+''We weren't confused about that,'' he said. ''We stayed in the access business for a while, and then we decided it wasn't for us.''
+The Microsoft executive who heads the MSN service, Yusuf Mehdi, said that Microsoft generated $1 billion annually in online advertising revenue and saw growth opportunities in creating a Yahoo-style Web portal and Google-style search-based advertising.
+As part of the company's strategy shift, it will redesign the MSN.com home page and enhance its My MSN customizable home page.
+''This is a major bet for us to get a relationship with people where we know more about their habits and usage,'' Mr. Mehdi said.
+The company said that the MSN division would not use any of the controversial ''Hailstorm'' technologies that can personalize activity on the Internet in its new customization and tracking service. It also said that it would not store or use personal information acquired from customers. Consumer groups have been worried about the privacy issues raised by those technologies, which began development in 2000.
+As a result of privacy fears raised by the Hailstorm project, Microsoft is now operating under a consent decree with the Federal Trade Commission to not misuse its customers' personal information.
+''This doesn't look like Hailstorm Part 2, but it does sound like son of Hailstorm,'' said David Card, a media analyst at Jupiter Research, a research firm based in New York City.
+Internet privacy experts warned that Microsoft would have to tread carefully as it pushed more aggressively into online advertising.
+''Internet advertising has always raised significant privacy issues, and several companies have run aground when they crossed the line with respect to Internet users' expectations of privacy,'' said Marc Rotenberg, director of the Electronic Privacy Information Center, a Washington-based group that follows privacy issues.
+An AOL spokesman said today that the Microsoft plans showed that the future lay in broadband services and enhanced content features.
+''This is great news for us and validation of our strategy during the past year,'' said an AOL spokesman, Andrew Weinstein.
+He said that Internet consumers were realizing that a broadband ''pipe'' is not enough, and that they were looking for added services like computer virus protection, spam blocking and other advanced services.
+Microsoft said that in addition to redesigning its free MSN.com home page, it would offer a premium service for $9.95 a month, or $99.95 annually, to provide enhanced security and antispam features and advanced information services like photo editing and MSN Money Plus.
+Microsoft also said yesterday that five companies -- Creative Labs, iRiver International, Samsung Electronics, Sanyo Electric and ViewSonic -- have agreed to build Portable Media Centers, hand-held computers that display digital video, using Microsoft software.
+Microsoft gave a similar demonstration of hand-held movie viewers last year. The company said that the systems would go on sale in the second half of this year.
+TECHNOLOGY

@@ -1,0 +1,34 @@
+A $22 million system to allow soldiers and other Americans overseas to vote via the Internet is inherently insecure and should be abandoned, according to a report by computer security experts asked to review the new program.
+The system, the Secure Electronic Registration and Voting Experiment, or Serve, was developed with financing from the Defense Department and will first be used in the primaries this year.
+The review, requested by the government, noted that experts had voiced increasingly strong warnings about the reliability of electronic voting systems. It said the new program, restricted to voters overseas using personal computers to vote using the Internet, raised the ante on the risks of such systems.
+Serve, the panel members wrote, ''has numerous other fundamental security problems that leave it vulnerable to a variety of well-known cyberattacks, any one of which could be catastrophic.''
+Any system for voting over the Internet with common personal computers, the report noted, would run the same risks.
+The Trojan horses, viruses and other attacks that complicate modern life and allow crimes like online snooping and identity theft could allow hackers to disrupt or even alter the course of elections, the report concluded. A major American election would be an irresistible target for hackers, and the ability of computers to automate tasks means that many attacks could be carried out on a large scale, the report added.
+Such attacks ''could have a devastating effect on public confidence in elections,'' the authors wrote, adding, ''The best course to take is not to field the Serve system at all.''
+A spokesman for the Pentagon said the critique overstated the importance of the risks.
+''The Department of Defense stands by the Serve program,'' the spokesman, Glenn Flood, said. ''We feel it's right on, at this point, and we're going to use it.''
+An official of Accenture, of Manhattan, the consulting and technical services company that is the main contractor on the project, said the researchers drew unwarranted conclusions about plans for the project.
+''We are doing a small controlled experiment,'' Meg T. McLaughlin, president of Accenture eDemocracy Services, said.
+The Federal Voting Assistance Program, part of the Defense Department, plans to introduce the program officially in a few weeks. Seven states have signed up to participate, and up to 100,000 people are expected to use the system this year.
+Moving to the larger population of the six million military and civilian voters overseas is far from certain, Ms. McLaughlin said, and the final system could be quite different.
+''It will be up to Congress and the states to determine if this gets expanded and how,'' she said.
+Trying to vote overseas can be frustrating. Internet voting makes intuitive sense to Americans who have grown accustomed to buying books, banking and even finding mates online. But the authors of the report adamantly state that what works for electronic commerce does not work for electronic democracy. Online shopping failures and fraud are covered by Internet merchants and credit card companies.
+''How do we recover if an election is compromised?'' they wrote.
+Any new system, they said, ''should be as secure as current absentee voting systems and should not introduce any new or expanded vulnerabilities into the election beyond those already present.''
+One author, David Wagner, an assistant professor of computer science at the University of California at Berkeley, said, ''The bottom line is we feel the solution can't be a system that introduces greater risks just to gain convenience.''
+Some attacks may sound farfetched or arcane, said Aviel D. Rubin, an author of the report who is technical director of the Information Security Institute at Johns Hopkins University.
+''These are all things that occur in the wild that we see all the time,'' Mr. Rubin said.
+The study said the Federal Voting Assistance Program and Accenture should not be faulted for their work, which it found innovative and conscientious.
+''There really is no good way to build such a voting system without a radical change in overall architecture of the Internet and the PC or some unforeseen security breakthrough,'' the report said.
+The risks inherent in Serve are likely to cripple any system for Internet-based voting, said Barbara Simons, a technology consultant who was a co-author of the report.
+''It's not just a Serve thing,'' she said.
+Such concerns are not new. They have formed the basis of several recent studies of Internet voting. A report in 2001 by the Internet Policy Institute said, ''Internet voting systems pose significant risk to the integrity of the voting process.''
+David R. Jefferson, an author of the new report who is a computer scientist at the Lawrence Livermore National Laboratory in California, also worked on a report in 2000 for the California secretary of state that reached similar conclusions and said that ''nothing fundamental has changed'' since the 2000 report.
+In trying to play down the critique of the system, Mr. Flood of the Pentagon called it a ''minority report,'' because it involved 4 of the 10 outside experts asked to review the system. Mr. Rubin noted that the four authors were the only members of the group who attended the two three-day briefings on the system.
+There is no majority report, because the other experts have not taken a public stance on the project.
+Ms. McLaughlin of Accenture said that her company had contacted the other six members and that five said they would not recommend closing the program.
+One other outside reviewer, Ted Selker, an associate professor at the Massachusetts Institute of Technology, disagreed with the report, saying it reflects the professional paranoia of security researchers.
+''That's their job,'' he said.
+Professor Selker, an expert on how people use technology, said security was a less pressing concern than mistakes in registration databases, poor ballot design and inadequate polling procedures.
+''Every single election machine I've seen,'' he said, ''including the lever machine, including punch card machines, including paper ballots, has vulnerabilities.''
+THE 2004 CAMPAIGN: THE INTERNET

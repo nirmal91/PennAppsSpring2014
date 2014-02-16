@@ -1,0 +1,19 @@
+Blind Rats' Compass
+To build a railroad or highway tunnel, sandhogs use laser transits and other high-tech surveying and navigation tools to ensure that once they start digging, they come out in the right place.
+Blind mole rats, on the other hand, have no technology at their disposal. They cannot even see. So how do they build their network of tunnels and find their way along them after they are built?
+Scientists in Israel and Switzerland have figured it out. The rats use the earth's magnetic field as a compass, at least for long distances.
+The researchers set up two mazes -- one that required the rats to return home from a central hub, and one that required them to find shortcuts between two locations. The mazes were placed in an apparatus that could create an electromagnetic field. By turning the apparatus on, the researchers could effectively shift the earth's magnetic field by 90 degrees.
+After training the rats to navigate the mazes, the researchers tested their ability to retrace their routes. They found that when the magnetic field was shifted, the rats had much more difficulty finding their way, particularly on longer routes. The results were reported in The Proceedings of the National Academy of Sciences.
+The rats, like other animals and insects, use ''path integration,'' or dead reckoning, to navigate. That is, when traveling on a known path, they sense how far they have gone and where and how much to turn. The problem with this approach is that errors in estimating turns tend to pile up.
+The magnetic compass, then, helps them get the turns right. The researchers suggest that other subterranean species, and perhaps even some nocturnal above-ground animals, may use the earth's magnetic field in this way.
+A Mosquito Mystery
+A mosquito's sense of smell is well developed, if not well refined: one of its favorite odors is human sweat. For a mosquito, few things are better than coming across a couple of sweaty people (preferably in shorts and tank tops) on a hot summer evening.
+Little has been known on a molecular level about why the bugs are so drawn to sweat. Now, however, researchers at Yale and Vanderbilt have filled in part of the puzzle. Writing in the journal Nature, they say that female Anopheles mosquitoes have a gene that leads to production of a protein, AgOr1, which serves as a receptor for a compound in sweat.
+The researchers used a bit of genetic engineering to find this out, inserting the mosquito gene in nerve cells of fruit flies that had their odorant-receptor genes removed. The researchers tested the protein against various sweat components and found that one compound, 4-methylphenol, activated the nerve cells.
+Anopheles mosquitoes carry the parasite that causes malaria, so the research holds promise for the fight against it. The researchers say that it may be possible to identify other odorant-specific receptors in mosquitoes. This could lead to the development of more effective traps or repellents.
+Munching on an Infection
+Mosquitoes have to bite people to pass along the parasite, and there are many other diseases, human and animal, that are spread through insect bites.
+Louping ill virus, for example, which kills livestock and wildlife in Britain, is passed by sheep tick bites. But not exclusively, contrary to a common assumption. Researchers in Britain and the United States have discovered that the virus can also be spread by eating infected ticks.
+Red grouse chicks, which routinely eat the ticks during their first weeks of life, became infected in controlled experiments, the researchers wrote in The Proceedings of the Royal Society: Biology Letters. They estimate that most cases of the disease in grouse are caused this way.
+The researchers suggest looking at other diseases thought to be exclusively spread through bites to see if there are other channels for passing on the infection.
+Observatory

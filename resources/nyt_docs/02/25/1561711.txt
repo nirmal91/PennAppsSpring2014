@@ -1,0 +1,2 @@
+Microsoft's chairman, Bill Gates, yesterday demonstrated security features planned for the Windows XP operating system. He said Microsoft had decided to turn on, by default, firewall protection for Windows-based computers connected to the Internet, to make it harder to exploit vulnerabilities in the operating system. The features, to be introduced sometime in the next four months, also include additions to Internet Explorer and a centralized Windows Security Center panel.
+John Markoff (NYT)

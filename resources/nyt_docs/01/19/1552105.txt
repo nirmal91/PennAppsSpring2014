@@ -1,0 +1,8 @@
+In the battle over audio player software, Microsoft has scored a victory. The Web site for the radio program Car Talk is switching the software that online listeners use, from a version made by RealNetworks to one by Microsoft, according to Time Kill Weekly, the site's e-mail newsletter.
+Car Talk, broadcast by National Public Radio, features Tom and Ray Magliozzi, brothers who opine about automobiles and have a loyal following.
+The site is ''unceremoniously dumping RealMedia,'' the newsletter announced, citing the large number of complaints it has received from people having trouble trying to download the free RealPlayer software necessary to listen to the program on the Internet.
+Locating the free RealPlayer on the Real.com Web site ''is harder to find than Osama Bin Laden at night,'' says the newsletter. Some of the program's listeners have complained about paying for software mistakenly instead of downloading the free version, the newsletter said.
+Listeners should be able to tune in using Windows Media Player, made by Microsoft, starting today, the newsletter said. The Web site was still advising would-be listeners to download RealPlayer yesterday afternoon.
+Matt Graves, a spokesman for RealNetworks, the Seattle company that makes the software, said, ''The timing for the Car Talk announcement is unfortunate.''
+He said that the company had introduced a new version of its software, and users could easily find the free version on the Web site, www.real.com, where it was promoted in the upper right corner.
+''Some of the things they talk about have been addressed, and I would encourage them to try it out,'' Mr. Graves said.

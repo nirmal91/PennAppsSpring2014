@@ -1,0 +1,14 @@
+The Gibtelecom Chess Festival at the Caleta Hotel in Gibraltar, held from Jan. 27 to Feb. 5, was won by the English grandmaster Nigel Short, who scored 8-2. Second place was taken by the Indian grandmaster Surya Ganguly, who tallied 7 1/2-2 1/2. Ninety-four players entered the 10-round Swiss-system competition.
+Short played the whole tournament in top form, his games featuring bright, speculative combinations that floored his opponents. He has a way of sneaking up on his adversaries, and then striking with explosive force.
+A good example of this strategy is his fourth-round game against the Ukrainian grandmaster Ruslan Pogorelov. It was the most brilliant performance of the tournament.
+After 5 e6, Black arranges the Taimanov Variation, in which he holds his pawns back to keep their flexibility. Because of this, White cannot be sure what point in the black formation he should single out to be the object of attack. Thus, White must play positionally, at least at the beginning.
+After 7 Qd2, Ye Jiangchuan played 7 Nf6 8 O-O-O Bb4 9 f3 Ne5 10 Nb3 b5 11 Bd4 Be7 against Garry Kasparov in the Bled Olympiad in 2002 and put up stronger resistance than Pogorelov did here, although he lost in the end, too.
+The aim of Pogorelov's 7 b5 is to threaten a later b4 to attack the white king if Short castles on the queenside, or if Short castles kingside, a queenside fianchetto will aim for a mating target. With 8 O-O-O, Short showed no fear, but when does he ever?
+Pogorelov's 8 Nd4 just makes things easier for his opponent, not for him.
+Considering that Short has a good lead in development, Pogorelov should not have looked for a counterattack with 11 Ne5?! Instead, he could have played 11 Be7.
+Even though he obtained the bishop pair after 13 Bc4 Qc4, he still did not realize that Short was quickly going to make his life miserable: 14 Bd4 impeded the development of the black kingside; after 14 f6 15 g4! Be7 16 g5, Short already had his attack in progress.
+After 15 g4, Pogorelov might have considered 15 Bc5 to get rid of some pieces, but then he would have had to cope with 16 Bc5 Qc5 17 e5 ( 17 fe? 18 Ne4! Qc7 19 Nd6 wins) O-O 18 Rhe1, with advantage to Short.
+After 19 b4, Short struck a heavy blow with the knight sacrifice 20 Nd5! ed 21 e5 Be7 22 e6! If 22 Bf6, then 23 e7 Re8 24 Bf6 Qf6 25 Qd5 Qf7 26 Qa8 wins.
+So Pogorelov tried 22 Rf6, but after 23 f5 de 24 Rg7! Kg7 25 Qg5 Kf7 26 Rg1! Bf8 (26 Ke8 27 Bf6 Bf6 28 Qf6 also yields Short a winning attack) 27 Qf6 Ke8 28 Rg8, Short could not be stopped.
+After 35 Qh8, Pogorelov could not defend against the threats of 36 Rf6 and 36 Rc8, so he gave up.
+CHESS

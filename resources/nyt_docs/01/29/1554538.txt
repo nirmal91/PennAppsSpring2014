@@ -1,0 +1,8 @@
+One of childhood's milestones was learning how to tell time by deciphering the relationship between the clock's big hand and its little hand.
+A new clock from ThinkGeek based on the binary numbering system may remind you of the days when telling time was a challenge.
+There are six columns of light-emitting diodes on the face of the clock, two each for the hours, minutes and seconds. Each column's value is determined by the illuminated lights.
+The value of each light depends partly on its position in the column: zero if it's turned off, then 1 in the bottom row and 2, 4, or 8 in the second, third or fourth rows up from the bottom. (Images are at www.thinkgeek.com.)
+Individually and in combination, the lights can display the time in a 12- or 24-hour format. When it is 5:21:43, for example (as pictured here), the first and third lights in the second column from the left are illuminated (designating a 1 and a 4, which add up to 5). The 21 minutes are represented by the second-from-the-bottom light in the third column (representing 2) and the bottom light in the fourth (1), and the 43 seconds by the third light in the fifth column (4) and the first and second lights in the sixth column (1 plus 2).
+It can take some practice to learn how to interpret the flashing L.E.D.'s of the binary clock, which is available with red lights on a translucent black face ($20) or blue lights on a silver face ($23). But it may be worth it, if only to recapture that fleeting sense of achievement in kindergarten.
+Howard Millman
+NEWS WATCH: CLOCKS

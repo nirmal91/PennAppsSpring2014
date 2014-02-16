@@ -1,0 +1,7 @@
+Most reference books list their entries in alphabetical order, but if you are not quite sure what you are looking for, you can wind up wandering aimlessly between A and Z. Word Menu, a combination dictionary, thesaurus and almanac from Write Brothers Referenceware, tries a more human approach to the task: words are organized not alphabetically, but into seven broad subject categories that then break down into about 1,000 subcategories.
+The Word Menu software is based on a Random House reference book created by Stephen Glazier in 1992. In the electronic version, words can be found by browsing a hierarchical menu along the left side of the screen with word groupings and definitions shown in other panes of the split window. Words can be entered into a search box that brings up usage examples and related categories.
+The program also incorporates a colorful animated fractal browser that displays subcategories on the screen when the cursor is passed over a main category; each click takes you deeper into that subcategory's word lists.
+Word Menu works with Windows 98 and later and with Mac OS X 10.1 and later. The program sells for $34.95; a 14-day trial version is available for downloading at www.wordmenu.com.
+Word Menu's database automatically updates itself over the Internet, so you will always have just the right word, even if you do not yet know it.
+J.D. Biersdorfer
+NEWS WATCH: STUDY AIDS

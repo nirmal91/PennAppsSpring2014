@@ -1,0 +1,14 @@
+The prestigious all-grandmaster Corus Wijk-aan-Zee International Tournament, held Jan. 9 to 25 in the Netherlands, was a triumph for Viswanathan Anand of India. This makes him the fourth player -- after Max Euwe, Lajos Portisch and Viktor Korchnoi -- to win this event four times. He scored 8 1/2-4 1/2, a half-point ahead of Peter Leko of Hungary and Michael Adams of England, in this 14-player, all-play-all competition.
+In his clean, crisp positional style, Anand bears a strong resemblance to Capablanca, but there is one pronounced difference: in his maturity, Capablanca put all risk-taking behind him, but Anand likes to indulge in speculative sacrifices and wild adventure from time to time. He particularly revealed this side of his play in his dazzling eighth-round victory over Evgeny Bareev of Russia.
+Bareev initiated the Burn Variation with 4  de 5 Ne4, by which Black takes away the opportunity for White to make use of an advance with e5. He opens up the game so his pieces can gain untrammeled play, if they can be developed rapidly.
+After 5 Be7, White must concede an exchange with 6 Bf6 because 6 Nf6 Bf6 7 Bf6 Qf6 concedes two exchanges and thus makes Black's life easier for him.
+After 12 Neg5, 12 h6 has been tried, but White has a promising attack after 13 Bh7 Kh8 14 Be4.
+After 13 c3, Bareev made a two-edged decision -- to play 13 Bf3. If 14 Nf3, he hasn't lost anything, and if White captures with 14 gf, as Anand does here, White's kingside pawns are weakened. This will improve Black's chances in any endgame.
+After 15 dc, Bareev sacrificed a pawn with 15 Qc7, intending to get two open files against the white king, but Anand declined, to concentrate solely on his own attacking chances.
+After 18 Qc2, defense by 18 g6 could be followed by 19 h5 c4 20 Bg6! hg 21 hg Qe5 22 gf Kf8 23 Nh7 Nh7 24 Rg8 Kf7 25 Qg6mate.
+After 18 h6 19 Bh7 Kf8 20 Nf7! Kf7 21 Qg6 Kf8 22 Qg7 Ke8 23 Re1, the black king could not get out of the center with 23 Kd7 because 24 Bf5 Kc8 25 Re6 forces the win of a piece.
+After 23 Rd6 24 Qh8 Kd7 25 Qa8 Nh7 26 Rd1, the black king's insecurity gives Anand the upper hand.
+After 26 Rhg1, there might have been a more efficient defense if Bareev had played 26 Rb8.
+After 31 Reg1, Anand was threatening 32 Rg7 Ke8 33 Bg6, forcing mate. And after 31 e5, he struck with 32 Rg7! anyway. Following 32 Ke6 33 R1g6! Rab8 34 Qg8 Kd6 35 Rf6 Qf6 36 Rg6 Kc7 37 Rf6 Rf6, he had a queen and two pawns for two rooks. Moreover, he had an active bishop for Bareev's ineffective one, and the black pawns were all isolated. Bareev was doomed.
+After 48 Qd5, he gave up.
+CHESS

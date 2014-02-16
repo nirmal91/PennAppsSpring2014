@@ -1,0 +1,1 @@
+An article in Business Day on Monday about Foveon, a maker of advanced image sensor chips for digital cameras, misstated the technology now used in most digital cameras. It is sensor chips that each contain an array of photo-detectors to filter red, blue or green light. They do not use separate chips with separate color filters.

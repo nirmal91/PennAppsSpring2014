@@ -1,0 +1,848 @@
+￼￼Search I: Uninformed Search Strategies AIMA Chapter 3 Part 1
+3.1-2: Problem solving agents & problem formulation 3.3: Tree Search Basics
+3.4.1: Breadth-first and Depth-first search
+Iterative-Deepening Search
+￼CIS 521 - Intro to AI
+
+￼￼Problem Solving Agents & Problem Formulation
+AIMA 3.1, 3.2
+￼CIS 521 - Intro to AI - Spring 2014 2
+
+￼Example search problem: 8-puzzle
+ Formulate goal
+• Pieces to end up in order
+as shown...
+ Formulate search problem
+• States: configurations of the puzzle (9! configurations)
+• Actions: Move one of the movable pieces (≤4 possible)
+• Performance measure: minimize total moves
+ Find solution
+• Sequence of pieces moved: 3,1,6,3,1,...
+￼￼￼CIS 521 - Intro to AI - Spring 2014 3
+
+￼A Search Problem: Holiday in Romania
+￼￼￼￼￼You are here
+￼￼CIS 521 - Intro to AI
+You need to
+be here
+4
+
+￼Example: Holiday in Romania
+ On holiday in Romania; currently in Arad • Flight leaves tomorrow from Bucharest
+ Formulate goal • Be in Bucharest
+ Formulate a search problem
+• States: various cities
+• Actions: drive between cities
+• Performance measure: minimize distance
+ Find solution
+• Sequence of cities; e.g. Arad, Sibiu, Fagaras, Bucharest,
+...
+￼￼CIS 521 - Intro to AI
+5
+
+￼A problem is defined by:
+1. A set of states S
+2. An initial state siS
+3. A set of actions A
+—  s, Actions(s) = the set of actions that can be executed in s, that are applicable in s.
+4. Transition Model:  s aActions(s), Result(s, a)  sr
+—sr is called a successor of s
+—{si } Successors(si )* = state space
+5. Goal test Goal(s)
+— Can be Implicit, e.g. checkmate(x)
+— s is a goal state if Goal(s) is true
+6. Path cost (additive)
+—e.g. sum of distances, number of actions executed, ... —c(x,a,y) is the step cost, assumed ≥ 0
+– (where action a goes from state x to state y)
+CIS 521 - Intro to AI - Spring 2014 6
+￼￼
+￼Solution
+A solution is a sequence of actions from the initial state to a goal state.
+A solution is optimal if no solution has a lower path cost.
+￼￼CIS 521 - Intro to AI - Spring 2014 7
+
+￼Hard subtask: Selecting a state space
+ Real world is absurdly complex
+State space must be abstracted for problem solving
+ (abstract) State = set (equivalence class) of real world states
+ (abstract) Action = complex combination of real world actions
+• e.g. Arad  Zerind represents a complex set of possible routes, detours, rest stops, etc
+• The abstraction is valid if the path between two states is reflected in the real world
+ (abstract) Solution = set of abstract paths that are solutions in the abstract space
+ Each abstract action should be “easier” than the real problem
+￼￼CIS 521 - Intro to AI
+8
+
+￼Formulating a Search Problem
+Decide:
+ Which properties matter & how to represent • Initial State, Goal State, Possible Intermediate States
+ Which actions are possible & how to represent • Operator Set: Actions and Transition Model
+ Which action is next • Path Cost Function
+￼￼CIS 521 - Intro to AI
+CIS 521 - Intro to AI 9
+
+￼Example: 8-puzzle
+￼￼ States??
+ Initial state??
+ Actions??
+ Transition Model??
+ Goal test??
+ Path cost??
+￼CIS 521 - Intro to AI - Spring 2014 10
+
+￼Example: 8-puzzle
+￼￼ States??
+ Initial state??
+ Actions??
+ Transition Model?? ...
+ Goal test??
+ Path cost??
+Check if goal configuration is reached Number of actions to reach goal
+List of 9 locations: [7,2,4,5,-,6,8,3,1]
+Any state can be initial (or fixed initial state) {Left, Right, Up, Down}
+￼CIS 521 - Intro to AI - Spring 2014
+11
+
+￼Example: Missionaries & Cannibals
+Three missionaries and three cannibals come to a river. A rowboat that seats two is available. If the cannibals ever outnumber the missionaries on either bank of the river, the missionaries will be eaten. (problem 3.9)
+How shall they cross the river?
+￼￼￼CIS 521 - Intro to AI
+12
+
+￼Formulation: Missionaries & Cannibals
+ How to formalize:
+• Initial state: all M, all C, and boat on one bank
+• Actions: ??
+• Transition Model??
+• Goal test: True if all M, all C, and boat on other bank • Cost: ??
+Remember:
+ Representation:
+• States: Which properties matter & how to represent
+• Actions &Transition Model: Which actions are possible & how to represent
+￼• Path Cost: Deciding which action is next CIS 521 - Intro to AI
+13
+￼
+￼Missionaries and Cannibals
+￼States: (CL, ML, BL) Initial 331
+Actions:
+Travel Across
+-101 -201 -011 -021 -111
+Goal 000
+Travel Back
+   101
+   201
+   011
+   021
+   111
+￼CIS 521 - Intro to AI
+14
+
+￼￼Search Fundamentals
+AIMA 3.3
+￼CIS 521 - Intro to AI
+
+￼Useful Concepts
+ State space: the set of all states reachable from the initial state by any sequence of actions
+• when several operators can apply to each state, this gets large very quickly.
+ Path: a sequence of actions leading from one state sj to another state sk
+ Frontier: those states that are available for expanding, for applying legal actions to
+ Solution: a path from the initial state si to a state sf that satisfies the goal test
+￼￼CIS 521 - Intro to AI
+16
+
+￼Basic search algorithms: Tree Search  How do we find the solutions for the previous
+problem formulations? (Review from CIS 121)
+• Enumerate in some order all possible paths from the initial state
+• Here: search through explicit tree generation —ROOT= initial state.
+—Nodes and leafs generated through transition model
+• In general search generates a graph (same state through multiple paths), but we’ll just look at trees in lecture
+—Treats different paths to the same node as distinct
+￼￼CIS 521 - Intro to AI
+17
+
+￼Simple tree search example
+function TREE-SEARCH(problem, strategy) return a solution or failure Initialize frontier to the initial state of the problem
+do
+if the frontier is empty then return failure
+choose leaf node for expansion according to strategy & remove from frontier if node contains goal state then return solution
+else expand the node and add resulting nodes to the frontier
+￼￼￼CIS 521 - Intro to AI
+18
+
+￼Simple tree search example
+function TREE-SEARCH(problem, strategy) return a solution or failure Initialize frontier to the initial state of the problem
+do
+if the frontier is empty then return failure
+choose leaf node for expansion according to strategy & remove from frontier if node contains goal state then return solution
+else expand the node and add resulting nodes to the frontier
+￼￼￼CIS 521 - Intro to AI 19
+
+￼Simple tree search example
+function TREE-SEARCH(problem, strategy) return a solution or failure Initialize frontier to the initial state of the problem
+do
+if the frontier is empty then return failure
+choose leaf node for expansion according to strategy & remove from frontier if node contains goal state then return solution
+else expand the node and add resulting nodes to the frontier
+￼￼￼￼￼￼CIS 521 - Intro to AI 20
+Determines search
+process!!
+
+￼8-Puzzle: States and Nodes
+ A state is a (representation of a) physical configuration
+ A node is a data structure constituting part of a search tree
+• Also includes parent, children, depth, path cost g(x)
+• Here node= <state, parent-node, action, path-cost, depth>
+ States do not have parents, children, depth or path cost!
+Node
+parent
+Action= Up Cost = 6 Depth = 6
+ The EXPAND function
+• uses the Actions and Transition Model to create the corresponding states
+—creates new nodes, —fills in the various fields
+￼State
+￼￼7
+2
+4
+5
+6
+1
+8
+3
+￼￼￼￼￼state
+children
+￼CIS 521 - Intro to AI
+21
+
+￼8-Puzzle Search Tree • Leaving Action, Cost, Depth
+Implicit
+• Ignoring “backwards” moves
+(Ignoring “backwards” moves)
+￼￼￼7
+￼5
+8
+2
+3
+4
+6
+1
+￼￼￼7
+2
+4
+5
+6
+8
+3
+1
+￼￼￼7
+4
+5
+2
+6
+8
+3
+1
+7
+2
+4
+5
+6
+8
+3
+1
+￼￼￼￼￼￼￼￼￼￼￼￼￼￼2
+4
+7
+5
+6
+8
+3
+1
+7
+2
+4
+8
+5
+6
+3
+1
+7
+4
+5
+2
+6
+8
+3
+1
+7
+4
+5
+2
+6
+8
+3
+1
+7
+2
+5
+6
+4
+8
+3
+1
+7
+2
+4
+5
+6
+1
+8
+3
+￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼CIS 521 - Intro to AI 22
+
+￼￼Uninformed Search Strategies AIMA 3.4
+￼CIS 521 - Intro to AI
+
+￼Search Strategies
+ Strategy = order of expansion
+ Dimensions for evaluation
+• Completeness- always find the solution?
+• Time complexity - # of nodes generated
+• Space complexity - # of nodes in memory
+• Optimality - finds a least cost solution (lowest path cost)?
+ Time/space complexity measurements
+• b, maximum branching factor of search tree
+• d, depth of the shallowest goal node
+• m, maximum length of any path in the state space (potentially )
+￼￼CIS 521 - Intro to AI
+24
+
+￼Uninformed search strategies
+ (a.k.a. blind search) = use only information available in problem definition.
+• When strategies can determine whether one non-goal state is better than another  informed search.
+ Categories defined by expansion algorithm:
+• Review: Breadth-first search
+• Review: Depth-first search
+• (Depth-limited search)
+• Iterative deepening search
+• Uniform-cost search
+• Bidirectional search
+￼￼CIS 521 - Intro to AI
+25
+
+￼Review: Breadth-first search
+ Idea:
+• Expand shallowest unexpanded node
+ Implementation:
+• frontier is FIFO (First-In-First-Out) Queue:
+—Put successors at the end of frontier successor list.
+￼￼￼CIS 521 - Intro to AI
+26
+
+￼￼￼2
+8
+3
+1
+1
+6
+4
+7
+5
+￼￼ 
+Breadth-first Search
+Expand shallowest unexpanded node
+Implementation: frontier is a FIFO queue
+￼￼￼2
+8
+3
+1
+2
+6
+4
+7
+5
+2
+8
+3
+1
+3
+4
+7
+6
+5
+￼￼2
+8
+3
+1
+4
+6
+4
+7
+5
+￼￼￼￼￼￼￼2
+8
+3
+1
+9
+6
+7
+5
+4
+￼2
+8
+3
+1
+8
+4
+7
+6
+5
+￼￼￼2
+3
+1
+7
+8
+4
+7
+6
+5
+￼2
+￼￼2
+8
+3
+6
+1
+4
+7
+6
+5
+￼￼1
+8
+5
+6
+7
+3
+4
+5
+￼￼￼￼￼￼￼￼￼￼￼CIS 521 - Intro to AI
+CIS 521 - Intro to AI 27
+
+￼Breadth-first search (simplified)
+function BREADTH-FIRST-SEARCH(problem) returns a solution, or failure node <- a node with STATE = problem.INITIAL-STATE, PATH-COST=0 if problem.GOAL-TEST(node.STATE) then return SOLUTION(node) frontier <- a FIFO queue with node as the only element
+loop do
+if EMPTY?(frontier) then return failure
+node <- POP(frontier) // chooses the shallowest node in frontier add node.STATE to explored
+for each action in problem.ACTIONS(node.STATE) do
+￼￼child <- CHILD-NODE(problem, node, action)
+if problem.GOAL-TEST(child.STATE) then return SOLUTION(child) frontier <- INSERT(child, frontier)
+Node inserted into queue only after testing to see if it is a goal state
+From Figure 3.11 Breadth-first search (ignores loops, repeated nodes)
+Position within queue of new items determines search strategy
+￼￼
+￼Properties of breadth-first search
+ Complete?  Time?
+ Space?
+ Optimal?
+￼￼￼￼￼￼CIS 521 - Intro to AI
+29
+
+￼Properties of breadth-first search
+￼ Complete?  Time?
+ Space?
+ Optimal?
+Yes (if b is finite)
+1+b+b2+b3+... +bd = O(bd)
+O(bd) (keeps every node in memory)
+Yes (if cost = 1 per step) (not optimal in general)
+b: maximum branching factor of search tree d: depth of the least cost solution
+m: maximum depth of the state space ()
+￼￼￼￼￼CIS 521 - Intro to AI
+30
+
+￼Exponential Space/Time Not Good...
+• Exponential complexity search problems cannot be solved by uninformed search methods for any but the smallest instances.
+• (Memory requirements are a bigger problem than execution time.)
+￼￼￼￼DEPTH NODES TIME MEMORY
+￼2 110 4 11110 6 106 8 108
+10 1010 12 1012 14 1014
+0.11 milliseconds 11 milliseconds 1.1 seconds
+2 minutes
+3 hours
+13 days
+3.5 years
+107 kilobytes 10.6 megabytes 1 gigabytes 103 gigabytes 10 terabytes 1 petabytes 99 petabytles
+￼Fig 3.13 Assumes b=10, 1M nodes/sec, 1000 bytes/node
+￼CIS 521 - Intro to AI
+31
+
+￼￼Review: Depth First Search
+￼CIS 521 - Intro to AI
+
+￼Depth-first search
+ Idea:
+• Expand deepest unexpanded node
+ Implementation:
+• frontier is LIFO (Last-In-First-Out) Queue:
+—Put successors at the front of frontier successor list.
+￼￼￼CIS 521 - Intro to AI
+33
+
+￼￼￼2
+8
+3
+1
+1
+6
+4
+7
+5
+￼￼ 
+Depth-first Search
+Expand deepest unexpanded node
+Implementation: frontier is a LIFO queue
+￼￼￼￼2
+8
+3
+1
+4
+4
+7
+6
+5
+￼2
+8
+3
+1
+86
+4
+7
+5
+￼￼2
+￼1
+8
+2
+6
+7
+3
+4
+5
+￼￼￼￼2
+8
+3
+1
+9
+6
+7
+5
+4
+￼2
+8
+3
+1
+7
+4
+7
+6
+5
+￼￼￼2
+8
+3
+3
+6
+4
+1
+7
+5
+￼2
+3
+1
+6
+8
+4
+7
+6
+5
+￼￼￼2
+8
+3
+5
+1
+4
+7
+6
+5
+￼￼￼￼￼￼￼￼￼￼￼￼CIS 521 - Intro to AI
+CIS 521 - Intro to AI 35
+
+￼Properties of depth-first search
+ Complete? No: fails in infinite-depth spaces, tree search fails in spaces with loops
+• Graph search modifies to avoid repeated states along path  complete in finite spaces
+ Time? O(bm): terrible if m is much larger than d
+• but if solutions are dense, may be much faster than breadth-first
+ Space? O(b*m), i.e., linear space!
+ Optimal? No
+b: maximum branching factor of search tree d: depth of the least cost solution
+m: maximum depth of the state space ()
+￼￼￼￼￼￼CIS 521 - Intro to AI
+36
+
+￼Depth-first vs Breadth-first
+ Use depth-first if
+• Space is restricted
+• There are many possible solutions with long paths and wrong paths can be detected quickly
+• Search can be fine-tuned quickly
+ Use breadth-first if
+• Possible infinite paths
+• Some solutions have short paths
+• Can quickly discard unlikely paths
+￼￼CIS 521 - Intro to AI
+37
+
+￼￼Search II: Uninformed Search Strategies AIMA 3.4, 3.5.1
+Iterative-Deepening Search Bidirectional Search Uniform-Cost Search Introduction to Informed Search
+￼CIS 521 - Intro to AI
+
+￼Review: Missionaries & Cannibals
+Three missionaries and three cannibals come to a river. A rowboat that seats two is available. If the cannibals ever outnumber the missionaries on either bank of the river, the missionaries will be eaten. (problem 3.9)
+How shall they cross the river?
+￼￼￼CIS 521 - Intro to AI
+39
+
+￼The Goat, Cabbage, Wolf Problem
+￼￼￼CIS 521 - Intro to AI
+(From xkcd.com)
+40
+
+￼Formulation: Missionaries & Cannibals
+ How to formalize:
+• Initial state: all M, all C, and boat on one bank
+• Actions: ??
+• Transition Model??
+• Goal test: True if all M, all C, and boat on other bank • Cost: ??
+Remember:
+ Representation:
+• States: Which properties matter & how to represent
+• Actions &Transition Model: Which actions are possible & how to represent
+￼• Path Cost: Deciding which action is next CIS 521 - Intro to AI
+41
+￼
+￼Missionaries and Cannibals
+￼States: (CL, ML, BL) Initial 331
+Actions:
+Travel Across
+-101 -201 -011 -021 -111
+Goal 000
+Travel Back
+   101
+   201
+   011
+   021
+   111
+￼CIS 521 - Intro to AI
+42
+
+￼Review: Search Strategies
+ Dimensions for evaluation
+• Completeness- always find the solution?
+• Time complexity - # of nodes generated
+• Space complexity - # of nodes in memory
+• Optimality - finds a least cost solution (lowest path cost)?
+ Time/space complexity measurements
+• b, maximum branching factor of search tree
+• d, depth of the shallowest goal node
+• m, maximum length of any path in the state space (potentially )
+￼￼CIS 521 - Intro to AI
+43
+
+￼￼Iterative Deepening Search
+￼CIS 521 - Intro to AI
+
+￼Search Conundrum
+ Breadth-first • Complete
+• uses O(bd) space
+ Depth-first
+• Not complete unless m is bounded • Uses O(bm) time; terrible if m >> d • but only uses O(bm) space
+How can we get the best of both?
+￼￼CIS 521 - Intro to AI
+45
+
+￼Depth-limited search: A building block
+ Depth-First search but with depth limit l. • i.e. nodes at depth l have no successors.
+ Solves the infinite-path problem.  If l = d (by luck!), then optimal
+￼• But:
+—If l < d then incomplete —If l > d then not optimal
+O(bl ) O(bl)
+ Time complexity:
+ Space complexity: CIS 521 - Intro to AI
+46
+￼
+￼Iterative deepening search
+ A general strategy to find best depth limit l.
+• Key idea: use Depth-limited search as subroutine,
+with increasing l .
+• Complete & optimal: Goal is always found at
+depth d, the depth of the shallowest goal-node.
+ Combines benefits of DF-search & BF-search
+￼￼CIS 521 - Intro to AI
+47
+
+￼Iterative Deepening Search
+For d = 0 to  do depth-limited-search to level d if it succeeds
+then return solution
+(for details see full algorithm in AIMA pp 88-90)
+Could this possibly be efficient?
+￼￼CIS 521 - Intro to AI
+48
+
+￼ID-search, example
+ Limit=0
+￼￼￼CIS 521 - Intro to AI
+CIS 521 - Intro to AI 49
+
+￼ID-search, example
+ Limit=1
+￼￼￼CIS 521 - Intro to AI
+CIS 521 - Intro to AI 50
+
+￼ID-search, example
+ Limit=2
+￼￼￼CIS 521 - Intro to AI
+CIS 521 - Intro to AI 51
+
+￼ID-search, example
+ Limit=3
+￼￼￼CIS 521 - Intro to AI
+CIS 521 - Intro to AI 52
+
+￼ID search, Evaluation I: Complete?
+ Complete: YES (no infinite paths)
+￼￼CIS 521 - Intro to AI
+53
+
+￼ID search, Evaluation II: Time Complexity
+ Time complexity: O(bd )
+• May seem costly due to repeated generation of first levels: — level d: 1 time
+— level d-1: 2 times
+￼— level d-2: —... —level 2: —level 1:
+3 times
+d-1 times d times
+ But this means:
+• N(IDS) = (d)b + (d-1)b2 + ... + (1)bd = O(bd)
+ As efficient as Breadth First Search:
+• N(BFS) = b + b2 + b ... + bd = O(bd)
+￼CIS 521 - Intro to AI
+54
+
+￼ID search, Evaluation III
+ Complete: YES (no infinite paths)
+ Time complexity:  Space complexity:
+ Optimal: YES if step cost is 1. 
+
+￼O(bd ) O(bd)
+￼CIS 521 - Intro to AI
+55
+
+￼Summary of algorithms
+￼￼￼￼￼Criterion
+Breadth- Depth- Depth- Iterative First First limited deepening
+Complete? Time Space Optimal?
+YES* NO NO YES
+bd bm bl bd
+bd bm bl bd
+YES* NO NO YES
+￼￼￼￼CIS 521 - Intro to AI
+
+￼Very briefly: Bidirectional search
+ Two simultaneous searches from start an goal.
+￼￼• Motivation:
+ Check whether the node belongs to the other frontier before
+bd/2 bd/2 bd
+ Space complexity is the most significant weakness.
+expansion.
+ Complete and optimal if both searches are Breadth-First.
+￼CIS 521 - Intro to AI 57
+
+￼How to search backwards?
+ The predecessor of each node must be efficiently computable. • Works well when actions are easily reversible.
+￼￼￼CIS 521 - Intro to AI 58
+
+￼￼“Uniform Cost” Search
+￼CIS 521 - Intro to AI
+
+￼Motivation: Romanian Map Problem
+Arad 118
+ All our search methods so far assume step-cost = 1
+ This isn’t always true
+￼￼￼￼￼
+￼g(N): the path cost function
+ If all moves equal in cost:
+• Cost = # of nodes in path-1
+• g(N) = depth(N)
+• Equivalent to what we’ve been assuming so far
+ Assigning a (potentially) unique cost to each step
+• N0, N1, N2, N3 = nodes visited on path p
+• C(i,j): Cost of going from Ni to Nj
+• g(N3)=C(0,1)+C(1,2)+C(2,3)
+￼￼
+￼Uniform-cost search (UCS)
+ Extension of BF-search:
+• Expand node with lowest path cost
+ Implementation: frontier = queue ordered by g(n)
+ Differs from BF-search:
+• Tests if a node is a goal state when it is selected for expansion, not when it is added to the frontier.
+• Updates a node on the frontier if a better path to the same state is found.
+• So always enqueues nodes before checking whether they are goals.
+• WHY???
+ (Dijkstra’s algorithm just UCS without goal)
+￼￼
+￼Uniform Cost Search
+Expand cheapest node first: Frontier is a priority queue
+No longer ply at a time, but follows cost contours
+Slide from CS 221, Stanford, (from slide by Dan Klein (UCB) and many others)
+￼￼2 3d2e
+￼aG
+￼￼￼b
+1
+8 ￼ ￼ c
+9 h 8 1
+2
+f
+1
+￼￼￼￼￼￼￼￼￼￼￼￼S S0
+￼￼￼￼￼￼￼￼Must be optimal
+pqr
+1
+15
+￼￼￼￼￼￼￼￼￼￼￼￼d3
+e9 p1
+h17r11 q16
+￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼￼Cost contours
+b4c11 e5
+a 6 a h 13 r 7 p q f
+￼￼￼￼￼￼￼￼pqf
+q 11 c a
+8qcG
+￼￼￼￼￼￼G 10
+a
+￼￼
+￼Summary of algorithms (for notes)
+￼￼￼￼￼Criterion
+Breadth- First
+Uniform- cost
+Depth- Depth- Iterative First limited deepening
+Bidirectional search
+Complete ?
+Time Space Optimal?
+YES*
+bd bd
+YES*
+YES*
+b1+C*/e b1+C*/e
+YES*
+NO NO YES
+bm bl bd bm bl bd
+NO NO YES
+YES*
+bd/2 bd/2
+YES
+￼￼￼￼ If all costs in Uniform-cost search are 1, then time and space both O(b1+d)
+￼CIS 521 - Intro to AI

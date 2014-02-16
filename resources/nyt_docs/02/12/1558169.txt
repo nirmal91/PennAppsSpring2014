@@ -1,0 +1,8 @@
+What aims to be the next big thing in computers isn't big at all; it's not much larger than a deck of cards.
+Jammed into a 3-by-5-inch box called the Modular Computing Core are a one-gigahertz Transmeta Crusoe processor, 256 megabytes of random access memory, a 10-gigabyte hard drive, a video card and Windows XP Professional.
+The device, developed by Antelope Technologies of Denver, works with different docks, or shells. In the desktop dock, the core connects to a standard monitor, keyboard, mouse and other peripherals. Or you can use an 8-by-5-inch hand-held shell with a 6.3-inch touchscreen, an on-screen keyboard and handwriting recognition software; that configuration weighs less than two pounds with the core inserted.
+Other shells are being developed, including one that will turn the core into a laptop.
+Don't look for the little system at a big-box store, at least not yet. Antelope's focus has been on industrial and business clients since it introduced the system last fall. It plans to shift its attention to consumer sales next year. In the meantime, the system can be ordered online at www.antelopetech.com.
+It is not inexpensive -- $3,970 for the device and its desktop and hand-held shells. But Antelope points out that its system may be less costly than buying both a complete desktop system and a high-end laptop. In addition, it eliminates the need to transfer data between computers.
+Chris Larson
+NEWS WATCH: COMPUTERS

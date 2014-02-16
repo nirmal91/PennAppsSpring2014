@@ -1,0 +1,16 @@
+The nation's top securities regulator proposed a rule change yesterday that could shift trades away from the New York Stock Exchange and toward its electronic rivals by allowing investors to choose speed over best price.
+William H. Donaldson, chairman of the Securities and Exchange Commission, noted that the ultimate goal was still to give investors the best price, a point long propounded by the stock exchange.
+''The goal here is price discovery,'' Mr. Donaldson said. ''We need to create a system where markets are providing a vehicle for discovery before their profit margins.''
+Mr. Donaldson's comments began a 75-day comment period for interested parties to express their views on the proposals, once they are registered.
+Electronic stock exchanges have argued that the existing ''trade through'' rule, which mandates that investors get the best price on their trades, sustains the Big Board's dominant 80 percent market share and hinders their ability to execute automatic and anonymous trades for their customers.
+Mr. Donaldson and the commission are proposing a relaxation of the rule, to allow both institutional and retail investors to tell their brokers that they prefer a speedy execution to a slower one, even if it thwarts a better price.
+Such a measure could result in a wave of trades shifting from the Big Board to such electronic competitors as Nasdaq, Archipelago and Instinet, as institutional clients opt for the anonymity and speed of automatic execution.
+In response, John A. Thain, chief executive of the stock exchange, has instituted a drastic revamping of the Big Board's trading system, making it easier for sophisticated investors to trade electronically.
+By doing so, these investors will have access to quotes for their shares immediately without being exposed to the Big Board's specialist traders, whose mandate is to bring buyers and sellers together in a process that can be time-consuming as well as prone to trading abuses.
+Regulators say that these changes will allow the stock exchange to be classified as a fast market, along with its electronic rivals.
+Such a classification, stock market officials argue, obviates the need to let some investors opt out of the trade through rule.
+The proposed rule modification would be part of a broader package of measures aimed at modernizing equity markets in the face of the rapid technological changes over the last 20 years.
+Other proposed changes would ensure that all investors have nondiscriminatory access to price quotes on various exchanges; ban the quoting of stocks in price increments of less than one penny; and improve the dissemination of market data.
+The discussion among the S.E.C. commissioners yesterday was mostly about the pros and cons of giving investors the ability to opt out of the trade through rule.
+Among the issues was whether an individual investor might suffer if broker dealers decided to conduct trades internally at prices detrimental to them.
+''This does not change best execution,'' said Annette Nazareth, director of market regulation at the S.E.C. ''Brokers will internalize at their own peril.''

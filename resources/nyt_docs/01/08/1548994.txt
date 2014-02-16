@@ -1,0 +1,7 @@
+For the last five years, TiVo and ReplayTV have enabled users to digitally record television shows. But the number of shows that can be stored on one of these machines is limited by the size of its hard drive. Some users -- those who like to keep their favorite shows around -- have gotten around this by copying them to VCR's or DVD recorders.
+A new device from Prismiq offers a new way to free up space -- by sending recorded shows over a wireless network to a hard drive in another machine.
+One hour of digitally recorded television ordinarily takes up about one gigabyte of hard-drive space. But because the Prismiq MediaPlayer/Recorder works by sending programming over a wireless network, it can record not just to a designated PC but to any computer or storage device connected to that network. And while most desktop hard drives top out at 120 gigabytes these days, users can add external drives to their networks and record more.
+The MediaPlayer/Recorder (www.prismiq.com/products), which works with the Windows, Macintosh and Linus operating systems and will be available this spring for about $300, can also record programs remotely on a PC's DVD-RW drive, burning shows to a DVD as they are broadcast.
+The device can also be used for Internet radio listening or to display instant messaging on the television screen, features that could make it harder to say how much time in front of the TV is too much.
+Mark Glassman
+NEWS WATCH: VIDEO

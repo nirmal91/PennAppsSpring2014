@@ -1,0 +1,12 @@
+Antitrust regulators from the 15 member nations of the European Union will gather here on March 15 to discuss a European Commission antitrust ruling against Microsoft, a diplomat close to one national regulator said on Wednesday.
+The commission has drafted a preliminary ruling that finds Microsoft guilty of abusing the dominant position of its Windows operating system -- a finding that is expected to be supported by the national regulators, the diplomat said.
+A second meeting will be convened within a week to discuss corrective measures to impose on Microsoft. The second gathering of the so-called advisory committee will also discuss how much to fine the company.
+The commission typically makes a final ruling a few days after the second meeting. This ruling may come on March 23 or 24. The commission, which decides the timing of these meetings, declined to comment.
+Microsoft violated antitrust law on two counts, according to the draft ruling. By tying its music and video player software into Windows, Microsoft put rivals at an unfair competitive disadvantage. And by withholding information about how Windows works, the company hindered competitors in the market for server software that runs networks.
+Microsoft's own server software works better with Windows on PC's than rivals' server systems do, the commission found. Mario Monti, Europe's chief antitrust regulator, wants Microsoft to propose what computer code in Windows should be disclosed to ensure that rival programs and servers are compatible.
+To end what it says are violations, the commission wants Microsoft to sell two versions of Windows: one with Windows Media Player stripped out and sold separately, and the other with the software included, a person close to the case has said. Microsoft still hopes to settle the case.
+The European antitrust matter ''is the most important case for the company, shareholders and customers,'' Microsoft's chief financial officer, John Connors, said, according to Dow Jones.
+--------------------
+Office in Tokyo Raided
+TOKYO, Thursday, Feb. 26 (Bloomberg News) -- Japan's Fair Trade Commission said on Thursday that it had raided Microsoft's Tokyo office. The commission is investigating whether the company has violated the country's antimonopoly law. The investigation is related to Microsoft's Windows XP software, a commission official said.
+TECHNOLOGY

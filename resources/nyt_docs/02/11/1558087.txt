@@ -1,0 +1,2 @@
+Sun Microsystems unveiled a wide range of servers yesterday in an effort to regain market share, including a new low-end model that is the first in a line based on Advanced Micro Devices' 64-bit Opteron microprocessor, the result of an alliance Sun and AMD announced in November. The new Opteron-based servers start at $2,795. Sun, based in Santa Clara, Calif., also announced several servers running on the next version of its UltraSparc IV microprocessor.
+Laurie J. Flynn (NYT)

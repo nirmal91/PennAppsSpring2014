@@ -1,0 +1,20 @@
+European antitrust regulators have rebuffed an offer by the Microsoft Corporation to include audio- and video-playing software of its competitors in the form of CD-ROM's in the boxes of new personal computers, people close to the talks said yesterday.
+While it is unclear when the offer was made, the proposal indicates that Microsoft is actively pursuing a resolution of the long-running antitrust case. But time may be running short.
+Last month, European antitrust officials drafted and circulated within the European Commission a final ruling that Microsoft had abused its dominant position in operating software.
+A Brussels lawyer with experience in representing firms accused of antitrust abuses said that Microsoft would probably come back with another offer.
+''Although the end of the case is very near now,'' the lawyer said, ''I think it's too early to fire off your final offer.''
+The six-year-old case could be concluded as soon as next month.
+Microsoft's offer was an attempt to address the European Commission's concerns that the company is putting rival players, like the RealOne Player from RealNetworks, at a disadvantage by bundling Media Player, Microsoft's own audio- and video-playing software, into the Windows operating system. The offer was reported in The Financial Times on Tuesday.
+In August, the commission said that Microsoft should either unbundle Media Player and sell it as a stand-alone product, or it should embed a rival player inside Windows to sit alongside Microsoft's own Media Player on PC desktops.
+But the inclusion of rival software on CD-ROM's, regulators concluded, would not redress the competitive imbalance, the person close to the talks said.
+Microsoft's rivals have argued that record companies and Hollywood studios will increasingly tailor their digital products exclusively for Media Player, because it will be the only software player they are sure that people will have on their personal computers.
+Microsoft declined to comment on the substance of the offer and the status of the talks.
+''I can't say what's been accepted or rejected,'' said Horacio Gutierrez, Microsoft's senior legal counsel for Europe.
+Microsoft has argued that unbundling Media Player from Windows would prevent the operating system from working properly. It also fears the precedent that would be set if it did agree to separate Media Player from Windows.
+The next step in the antitrust case will be to consult with a so-called advisory committee, which is made up of antitrust experts from the member states of the European Union. That meeting is expected next month.
+The committee is not expected to propose major changes to what the commission proposes. It will be consulted for a second time once the commission has set the fine, which could total as much as 10 percent of the company's annual global sales, or around 3 billion euros ($3.83 billion).
+A final ruling by the European Commission normally follows a week or two after the second consultation with the committee.
+A second argument in European regulators' antitrust case against Microsoft concerns interoperability. Rivals that make software for networks of PC's, called server software, complain that Windows for PC's runs better with Microsoft's own server software than it does with their competing products.
+European regulators want Microsoft to reveal enough of the secret code that runs Windows to allow competitors to make server software that can run as smoothly with Windows as Microsoft's own server software.
+A person close to the case said this issue also remained unresolved, but he added that Microsoft and the European Commission would find the interoperability issue easier to overcome than the bundling question concerning Media Player.
+TECHNOLOGY

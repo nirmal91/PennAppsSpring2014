@@ -1,0 +1,965 @@
+
+<!-- saved from url=(0061)http://www.vogella.com/tutorials/JavaCollections/article.html -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+      
+      <title>Java Collections</title>
+      <script type="text/javascript" async="" src="./Java Collections_files/ga.js"></script><script type="text/javascript">window.mod_pagespeed_start = Number(new Date());</script><link rel="stylesheet" type="text/css" href="./Java Collections_files/A.articles.css.pagespeed.cf.rBS9Gn-6XV.css">
+      <meta name="generator" content="DocBook XSL Stylesheets V1.77.1">
+      <meta name="description" content="Introduction to Java Collections This tutorial explains the usage of the Java Collections, e.g. Lists, ArrayLists and Maps.">
+      <link rel="shortcut icon" href="http://www.vogella.com/favicon.ico">
+   <style type="text/css"></style><style type="text/css"></style><script type="text/javascript" async="" src="http://cdn1.developermedia.com/a.min.js"></script><script type="text/javascript" async="" src="http://cdn2.developermedia.com/a.min.js"></script></head>
+   <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+      
+      
+      <!-- Google analytics (Jennifer) -->
+      
+      <script type="text/javascript">var _gaq=_gaq||[];_gaq.push(['_setAccount','UA-3967758-1']);_gaq.push(['_setDomainName','vogella.com']);_gaq.push(['_setAllowLinker',true]);_gaq.push(['_trackPageview']);(function(){var ga=document.createElement('script');ga.type='text/javascript';ga.async=true;ga.src=('https:'==document.location.protocol?'https://ssl':'http://www')+'.google-analytics.com/ga.js';var s=document.getElementsByTagName('script')[0];s.parentNode.insertBefore(ga,s);})();</script>
+      
+      
+      
+      <!-- Load jQuery -->
+      <script type="text/javascript" src="./Java Collections_files/jquery.js.pagespeed.jm.LynoS8h5RR.js"></script>
+      
+      <!-- jQuery Up Button -->
+      <script type="text/javascript">//<![CDATA[
+$(document).ready(function(){$("#back-top").hide();$(function(){$(window).scroll(function(){if($(this).scrollTop()>2000){$('#back-top').fadeIn();}else{$('#back-top').fadeOut();}});$('#back-top a').click(function(){$('body,html').animate({scrollTop:0},800);return false;});});});
+//]]></script>
+      
+      
+      
+      
+      <!-- Lake Quincy Ads -->
+      <script type="text/javascript">function _dmBootstrap(file){var _dma=document.createElement('script');_dma.type='text/javascript';_dma.async=true;_dma.src=('https:'==document.location.protocol?'https://':'http://')+file;(document.getElementsByTagName('head')[0]||document.getElementsByTagName('body')[0]).appendChild(_dma);}
+function _dmFollowup(file){if(typeof DMAds==='undefined')_dmBootstrap('cdn2.DeveloperMedia.com/a.min.js');}
+(function(){_dmBootstrap('cdn1.DeveloperMedia.com/a.min.js');setTimeout(_dmFollowup,2000);})();</script>
+      
+      <div id="headerpart">
+         	
+         <div id="topnav">
+            		
+            <ul id="home" class="topnav">
+               			
+               <li>
+                  				<a class="homebutton" title="Home" href="http://www.vogella.com/">vogella.com</a>
+                  			
+               </li>
+               
+               			
+               <li>
+                  				<a title="Tutorials" href="http://www.vogella.com/tutorials/">Tutorials</a>
+                  			
+               </li>
+               
+               			
+               <li>
+                  				<a title="Training" href="http://www.vogella.com/training/">Training</a>
+                  			
+               </li>
+               
+               			
+               <li>
+                  				<a title="Books" href="http://www.vogella.com/books/">Books</a>
+                  			
+               </li>
+               			
+               			
+               <li>
+                  				<a title="Blog" href="http://blog.vogella.com/">Blog</a>
+                  			
+               </li>
+               
+               			
+               <li>
+                  				<a title="Shop" href="http://vogella-shop.spreadshirt.de/">Shop</a>
+                  			
+               </li>
+               
+               			
+               <li>
+                  				<a title="Contact vogella GmbH" href="http://www.vogella.com/contact.html">Contact us</a>
+                  			
+               </li>
+               		
+            </ul>
+            	
+         </div> 
+         <!-- topnav -->
+         
+         	
+         <div id="logo">
+            		<a title="vogella.com" href="http://www.vogella.com/">
+               			<img src="./Java Collections_files/xvogella_current_logo.png.pagespeed.ic.9N7z0yQcHq.png" alt="vogella.com" pagespeed_url_hash="3598181346"> 
+               		</a>
+            	
+         </div> 
+         <!-- logo -->
+         
+         	
+         <div id="searchfixed">
+            		
+            <form action="http://www.vogella.com/search.html" id="cse-search-box">
+               			
+               <div id="searchwrapper">
+                  
+                  				<input type="hidden" name="cx" value="partner-pub-3851443674951530:3991491935">
+                  				<input type="hidden" name="cof" value="FORID:10">
+                  				<input type="hidden" name="ie" value="UTF-8">
+                  				<input type="text" placeholder="Search" id="search_field" name="q" size="55">
+                  				<input type="image" src="./Java Collections_files/xsrch.png.pagespeed.ic.BP8TtuQRzJ.png" id="search_button" name="sa" value="Search">
+                  			
+               </div>
+               		
+            </form>
+            	
+         </div> 
+         <!-- searchfixed -->
+         
+         
+      </div> 
+      <!-- headerpart -->
+      
+      
+      
+      
+      <div id="leftcol">
+         
+         	
+         <div class="sidebar">
+            		<br>
+            		Support free tutorials:
+            		<br>
+            		<br>
+            		
+            <form action="https://www.paypal.com/cgi-bin/webscr" method="post">
+               		<input type="hidden" name="cmd" value="_s-xclick">
+               		<input type="hidden" name="hosted_button_id" value="10463995">
+               		<input type="image" src="./Java Collections_files/160x80xvogella-donate.png.pagespeed.ic.sqhcKNBYjj.jpg" width="160" height="80" border="0" name="submit" alt="Donation">
+               		
+            </form>
+            	
+         </div> 
+         <!--sidebar-->
+         
+         	<br>
+         	<br>
+         
+         	<script type="text/javascript">google_ad_client="ca-pub-3851443674951530";google_ad_slot="6294971031";google_ad_width=160;google_ad_height=600;</script>
+         	<script type="text/javascript" src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
+         
+         	<br>
+         	<br>
+         	<br>
+         	<br>
+         
+         
+         	
+         <!-- Lake Quincy-->
+         	
+         <div class="lqm_ad" lqm_publisher="lqm.javaeclipseandroid.site" lqm_zone="ron" lqm_tags="Android%2cMobile%2cJava" lqm_format="160x600"></div>
+         	
+         <p></p>
+         
+         
+         
+      </div> 
+      <!-- leftcolumn -->
+      
+      
+      
+      
+      <div id="rightcol">
+         
+         	
+         <p class="training-bg">
+            		<a class="image-z" href="http://www.vogella.com/training/">
+               			<img src="./Java Collections_files/200x364xvogellatraining_ad.png.pagespeed.ic.KQGlbyMRAP.png" height="364" width="200" alt="vogella training" pagespeed_url_hash="3206313059">
+               		</a>
+            		<a class="btn-training button1" href="http://www.vogella.com/training/">Training</a>
+            		<a class="btn-training button2" href="http://www.vogella.com/books/index.html">Books</a>
+            	
+         </p>
+         
+         	
+         <div class="twitter">
+            		
+            <div class="twitt">
+               			<a href="http://www.twitter.com/vogella">
+                  				<img src="./Java Collections_files/xtwitter.png.pagespeed.ic.jzAwobzXLA.png" alt="Follow me on twitter" pagespeed_url_hash="3840866205">
+                  			</a>
+               		
+            </div>
+            
+            		
+            <div class="googleplus">
+               			<a rel="me" href="https://profiles.google.com/104044918586174763681">
+                  				<img src="./Java Collections_files/xgoogle.png.pagespeed.ic.vtrt42uiF7.png" alt="Lars Vogel on Google+" pagespeed_url_hash="1616412609">
+                  			</a>
+               		
+            </div>
+            	
+         </div> 
+         <!-- twitter -->
+         	
+         	
+         <div class="book-buttons">
+            	
+            <div class="books">
+               	<a href="http://www.vogella.com/books/index.html">
+                  	<img src="./Java Collections_files/xbooks.png.pagespeed.ic.cAm5icdowv.png" alt="Purchase books" pagespeed_url_hash="1180597834">
+                  	</a>
+               	
+               	<a href="http://www.vogella.com/support.html">
+                  	<img src="./Java Collections_files/xdonate.png.pagespeed.ic.t1XNIwyNCl.png" alt="Support free tutorials" pagespeed_url_hash="3687254801">
+                  	</a>
+               	
+               
+            </div> 
+            <!-- books -->
+            
+         </div> 
+         <!-- book buttons -->
+         
+         
+      </div> 
+      <!--rightcol-->
+      
+      
+      
+      <div class="article">
+         <div class="titlepage">
+            <div>
+               <div xmlns:fo="http://www.w3.org/1999/XSL/Format" class="vogellalogo"><a rel="author" href="http://www.vogella.com/people/larsvogel.html"><img src="./Java Collections_files/100x120xlars-hackagotchi.png.pagespeed.ic.gx2Sf13j9r.png" height="120" width="100" alt="Lars Vogel" pagespeed_url_hash="954687886"></a></div>
+               <div>
+                  <h2 class="title"><a name="d316774e1"></a>Java Collections
+                  </h2>
+               </div>
+               <div>
+                  <div class="author">
+                     <h3 class="author"><span class="firstname">Lars</span> <span class="surname">Vogel</span></h3>
+                  </div>
+               </div>
+               <div>
+                  <p class="releaseinfo">
+                     
+                  </p>
+                  <p>Version 2.3</p>
+                  <p class="releaseinfo">
+                     
+                  </p>
+               </div>
+               <div>
+                  <p class="copyright">Copyright © 2008, 2009, 2010, 2011, 2012, 2013  Lars Vogel</p>
+               </div>
+               <div>
+                  <p class="pubdate">11.06.2013</p>
+               </div>
+               <div>
+                  <div class="revhistory">
+                     <table summary="Revision History">
+                        <tbody><tr>
+                           <th align="left" valign="top" colspan="4"><b>Revision History</b></th>
+                        </tr>
+                        <tr>
+                           <td align="left">Revision 0.1</td>
+                           <td align="left">07.08.2008</td>
+                           <td align="left"><span class="firstname">Lars<br></span><span class="surname">Vogel<br></span></td>
+                           <td align="left">created</td>
+                        </tr>
+                        <tr>
+                           <td align="left">Revision 0.2 - 2.3</td>
+                           <td align="left">22.09.2008 - 11.06.2013</td>
+                           <td align="left"><span class="firstname">Lars<br></span><span class="surname">Vogel<br></span></td>
+                           <td align="left">bug fixes and updates</td>
+                        </tr>
+                     </tbody></table>
+                  </div>
+               </div>
+               <div>
+                  <div class="abstract"><a name="abstract"></a><p class="title"><b>Introduction to Java Collections</b></p>
+                     <p> This tutorial explains the usage of the Java Collections, e.g.
+                        Lists, ArrayLists and Maps.
+                        
+                     </p>
+                  </div>
+               </div>
+            </div>
+            <hr>
+         </div>
+         <div class="toc">
+            <p><b>Table of Contents</b></p>
+            <dl>
+               <dt><span class="section"><a href="http://www.vogella.com/tutorials/JavaCollections/article.html#javacollections">1. Java Collections</a></span></dt>
+               <dt><span class="section"><a href="http://www.vogella.com/tutorials/JavaCollections/article.html#javacollections_types">2. Important implementations</a></span></dt>
+               <dd>
+                  <dl>
+                     <dt><span class="section"><a href="http://www.vogella.com/tutorials/JavaCollections/article.html#javacollections_hashmap">2.1. Map and HashMap</a></span></dt>
+                     <dt><span class="section"><a href="http://www.vogella.com/tutorials/JavaCollections/article.html#javacollections_lists">2.2. List, ArrayList and LinkedList</a></span></dt>
+                  </dl>
+               </dd>
+               <dt><span class="section"><a href="http://www.vogella.com/tutorials/JavaCollections/article.html#javacollections_methods">3. Useful collection methods</a></span></dt>
+               <dt><span class="section"><a href="http://www.vogella.com/tutorials/JavaCollections/article.html#collectionssort">4. Using Collections.sort and Comparator in Java</a></span></dt>
+               <dt><span class="section"><a href="http://www.vogella.com/tutorials/JavaCollections/article.html#exercise_javacollections">5. Exercise: Use Java Collections</a></span></dt>
+               <dt><span class="section"><a href="http://www.vogella.com/tutorials/JavaCollections/article.html#thankyou">6. Support free vogella tutorials</a></span></dt>
+               <dd>
+                  <dl>
+                     <dt><span class="section"><a href="http://www.vogella.com/tutorials/JavaCollections/article.html#thankyou">6.1. Thank you</a></span></dt>
+                     <dt><span class="section"><a href="http://www.vogella.com/tutorials/JavaCollections/article.html#questions">6.2. Questions and Discussion</a></span></dt>
+                  </dl>
+               </dd>
+               <dt><span class="section"><a href="http://www.vogella.com/tutorials/JavaCollections/article.html#resources">7. Links and Literature</a></span></dt>
+            </dl>
+         </div> 
+         
+         
+         
+         <div class="section">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h2 class="title"><a name="javacollections"></a>1.&nbsp;Java Collections
+                     </h2>
+                  </div>
+               </div>
+            </div><a class="indexterm" name="d316774e75"></a><p>
+               A Java
+               <em class="wordasword">collection</em>
+               is a data structure which contains and
+               processes a
+               set of data. The
+               data
+               stored in the collection is
+               encapsulated and
+               the access to
+               the
+               data
+               is only
+               possible via predefined
+               methods.
+               
+            </p>
+            <p>
+               For example if your application saves data in an
+               object of type
+               <code class="code">People</code>,
+               you can store several
+               <code class="code">People</code>
+               objects in a
+               collection.
+               
+            </p>
+            <p>
+               While arrays are of a fixed size, collections have a dynamic
+               size,
+               e.g. a collection can contain a flexible number of objects.
+               
+            </p>
+            <p>
+               Typical collections are: stacks, queues, deques, lists and
+               trees.
+               
+            </p>
+            <p>
+               As of Java 5 collections should get parameterized with an object
+               declaration
+               to enable the compiler to check if objects which are added
+               to
+               the collection have the correct type. This is based on
+               <em class="wordasword">Generics</em>. Generics allow a type or method to operate on objects of
+               various
+               types while providing compile-time type safety.
+               
+            </p>
+            <p>
+               The following code shows an example how to create a Collection of type
+               <code class="code">List</code>
+               which is parameterized with &lt;String&gt;
+               to indicate to the Java compiler that only Strings are allowed in this
+               list.
+               .
+               
+            </p>
+            <p>
+               
+            </p><pre class="programlisting"><span class="hl-keyword">package</span> collections;
+
+<span class="hl-keyword">import</span> java.util.ArrayList;
+
+<span class="hl-keyword">public</span> <span class="hl-keyword">class</span> MyArrayList {
+
+    <span class="hl-keyword">public</span> <span class="hl-keyword">static</span> <span class="hl-keyword">void</span> main(String[] args) {
+        
+        <em class="hl-comment" style="color: #080">// Declare the List concrete type is ArrayList</em>
+        List&lt;String&gt; var = <span class="hl-keyword">new</span> ArrayList&lt;String&gt;();
+        
+        <em class="hl-comment" style="color: #080">// add a few Strings to it</em>
+        var.add(<span class="hl-string" style="color:blue">"Lars"</span>);
+        var.add(<span class="hl-string" style="color:blue">"Tom"</span>);
+        
+        <em class="hl-comment" style="color: #080">// Loop over it and print the result to the console</em>
+        <span class="hl-keyword">for</span> (String s : var) {
+            System.out.println(s);
+        }
+    }
+} </pre><p>
+               
+            </p>
+            <p>If you try to put a non String into this list, you would receive
+               a compiler error.
+            </p>
+            <p>
+               <code class="code">List</code>
+               is only an interface, a common implementation is the
+               <code class="code">ArrayList</code>
+               class, hence you need to call
+               <code class="code">new ArrayList()</code>.
+               
+            </p>
+         </div>
+         <div class="section">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h2 class="title"><a name="javacollections_types"></a>2.&nbsp;Important implementations
+                     </h2>
+                  </div>
+               </div>
+            </div>
+            <div class="section">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="javacollections_hashmap"></a>2.1.&nbsp;Map and HashMap
+                        </h3>
+                     </div>
+                  </div>
+               </div><a class="indexterm" name="d316774e129"></a><a class="indexterm" name="d316774e132"></a><p>
+                  The
+                  <code class="code">Map</code>
+                  interface defines an object that maps keys to values. A map cannot
+                  contain
+                  duplicate keys; each key can map to at most one value.
+                  
+               </p>
+               <p>
+                  The
+                  <code class="code">HashMap</code>
+                  class is an efficient implementation of the
+                  <code class="code">Map</code>
+                  interface. The following code demonstrates its usage.
+                  
+               </p>
+               <p>
+                  
+               </p><pre class="programlisting"><span class="hl-keyword">package</span> com.vogella.java.collections.map;
+
+<span class="hl-keyword">import</span> java.util.HashMap;
+<span class="hl-keyword">import</span> java.util.Iterator;
+<span class="hl-keyword">import</span> java.util.Map;
+
+<span class="hl-keyword">public</span> <span class="hl-keyword">class</span> MapTester {
+  <span class="hl-keyword">public</span> <span class="hl-keyword">static</span> <span class="hl-keyword">void</span> main(String[] args) {
+    <em class="hl-comment" style="color: #080">// Keys are Strings</em>
+    <em class="hl-comment" style="color: #080">// Objects are also Strings</em>
+    
+    Map&lt;String, String&gt; mMap = <span class="hl-keyword">new</span> HashMap&lt;String, String&gt;();
+    mMap.put(<span class="hl-string" style="color:blue">"Android"</span>, <span class="hl-string" style="color:blue">"Mobile"</span>);
+    mMap.put(<span class="hl-string" style="color:blue">"Eclipse"</span>, <span class="hl-string" style="color:blue">"IDE"</span>);
+    mMap.put(<span class="hl-string" style="color:blue">"Git"</span>, <span class="hl-string" style="color:blue">"Version control system"</span>);
+    
+    <em class="hl-comment" style="color: #080">// Output </em>
+    <span class="hl-keyword">for</span> (String key : mMap.keySet()) {
+      System.out.println(key +<span class="hl-string" style="color:blue">" "</span>+ mMap.get(key));
+    }
+
+    System.out.println(<span class="hl-string" style="color:blue">"Changing the data"</span>);
+    <em class="hl-comment" style="color: #080">// adding to the map</em>
+    mMap.put(<span class="hl-string" style="color:blue">"iPhone"</span>, <span class="hl-string" style="color:blue">"Created by Apple"</span>);
+
+    <em class="hl-comment" style="color: #080">// Delete from map</em>
+    
+    mMap.remove(<span class="hl-string" style="color:blue">"Android"</span>);
+    
+    System.out.println(<span class="hl-string" style="color:blue">"New output:"</span>);
+    <em class="hl-comment" style="color: #080">// Output</em>
+    <span class="hl-keyword">for</span> (String key : mMap.keySet()) {
+      System.out.println(key +<span class="hl-string" style="color:blue">" "</span>+ mMap.get(key));
+    }
+  }
+} </pre><p>
+                  
+               </p>
+            </div>
+            <div class="section">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="javacollections_lists"></a>2.2.&nbsp;List, ArrayList and LinkedList
+                        </h3>
+                     </div>
+                  </div>
+               </div><a class="indexterm" name="d316774e156"></a><a class="indexterm" name="d316774e159"></a><a class="indexterm" name="d316774e162"></a><p>
+                  <code class="code">List</code>
+                  is the interface which allows to store objects in a resizable
+                  container.
+                  
+               </p>
+               <p>
+                  <code class="code">ArrayList</code>
+                  is implemented as a resizable array. If more elements are added to
+                  ArrayList than its initial size, its size is increased dynamically.
+                  The elements in an
+                  <code class="code">ArrayList</code>
+                  can be
+                  accessed directly and efficiently by using the
+                  <code class="code">get()</code>
+                  and
+                  <code class="code">get()</code>
+                  methods, since
+                  ArrayList
+                  is implemented based on an array.
+                  
+                  
+               </p>
+               <p>
+                  <code class="code">LinkedList</code>
+                  is implemented as a double linked list. Its
+                  performance on
+                  <code class="code">add()</code>
+                  and
+                  <code class="code">remove()</code>
+                  is better than the performance of Arraylist. The
+                  <code class="code">get()</code>
+                  and
+                  <code class="code">get()</code>
+                  methods have worse performance than the ArrayList, as the
+                  <code class="code">LinkedList</code>
+                  does not provide direct access.
+                  
+               </p>
+               <p>
+                  The following code demonstrates the usage of
+                  <code class="code">List</code>
+                  and
+                  <code class="code">ArrayList</code>.
+                  
+               </p>
+               <p>
+                  
+               </p><pre class="programlisting"><span class="hl-keyword">package</span> com.vogella.java.collections.list;
+
+<span class="hl-keyword">import</span> java.util.ArrayList;
+<span class="hl-keyword">import</span> java.util.List;
+
+<span class="hl-keyword">public</span> <span class="hl-keyword">class</span> ListExample {
+  <span class="hl-keyword">public</span> <span class="hl-keyword">static</span> <span class="hl-keyword">void</span> main(String[] args) {
+    List&lt;Integer&gt; list = <span class="hl-keyword">new</span> ArrayList&lt;Integer&gt;();
+    list.add(<span class="hl-number">3</span>);
+    list.add(<span class="hl-number">2</span>);
+    list.add(<span class="hl-number">1</span>);
+    list.add(<span class="hl-number">4</span>);
+    list.add(<span class="hl-number">5</span>);
+    list.add(<span class="hl-number">6</span>);
+    list.add(<span class="hl-number">6</span>);
+    <span class="hl-keyword">for</span> (Integer integer : list) {
+      System.out.println(integer);
+    }
+  }
+
+} </pre><p>
+                  
+               </p>
+            </div>
+         </div>
+         <div class="section">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h2 class="title"><a name="javacollections_methods"></a>3.&nbsp;Useful collection methods
+                     </h2>
+                  </div>
+               </div>
+            </div><a class="indexterm" name="d316774e221"></a><p>
+               The
+               <code class="code">java.util.Collections</code>
+               class provides useful functionalities for working with collections.
+               
+            </p>
+            <div class="table"><a name="d316774e231"></a><p class="title"><b>Table&nbsp;1.&nbsp;Collections</b></p>
+               <div class="table-contents">
+                  <table summary="Collections" border="1">
+                     <colgroup>
+                        <col align="left" class="c1">
+                        <col align="left" class="c2">
+                     </colgroup>
+                     <thead>
+                        <tr>
+                           <th align="left">Method</th>
+                           <th align="left">Description</th>
+                        </tr>
+                     </thead>
+                     <tbody>
+                        <tr>
+                           <td align="left">Collections.copy(list, list)</td>
+                           <td align="left">Copy a collection to another</td>
+                        </tr>
+                        <tr>
+                           <td align="left">Collections.reverse(list)</td>
+                           <td align="left">Reverse the order of the list</td>
+                        </tr>
+                        <tr>
+                           <td align="left">Collections.shuffle(list)</td>
+                           <td align="left">Shuffle the list</td>
+                        </tr>
+                        <tr>
+                           <td align="left">Collections.sort(list)</td>
+                           <td align="left">Sort the list</td>
+                        </tr>
+                     </tbody>
+                  </table>
+               </div>
+            </div><br class="table-break"></div>
+         <div class="section">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h2 class="title"><a name="collectionssort"></a>4.&nbsp;Using Collections.sort and Comparator in Java
+                     </h2>
+                  </div>
+               </div>
+            </div><a class="indexterm" name="d316774e267"></a><p>
+               Sorting a collection in Java is easy, just use the
+               <code class="code">Collections.sort(Collection)</code>
+               to sort your values. The following code shows an example for this.
+               
+            </p>
+            <p>
+               
+            </p><pre class="programlisting"><span class="hl-keyword">package</span> de.vogella.algorithms.sort.standardjava;
+ 
+<span class="hl-keyword">import</span> java.util.ArrayList;
+<span class="hl-keyword">import</span> java.util.Collections;
+<span class="hl-keyword">import</span> java.util.List;
+ 
+<span class="hl-keyword">public</span> <span class="hl-keyword">class</span> Simple {
+    <span class="hl-keyword">public</span> <span class="hl-keyword">static</span> <span class="hl-keyword">void</span> main(String[] args) {
+        List list = <span class="hl-keyword">new</span> ArrayList();
+        list.add(<span class="hl-number">5</span>);
+        list.add(<span class="hl-number">4</span>);
+        list.add(<span class="hl-number">3</span>);
+        list.add(<span class="hl-number">7</span>);
+        list.add(<span class="hl-number">2</span>);
+        list.add(<span class="hl-number">1</span>);
+        Collections.sort(list);
+        <span class="hl-keyword">for</span> (Integer integer : list) {
+            System.out.println(integer);
+        }
+    }
+} </pre><p>
+               
+            </p>
+            <p>
+               This is possible because Integer implements the
+               <code class="code">Comparable</code>
+               interface. This interface defines the method compare which performs
+               pairwise comparison of the elements and returns -1 if the element is
+               smaller then the compared element, 0 if it is equal and 1 if it is
+               larger.
+               
+            </p>
+            <p>
+               If what to sort differently you can define your own implementation
+               based on the
+               <code class="code">Comparator</code>
+               interface.
+               
+            </p>
+            <p>
+               
+            </p><pre class="programlisting"><span class="hl-keyword">package</span> de.vogella.algorithms.sort.standardjava;
+ 
+<span class="hl-keyword">import</span> java.util.Comparator;
+ 
+<span class="hl-keyword">public</span> <span class="hl-keyword">class</span> MyIntComparable <span class="hl-keyword">implements</span> Comparator&lt;Integer&gt;{
+ 
+    <em><span class="hl-annotation" style="color: gray">@Override</span></em>
+    <span class="hl-keyword">public</span> <span class="hl-keyword">int</span> compare(Integer o1, Integer o2) {
+        <span class="hl-keyword">return</span> (o1&gt;o2 ? -<span class="hl-number">1</span> : (o1==o2 ? <span class="hl-number">0</span> : <span class="hl-number">1</span>));
+    }
+} </pre><p>
+               
+            </p>
+            <p>
+               
+            </p><pre class="programlisting"><span class="hl-keyword">package</span> de.vogella.algorithms.sort.standardjava;
+
+<span class="hl-keyword">import</span> java.util.ArrayList;
+<span class="hl-keyword">import</span> java.util.Collections;
+<span class="hl-keyword">import</span> java.util.List;
+
+<span class="hl-keyword">public</span> <span class="hl-keyword">class</span> Simple2 {
+  <span class="hl-keyword">public</span> <span class="hl-keyword">static</span> <span class="hl-keyword">void</span> main(String[] args) {
+    List&lt;Integer&gt; list = <span class="hl-keyword">new</span> ArrayList&lt;Integer&gt;();
+    list.add(<span class="hl-number">5</span>);
+    list.add(<span class="hl-number">4</span>);
+    list.add(<span class="hl-number">3</span>);
+    list.add(<span class="hl-number">7</span>);
+    list.add(<span class="hl-number">2</span>);
+    list.add(<span class="hl-number">1</span>);
+    Collections.sort(list, <span class="hl-keyword">new</span> MyIntComparable());
+    <span class="hl-keyword">for</span> (Integer integer : list) {
+      System.out.println(integer);
+    }
+  }
+
+} </pre><p>
+               
+            </p>
+            <div class="note" style="margin-left: 0.5in; margin-right: 0.5in;">
+               <h3 class="title">Note</h3>
+               <p>
+                  For the above you could also have used the
+                  <code class="code">Collection.reverse()</code>
+                  method call.
+                  
+               </p>
+            </div>
+            <p>
+               This approach is that you then sort any
+               object by any attribute or
+               even
+               a combination of attributes. For
+               example if you have objects of
+               type
+               <code class="code">Person</code>
+               with an attribute income and dataOfBirth you could define different
+               implementations of
+               <code class="code">Comparator</code>
+               and sort the objects according to your needs.
+               
+            </p>
+         </div>
+         <div class="section">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h2 class="title"><a name="exercise_javacollections"></a>5.&nbsp;Exercise: Use Java Collections
+                     </h2>
+                  </div>
+               </div>
+            </div>
+            <p>
+               Create a new Java project called
+               <code class="code">com.vogella.java.collections</code>. Also add a package with the same name.
+               
+               
+            </p>
+            <p>
+               Create a Java class called
+               <em class="wordasword">Server</em>
+               with one String attribute called
+               <span class="property">url</span>.
+               
+            </p>
+            <p>
+               
+            </p><pre class="programlisting"><span class="hl-keyword">package</span> com.vogella.java.collections;
+
+<span class="hl-keyword">public</span> <span class="hl-keyword">class</span> Server {
+    <span class="hl-keyword">private</span> String url;
+} </pre><p>
+               
+            </p>
+            <p>
+               Create getter and setter methods for this attribute using code
+               generation capabilities of Eclipse. For this select
+               <span class="guimenu">Source</span> &#8594; <span class="guisubmenu">Generate Getters and Setters</span>
+               from the Eclipse menu.
+               
+            </p>
+            <p>
+               Create via Eclipse a constructor which gets a url as parameter. For
+               this select
+               <span class="guimenu">Source</span> &#8594; <span class="guisubmenu">Generate Constructor using Fields...</span>
+               from the Eclipse menu.
+               
+            </p>
+            <p>
+               Type
+               <em class="parameter"><code>main</code></em>
+               in the class body and use code completion (<span class="keycap"><strong>Ctrl</strong></span>+<span class="keycap"><strong>Space</strong></span>) to generate a
+               <code class="code">main</code>
+               method.
+               
+            </p>
+            <p>
+               
+            </p>
+            <div class="mediaobject"><img src="./Java Collections_files/xcollectioncodecompletion10.png.pagespeed.ic.L8XSXnUViW.png" alt="Code completion" pagespeed_url_hash="833383275"></div>
+            <p>
+               
+            </p>
+            <p>
+               In your
+               <code class="code">main</code>
+               method create a
+               <code class="code">List</code>
+               of type
+               <code class="code">ArrayList</code>
+               and add 3 objects of type
+               <code class="code">Server</code>
+               objects to this list.
+               
+            </p>
+            <p>
+               
+            </p><pre class="programlisting"><span class="hl-keyword">public</span> <span class="hl-keyword">static</span> <span class="hl-keyword">void</span> main(String[] args) {
+    List&lt;Server&gt; list = <span class="hl-keyword">new</span> ArrayList&lt;Server&gt;();
+    list.add(<span class="hl-keyword">new</span> Server(<span class="hl-string" style="color:blue">"http://www.vogella.com"</span>));
+    list.add(<span class="hl-keyword">new</span> Server(<span class="hl-string" style="color:blue">"http://www.google.com"</span>));
+    list.add(<span class="hl-keyword">new</span> Server(<span class="hl-string" style="color:blue">"http://www.heise.de"</span>));
+} </pre><p>
+               
+            </p>
+            <p>
+               Use code completion to create a
+               <span class="guilabel">foreach</span>
+               loop and write the
+               <code class="code">toString</code>
+               method to the console. Use code completion based on
+               <code class="code">syso</code>
+               for that.
+               
+            </p>
+            <p>Run your program.</p>
+            <p>
+               Use Eclipse to create a
+               <code class="code">toString</code>
+               method based on the
+               <span class="property">url</span>
+               parameter and re-run your program again.
+               
+            </p>
+         </div>
+         <!-- Lake Quincy Ads -->
+         <div class="lqm_ad" lqm_publisher="lqm.javaeclipseandroid.site" lqm_tags="Java%20Mobile%20Android" lqm_zone="ron" lqm_format="728x90"></div>
+         <div class="section">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h2 class="title"><a name="thankyou"></a>6.&nbsp;Support free vogella tutorials
+                     </h2>
+                  </div>
+               </div>
+            </div>
+            <p>Maintaining high quality free online tutorials is a lot of work.
+               Please support free tutorials by donating or by reporting typos
+               and factual
+               errors.
+               
+            </p>
+            <div class="section">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="thankyou"></a>6.1.&nbsp;Thank you
+                        </h3>
+                     </div>
+                  </div>
+               </div>
+               <p>
+                  
+                  	
+               </p>
+               <p></p>
+               <p>
+                  	Please consider a contribution if this article helped you.
+                  	
+               </p>
+               <table style="border: none;">
+                  <tbody><tr>
+                     			
+                     <td>
+                        				<a href="http://flattr.com/thing/49772/Tutorials-for-Eclipse-Java-Android-and-Webprogramming" target="_blank">
+                           					<img src="./Java Collections_files/xflattr.png.pagespeed.ic.5ZB2lDsqgv.png" alt="Flattr this" title="Flattr this" border="0" pagespeed_url_hash="2804159643">
+                           				</a>
+                        			
+                     </td>
+                     
+                     			
+                     <td>
+                        				
+                        <form action="https://www.paypal.com/cgi-bin/webscr" method="post">
+                           					<input type="hidden" name="cmd" value="_s-xclick">
+                           					<input type="hidden" name="hosted_button_id" value="10463995">
+                           					<input type="image" src="./Java Collections_files/xvogella-donate-transparent.png.pagespeed.ic.8vWXnZXSrJ.png" border="0" name="submit" alt="PayPal Donate">
+                           				
+                        </form>
+                        			
+                     </td>
+                     		
+                  </tr>
+               </tbody></table>
+               <p>
+                  
+                  
+                  
+                  
+               </p>
+            </div>
+            <div class="section">
+               <div class="titlepage">
+                  <div>
+                     <div>
+                        <h3 class="title"><a name="questions"></a>6.2.&nbsp;Questions and Discussion
+                        </h3>
+                     </div>
+                  </div>
+               </div>
+               <p>
+                  If you find errors in this tutorial, please notify me
+                  (see the
+                  <a class="ulink" href="http://www.vogella.com/tutorials/JavaCollections/article.html#top" target="_top">top of the page</a>).
+                  Please note that due to the high volume of feedback I
+                  receive, I
+                  cannot answer questions to your implementation. Ensure you
+                  have read
+                  the
+                  <a class="ulink" href="http://www.vogella.com/faq.html" target="_top">vogella FAQ</a>
+                  as
+                  I don't respond to questions already answered there.
+                  
+               </p>
+            </div>
+         </div>
+         <div class="section">
+            <div class="titlepage">
+               <div>
+                  <div>
+                     <h2 class="title"><a name="resources"></a>7.&nbsp;Links and Literature
+                     </h2>
+                  </div>
+               </div>
+            </div>
+            <p>
+               
+               <a class="ulink" href="http://java.sun.com/docs/codeconv/index.html" target="_top">
+                  http://java.sun.com/docs/codeconv/index.html - Sun Coding Convention</a>.
+               
+            </p>
+         </div>
+      </div>
+      
+      
+      
+   <script>//<![CDATA[
+(function(){var d=encodeURIComponent,f=window,g=document,h="documentElement",k="length",l="prototype",m="body",p="&",s="&ci=",t=",",u="?",v="Content-Type",w="Microsoft.XMLHTTP",x="Msxml2.XMLHTTP",y="POST",z="application/x-www-form-urlencoded",A="img",B="input",C="load",D="oh=",E="on",F="pagespeed_url_hash",G="url=";f.pagespeed=f.pagespeed||{};var H=f.pagespeed,I=function(a,b,c){this.c=a;this.e=b;this.d=c;this.b=this.f();this.a={}};I[l].f=function(){return{height:f.innerHeight||g[h].clientHeight||g[m].clientHeight,width:f.innerWidth||g[h].clientWidth||g[m].clientWidth}};I[l].g=function(a){a=a.getBoundingClientRect();return{top:a.top+(void 0!==f.pageYOffset?f.pageYOffset:(g[h]||g[m].parentNode||g[m]).scrollTop),left:a.left+(void 0!==f.pageXOffset?f.pageXOffset:(g[h]||g[m].parentNode||g[m]).scrollLeft)}};I[l].h=function(a){if(0>=a.offsetWidth&&0>=a.offsetHeight)return!1;a=this.g(a);var b=a.top.toString()+t+a.left.toString();if(this.a.hasOwnProperty(b))return!1;this.a[b]=!0;return a.top<=this.b.height&&a.left<=this.b.width};I[l].i=function(a){var b;if(f.XMLHttpRequest)b=new XMLHttpRequest;else if(f.ActiveXObject)try{b=new ActiveXObject(x)}catch(c){try{b=new ActiveXObject(w)}catch(e){}}if(!b)return!1;b.open(y,this.c+(-1==this.c.indexOf(u)?u:p)+G+d(this.e));b.setRequestHeader(v,z);b.send(a);return!0};I[l].k=function(){for(var a=[A,B],b=[],c={},e=0;e<a[k];++e)for(var q=g.getElementsByTagName(a[e]),n=0;n<q[k];++n){var r=q[n].getAttribute(F);r&&(q[n].getBoundingClientRect&&this.h(q[n]))&&!(r in c)&&(b.push(r),c[r]=!0)}if(0!=b[k]){a=D+this.d;a+=s+d(b[0]);for(e=1;e<b[k];++e){c=t+d(b[e]);if(131072<a[k]+c[k])break;a+=c}H.criticalImagesBeaconData=a;this.i(a)}};H.j=function(a,b,c){if(a.addEventListener)a.addEventListener(b,c,!1);else if(a.attachEvent)a.attachEvent(E+b,c);else{var e=a[E+b];a[E+b]=function(){c.call(this);e&&e.call(this)}}};H.l=function(a,b,c){var e=new I(a,b,c);H.j(f,C,function(){f.setTimeout(function(){e.k()},0)})};H.criticalImagesBeaconInit=H.l;})();pagespeed.criticalImagesBeaconInit('/mod_pagespeed_beacon','http://www.vogella.com/tutorials/JavaCollections/article.html','pStBjfbbxe');
+//]]></script><script pagespeed_no_defer="">//<![CDATA[
+(function(){var c=encodeURIComponent,f=window,h="performance",k="",l="&",m="&b_csi=",n="&cces=",p="&ccis=",q="&ccos=",r="&ccrl=",s="&ccul=",t="&connect=",u="&dns=",v="&dom_c=",w="&dwld=",x="&fp=",y="&htmlAt=",z="&ifr=0",A="&ifr=1",B="&nav=",C="&nrp=",D="&nt=",E="&r",F="&ref=",G="&req_start=",H="&ttfb=",I="&url=",J="=",K="?",L="EventStart",M="beforeunload",N="ets=",O="load",P="load:",Q="on",R="unload:";f.pagespeed=f.pagespeed||{};var S=f.pagespeed,T=function(a,d,b,e){this.d=a;this.a=d;this.b=b;this.e=e};
+S.beaconUrl=k;
+T.prototype.c=function(){var a=this.d,d=f.mod_pagespeed_start,b=Number(new Date)-d,a=a+(-1==a.indexOf(K)?K:l),a=a+N+(this.a==O?P:R),a=a+b;if(this.a!=M||!f.mod_pagespeed_loaded){a+=E+this.a+J;if(f[h]){var b=f[h].timing,e=b.navigationStart,g=b.requestStart,a=a+(b[this.a+L]-e),a=a+(B+(b.fetchStart-e)),a=a+(u+(b.domainLookupEnd-b.domainLookupStart)),a=a+(t+(b.connectEnd-b.connectStart)),a=a+(G+(g-e)),a=a+(H+(b.responseStart-g)),a=a+(w+(b.responseEnd-b.responseStart)),a=a+(v+(b.domContentLoadedEventStart-e));
+f[h].navigation&&(a+=D+f[h].navigation.type);e=-1;b.msFirstPaint?e=b.msFirstPaint:f.chrome&&f.chrome.loadTimes&&(e=Math.floor(1E3*f.chrome.loadTimes().firstPaintTime));-1!=e&&(a+=x+(e-g))}else a+=b;S.getResourceTimingData&&f.parent==f&&(a+=S.getResourceTimingData());a+=f.parent!=f?A:z;this.a==O&&(f.mod_pagespeed_loaded=!0,(b=f.mod_pagespeed_num_resources_prefetched)&&(a+=C+b),(b=f.mod_pagespeed_prefetch_start)&&(a+=y+(d-b)));S.panelLoader&&(d=S.panelLoader.getCsiTimingsString(),d!=k&&(a+=m+d));S.criticalCss&&
+(d=S.criticalCss,a+=p+d.total_critical_inlined_size+n+d.total_original_external_size+q+d.total_overhead_size+r+d.num_replaced_links+s+d.num_unreplaced_links);this.b!=k&&(a+=this.b);document.referrer&&(a+=F+c(document.referrer));a+=I+c(this.e);S.beaconUrl=a;(new Image).src=a}};S.f=function(a,d,b,e){var g=new T(a,d,b,e);f.addEventListener?f.addEventListener(d,function(){g.c()},!1):f.attachEvent(Q+d,function(){g.c()})};S.addInstrumentationInit=S.f;})();
+
+pagespeed.addInstrumentationInit('/mod_pagespeed_beacon', 'load', '', 'http://www.vogella.com/tutorials/JavaCollections/article.html');
+//]]></script>
+</body></html>
