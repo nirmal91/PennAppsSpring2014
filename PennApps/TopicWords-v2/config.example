@@ -1,0 +1,10 @@
+==== Do not change these values ====
+stopFilePath = resources/stoplist-smart-sys.txt
+performStemming = N
+backgroundCorpusFreqCounts = resources/bgCounts-Giga.txt
+topicWordCutoff = 0.1
+
+==== Directory to compute topic words on ====
+inputDir = /contents/
+==== Output File ====
+outputFile = /topic_words/lectures.ts

@@ -5,7 +5,30 @@ public class SentenceObject implements Comparable<SentenceObject> {
 	int indexNumber;
 	String fileName;
 	float score;
+	float topicWordScore;
+	float finalScore;
 	
+	public float getFinalScore() {
+		return finalScore;
+	}
+	public void setFinalScore(float finalScore) {
+		this.finalScore = finalScore;
+	}
+	public SentenceObject(String content, int indexNumber, String fileName,
+			float score, float topicWordScore) {
+		super();
+		this.content = content;
+		this.indexNumber = indexNumber;
+		this.fileName = fileName;
+		this.score = score;
+		this.topicWordScore = topicWordScore;
+	}
+	public float getTopicWordScore() {
+		return topicWordScore;
+	}
+	public void setTopicWordScore(float topicWordScore) {
+		this.topicWordScore = topicWordScore;
+	}
 	public float getScore() {
 		return score;
 	}
@@ -35,7 +58,8 @@ public class SentenceObject implements Comparable<SentenceObject> {
 		this.content = content;
 		this.indexNumber = indexNumber;
 		this.fileName = fileName;
-		this.score = 0;
+		this.score = 0.0f;
+		this.topicWordScore = 0.0f;
 	}
 	
 	public SentenceObject(String content, int indexNumber, String fileName,
@@ -51,11 +75,12 @@ public class SentenceObject implements Comparable<SentenceObject> {
 	public String toString() {
 		return "SentenceObject [content=" + content + ", indexNumber="
 				+ indexNumber + ", fileName=" + fileName + ", score=" + score
-				+ "]";
+				+ ", topicWordScore=" + topicWordScore + ", finalScore="
+				+ finalScore + "]";
 	}
 	public int compareTo(SentenceObject obj)
 	{
-		if(obj.score > score)
+		if(obj.finalScore > finalScore)
 			return 1;
 		else
 			return -1;

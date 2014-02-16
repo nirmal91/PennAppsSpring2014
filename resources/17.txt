@@ -1,0 +1,631 @@
+CIS 455/555: Internet and Web Systems 
+Information retrieval; Ranking; TF-IDF 
+ 
+March 25, 2013 
+1 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania Announcements 
+n? ? HW2MS2 is due tomorrow at 10:00pm EDT 
+n? ? Please use the Basic Testing Guide (posted on Piazza)! 
+ 
+n? ? Reading for next time: 
+n? ? Brin and Page: The PageRank Citation Ranking: Bringing 
+Order to the Web 
+n? ? http://ilpubs.stanford.edu:8090/422/1/1999-66.pdf 
+n? ? Brin and Page: The Anatomy of a Large-Scale Hypertextual 
+Web Search Engine 
+n? ? http://research.google.com/pubs/archive/334.pdf 
+n? ? Kleinberg: Authoritative Sources in a Hyperlinked 
+Environment  [optional] 
+n? ? http://www.cs.cornell.edu/home/kleinber/auth.pdf 
+2 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania Plan for today 
+NEXT 
+n? ? Information retrieval 
+n? ? Basics 
+n? ? Precision and recall 
+n? ? Taxonomy of IR models 
+n? ? Classic IR models 
+n? ? Boolean model 
+n? ? Vector model 
+n? ? TF/IDF 
+n? ? HITS and PageRank 
+3 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania Web search 
+n? ? Goal is to find information relevant to a userÕs 
+interests - and this is hard! 
+n? ? Challenge 1: Data quality 
+n? ? A significant amount of content on the web is not quality 
+information 
+n? ? Many pages contain nonsensical rants, etc. 
+n? ? The web is full of misspellings, multiple languages, etc. 
+n? ? Many pages are designed not to convey information Ð but to 
+get a high ranking (e.g., Òsearch engine optimizationÓ) 
+n? ? Challenge 2: Scale 
+n? ? Billions of documents 
+n? ? Challenge 3: Very little structure 
+n? ? No explicit schemata 
+n? ? However, hyperlinks encode information 
+4 
+© 2013 A. Haeberlen , Z. Ives Our discussion of web search 
+n? ? Begin with traditional information retrieval 
+n? ? Document models 
+n? ? Stemming and stop words 
+n? ? Web-specific issues 
+n? ? Crawlers and robots.txt (already discussed) 
+n? ? Scalability 
+n? ? Models for exploiting hyperlinks in ranking 
+n? ? Google and PageRank 
+n? ? Latent Semantic Indexing 
+5 
+© 2013 A. Haeberlen , Z. Ives Information Retrieval 
+n? ? Traditional information retrieval is basically text search 
+n? ? A corpus or body of text documents, e.g., in a document 
+collection in a library or on a CD 
+n? ? Documents are generally high-quality and designed to convey 
+information 
+n? ? Documents are assumed to have no structure beyond words 
+n? ? Searches are generally based on meaningful phrases, 
+perhaps including predicates over categories, dates, etc. 
+n? ? The goal is to find the document(s) that best match the 
+search phrase, according to a search model 
+n? ? Assumptions are typically different from Web:  quality 
+text, limited-size corpus, no hyperlinks 
+6 
+© 2013 A. Haeberlen , Z. Ives Motivation for Information Retrieval 
+n? ? Information Retrieval (IR) is about:  
+n? ? Representation 
+n? ? Storage 
+n? ? Organization of 
+n? ? And access to Òinformation itemsÓ 
+n? ? Focus is on userÕs information need rather than a 
+precise query: 
+n? ? User enters: ÒMarch MadnessÓ  
+n? ? Goal: Find information on college basketball teams which (1) 
+are maintained by a US university and (2) participate in the 
+NCAA tournament 
+n? ? Emphasis is on the retrieval of information (not data) 
+7 
+© 2013 A. Haeberlen , Z. Ives Data vs. Information Retrieval 
+n? ? Data retrieval, analogous to database querying:  
+which docs contain a set of keywords? 
+n? ? Well-defined, precise logical semantics 
+n? ? Example: All documents with (('CIS455' OR 'CIS555') AND ('midterm')) 
+n? ? A single erroneous object implies failure! 
+n? ? Information retrieval: 
+n? ? Information about a subject or topic 
+n? ? Semantics is frequently loose; we want approximate 
+matches 
+n? ? Small errors are tolerated (and in fact inevitable) 
+n? ? IR system: 
+n? ? Interpret contents of information items 
+n? ? Generate a ranking which reflects relevance 
+n? ? Notion of relevance is most important Ð needs a model 
+8 
+© 2013 A. Haeberlen , Z. Ives Basic model 
+Docs 
+Index Terms 
+doc 
+match 
+Information Need 
+Ranking 
+? 
+query 
+9 
+© 2013 A. Haeberlen , Z. Ives Information Retrieval as a field 
+n? ? IR addressed many issues in the last 20 years: 
+n? ? Classification and categorization of documents 
+n? ? Systems and languages for searching 
+n? ? User interfaces and visualization of results 
+n? ? Area was seen as of narrow interest Ð libraries, mainly 
+n? ? And then Ð the advent of the web: 
+n? ? Universal ÒlibraryÓ 
+n? ? Free (low cost) universal access 
+n? ? No central editorial board 
+n? ? Many problems in finding information:  
+IR seen as key to finding the solutions! 
+10 
+© 2013 A. Haeberlen , Z. Ives The full Information Retrieval process 
+Text 
+Browser / 
+UI 
+user interest 
+Text 
+Text Processing and Modeling 
+logical view 
+logical view 
+Query  
+Indexing 
+Operations 
+user feedback 
+Crawler 
+inverted index / Data  
+query 
+Access 
+Searching 
+Index 
+ 
+retrieved docs 
+Documents 
+(Web or DB) 
+Ranking 
+ranked docs  
+11 
+© 2013 A. Haeberlen , Z. Ives Terminology 
+n? ? IR systems usually adopt index terms to 
+process queries 
+n? ? Index term: 
+n? ? a keyword or group of selected words 
+n? ? any word (more general) 
+n? ? Stemming might be used: 
+n? ? connect: connecting, connection, connections 
+n? ? An inverted index is built for the chosen index 
+terms 
+12 
+© 2013 A. Haeberlen , Z. Ives What is a meaningful result? 
+n? ? Matching at index term level is quite imprecise 
+n? ? Users are frequently dissatisfied 
+n? ? One problem: users are generally poor at formulating queries 
+n? ? Frequent dissatisfaction of Web users (who often give single-
+keyword queries) 
+n? ? Issue of deciding relevance is critical for IR 
+systems: ranking 
+n? ? Show more relevant documents first 
+n? ? May leave out documents with low relevance 
+ 
+13 
+© 2013 A. Haeberlen , Z. Ives Precision and recall 
+ideal 
+p 
+better 
+n? ? How good is our IR system? 
+n? ? Two common metrics: 
+typical 
+n? ? Precision: What fraction 
+of the returned documents 
+is relevant? 
+n? ? Recall: What fraction of 
+the relevant documents 
+r 
+are returned? 
+n? ? How can you build trivial systems that optimize one of them? 
+n? ? Tradeoff: Increasing precision will usually lower 
+recall, and vice versa 
+n? ? Evaluate in a p-r graph (vary, e.g., number of results returned) 
+14 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania Rankings 
+n? ? A ranking is an ordering of the documents 
+retrieved that (hopefully) reflects the 
+relevance of the documents to the user query  
+n? ? A ranking is based on fundamental premises 
+regarding the notion of relevance, such as: 
+n? ? common sets of index terms 
+n? ? sharing of weighted terms 
+n? ? likelihood of relevance 
+n? ? Each set of premises leads to a distinct  
+IR model 
+15 
+© 2013 A. Haeberlen , Z. Ives Types of IR Models 
+ Set Theoretic 
+ Fuzzy 
+ Extended Boolean 
+ Classic Models 
+   boolean  Algebraic 
+   vector 
+ U 
+ Generalized Vector 
+   probabilistic 
+ Retrieval:  
+ s 
+ Lat. Semantic Index 
+ e      Adhoc 
+ Neural Networks 
+ r  
+     Filtering 
+   Structured Models 
+ 
+ Probabilistic 
+ T Non-Overlapping Lists 
+ Inference Network  
+ a Proximal Nodes 
+ Belief Network 
+ s 
+ Browsing 
+ k 
+  Browsing 
+ Flat 
+ Structure Guided 
+ Hypertext 
+16 
+© 2013 A. Haeberlen , Z. Ives Classic IR models Ð Basic concepts 
+n? ? Each document represented by a set of 
+representative keywords or index terms 
+n? ? An index term is a document word useful for 
+remembering the document's main themes 
+n? ? Traditionally, index terms were nouns 
+because nouns have meaning by themselves 
+n? ? Search engines assume that all words are 
+index terms (full text representation) 
+ 
+17 
+© 2013 A. Haeberlen , Z. Ives Classic IR Models Ð Weights 
+n? ? Not all terms are equally useful for representing the 
+document contents: less frequent terms allow 
+identifying a narrower set of documents 
+n? ? The importance of the index terms is represented by 
+weights associated to them 
+n? ? Let  
+n? ? k  be an index term 
+i
+n? ? d  be a document  
+j
+n? ? w be a weight associated with (k, d ) 
+ij i j
+n? ? The weight w quantifies the importance of the index 
+ij
+term for describing the document contents 
+18 
+© 2013 A. Haeberlen , Z. Ives Classic IR Models Ð Notation 
+k     is an index term (keyword) 
+i
+d    is a document 
+j
+t      is the total number of index terms 
+K = (k , k , É, k )    is the set of all index terms 
+1 2 t
+w ³ 0  is a weight associated with (k,d ) 
+ij i j
+w = 0  indicates that term does not belong to doc 
+ij
+d = (w , w , É, w )   is a weighted vector associated  
+j 1j 2j tj
+  with the document d
+j 
+g(d ) = w     is a function which returns the weight 
+i j ij
+  associated with pair (k, d ) 
+i j
+19 
+© 2013 A. Haeberlen , Z. Ives Plan for today 
+n? ? Information retrieval 
+n? ? Basics 
+n? ? Precision and recall 
+n? ? Taxonomy of IR models 
+NEXT 
+n? ? Classic IR models 
+n? ? Boolean model 
+n? ? Vector model 
+n? ? TF/IDF 
+n? ? HITS and PageRank 
+20 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania Boolean model 
+n? ? Simple model based on set theory 
+n? ? Queries specified as boolean expressions  
+n? ? precise semantics 
+n? ? neat formalism 
+n? ? q = k  ?  (k  ?  Âk ) 
+a b c
+n? ? Terms are either present or absent. Thus,  
+              w ? {0,1} 
+ij
+n? ? An example query 
+   q = k  ?  (k  ?  Âk ) 
+a b c
+21 
+© 2013 A. Haeberlen , Z. Ives Boolean model for similarity 
+K K
+a b 
+Query: 
+(1,1,0) 
+(1,0,0) 
+q = k  ?  (k  ?  Âk )  
+a b c
+(1,1,1) 
+In disjunctive normal form: 
+q = (k?k?k ) ? 
+a b c
+conjunctive 
+   (k?k?Âk ) ? 
+components 
+a b c
+K
+c 
+   (k?Âk?Âk ) 
+a b c
+ 
+       
+1 if ?q | (q ?q )? (?k :g (d )= g (q ))
+cc cc dnf i i j i cc
+sim(d ,q)=
+j
+otherwise 
+0
+22 
+© 2013 A. Haeberlen , Z. Ives Drawbacks of boolean model 
+n? ? Retrieval based on binary decision criteria with no 
+notion of partial matching 
+n? ? No ranking of the documents is provided (absence of 
+a grading scale) 
+n? ? Information need has to be translated into a Boolean 
+expression, which most users find awkward 
+n? ? The Boolean queries formulated by the users are 
+most often too simplistic 
+n? ? As a consequence, the Boolean model frequently 
+returns either too few or too many documents in 
+response to a user query 
+23 
+© 2013 A. Haeberlen , Z. Ives Plan for today 
+n? ? Information retrieval 
+n? ? Basics 
+n? ? Precision and recall 
+n? ? Taxonomy of IR models 
+n? ? Classic IR models 
+n? ? Boolean model 
+NEXT 
+n? ? Vector model 
+n? ? TF/IDF 
+n? ? HITS and PageRank 
+24 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania Vector model 
+n? ? A refinement of the boolean model, which 
+does not focus strictly on exact matching 
+n? ? Non-binary weights provide consideration for partial matches 
+n? ? These term weights are used to compute a degree of 
+similarity between a query and each document 
+n? ? Ranked set of documents provides for better 
+matching 
+25 
+© 2013 A. Haeberlen , Z. Ives Vector model 
+n? ? Define: 
+ w > 0  whenever  k ?  d
+ij i j 
+ w ³ 0  associated with the pair  (k,q) 
+iq i
+ d = (w , w , ..., w )       
+j 1j 2j tj
+q = (w , w , ..., w ) 
+1q 2q tq
+n? ? With each term k , associate a unit vector vec(i) 
+i
+n? ? The unit vectors vec(i)  and vec(j)  are assumed to be 
+orthonormal  (i.e., index terms are assumed to occur 
+independently within the documents) 
+n? ? Does this assumption ("independence assumption") hold in practice? 
+n? ? What influence do you think this has on performance? 
+n? ? The t unit vectors vec(i) form an orthonormal basis 
+for a t-dimensional space 
+n? ? In this space, queries and documents are 
+represented as weight vectors  
+26 
+© 2013 A. Haeberlen , Z. Ives Bag of words 
+n? ? In this model, w > 0 whenever k?d
+ij i j 
+n? ? Exact ordering of terms in the document is ignored 
+n? ? This is called the "bag of words" model 
+n? ? What will be the vectors for the following two 
+documents? 
+n? ? "Ape eats banana" 
+n? ? "Banana eats ape" 
+n? ? What needs to be done to fix this? 
+27 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania Similarity 
+S Se en ns se e a  an nd d  P Pr ri id de e a  an nd d  Wuthering Wuthering  
+T Te er rm m     
+Se Sens nsi ib bi il li it ty y  Pr Pre ejudice judice  He Height ights s  
+a af ff fe ec ct tiion on  0.996  115 0.993  58 0.847  20 
+jje ea allou ous s  0.087  10 0.120  7 0.466  11 
+g gos oss siip p  0.017  2 0  0 0.254  6 
+From: An Introduction to Information Retrieval, Cambridge UP 
+n? ? In the vector model, queries may return 
+documents that are not a 'perfect match' 
+n? ? Hence, we need a metric for the similarity between different 
+documents, or between a document and a query 
+n? ? Could we simply subtract the vectors? 
+n? ? Could we use a dot product? 
+n? ? Does normalization help? 
+28 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania Cosine similarity 
+j 
+dj 
+? 
+q 
+i 
+ 
+ 
+t
+d ?q w ?w
+·
+j i=1 i,j i,q
+ 
+sim(d ,q)= cos? = =
+ 
+j
+t 2 t 2
+|d |?|q |
+w ? w
+j
+· ·
+i=1 i,j j=1 i,q
+n? ? All weights are nonnegative; hence, 0 ² sim(q,d ) ²1 
+j
+29 
+© 2013 A. Haeberlen , Z. Ives Plan for today 
+n? ? Information retrieval 
+n? ? Basics 
+n? ? Precision and recall 
+n? ? Taxonomy of IR models 
+n? ? Classic IR models 
+n? ? Boolean model 
+n? ? Vector model 
+NEXT 
+n? ? TF/IDF 
+n? ? HITS and PageRank 
+30 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania An example 
+The University of Pennsylvania 
+n? ? What would be a good match for this query? 
+31 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania Weights in the vector model 
+ 
+ 
+t
+d ¥q w ?w
+j · i=1 i,j i,q
+ 
+sim(d ,q)= cos? = =
+ 
+j
+t 2 t 2
+|d |?|q |
+w ? w
+j
+· i=1 i,j · j=1 i,q
+n? ? How do we compute the weights w  and w ? 
+ij iq
+n? ? A good weight must take into account two 
+effects: 
+n? ? quantification of intra-document contents (similarity) 
+n? ? tf factor, the term frequency within a document 
+n? ? quantification of inter-documents separation (dissimilarity) 
+n? ? idf factor, the inverse document frequency 
+n? ? w = tf(i,j) * idf(i) 
+ij
+32 
+© 2013 A. Haeberlen , Z. Ives TF and IDF Factors 
+n? ? Let: 
+N  be the total number of docs in the collection 
+n  be the number of docs which contain k
+i i 
+freq(i,j)  raw frequency of k within d
+i j 
+ 
+n? ? A normalized tf factor is given by 
+ f(i,j)  =  a + (1-a) * freq(i,j) / max(freq(l,j)) 
+where the maximum is computed over all terms which occur 
+within the document d . (a is usually set to 0.4 or 0.5)
+j 
+ 
+n? ? The idf factor is computed as 
+ idf(i) = log (N / n) 
+i
+the log is used to make the values of  tf  and  idf  comparable.  
+It can also be interpreted as the amount of information 
+associated with the term k 
+i
+33 
+© 2013 A. Haeberlen , Z. Ives k2 
+k1 
+d7 
+Vector Model Example 1 
+d6 
+d2 
+d4 d5 
+d3 
+No weights 
+d1 
+k3 
+ k1 k2 k3 
+q ¥ dj 
+1 0 1 
+d1 2 
+d2 1 0 0 1 
+d3 0 1 1 2 
+1 0 0 
+d4 1 
+d5 1 1 1 3 
+1 1 0 
+d6 2 
+d7 0 1 0 1 
+     
+1 1 1 
+q  
+34 
+ 
+Query: k1 k2 k3 
+© 2013 A. Haeberlen , Z. Ives k2 
+k1 
+d7 
+Vector Model Example 2 
+d6 
+d2 
+d4 d5 
+d3 
+Query weights 
+d1 
+k3 
+ k1 k2 k3 
+q ¥ dj 
+1 0 1 
+d1 4 
+d2 1 0 0 1 
+d3 0 1 1 5 
+d4 1 0 0 1 
+1 1 1 
+d5 6 
+d6 1 1 0 3 
+d7 0 1 0 2 
+   
+  
+1 2 3 
+q  
+ 
+35 
+Query: k3 k2 k3 k1 k2 k3 
+© 2013 A. Haeberlen , Z. Ives k2 
+k1 
+d7 
+Vector Model Example 3 
+d6 
+d2 
+d4 d5 
+d3 
+Document + query weights 
+d1 
+k3 
+ k1 k2 k3 
+q ¥ dj 
+2 0 1 
+d1 5 
+d2 1 0 0 1 
+d3 0 1 3 11 
+2 0 0 
+d4 2 
+d5 1 2 4 17 
+d6 1 2 0 5 
+0 5 0 
+d7 10 
+   
+  
+q 1 2 3  
+ 
+36 
+Query: k3 k2 k3 k1 k2 k3 
+© 2013 A. Haeberlen , Z. Ives Putting it all together: Scoring 
+Specific document being scored 
+Computed across 
+all documents 
+Corpus Docum. Query 
+Term df idf tf w tf w product 
+t,d t,q 
+auto 5000 2.3 1 0.41 0 0 0 
+best 50000 1.3 0 0 1 1.3 0 
+car 10000 2.0 1 0.41 1 2.0 0.82 
+insurance 1000 3.0 2 0.82 1 3.0 2.46 
+From: An Introduction to Information Retrieval, Cambridge UP 
+n? ? Example: Query is for 'best car insurance' 
+n? ? Document: Use tf weighting without idf, but with Euclidean 
+normalization 
+n? ? Query: Use idf 
+n? ? Net score for this document is sum of w *w : 
+t,d t,q
+0.41*0 + 0*1.3 + 0.41*2.0 + 0.82*3.0 = 3.28 
+37 
+© 2013 A. Haeberlen , Z. Ives Stop words 
+n? ? What do we do about very common words 
+('the', 'of', 'is', 'may', 'a', ...)? 
+n? ? Do not appear to be very useful in general 
+n? ? ... though they may be in phrase searches  
+n? ? "President of the United States"  
+n? ? "To be or not to be" 
+n? ? We can use a stop list to remove these entirely 
+n? ? Typically small (200-300 terms or less) 
+n? ? Ongoing trend is toward

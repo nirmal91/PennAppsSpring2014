@@ -1,0 +1,486 @@
+CIS 455/555: Internet and Web Systems 
+Server Architectures and Web Servers 
+ 
+January 14, 2013 
+1 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Announcements 
+n? ? Please sign up on Piazza! 
+n? ? Office hours now on the course web page 
+n? ? Lab session: Thursday 2-4pm? 
+n? ? HW0 is now available 
+n? ? Download VM and submit "Hello world" in Java 
+n? ? PLEASE WAIT FOR A PIAZZA POST LATER TODAY BEFORE YOU START 
+n? ? Due on Friday, January 18th 
+n? ? Reading for next time: 
+n? ? "HTTP Made Really Easy" http://www.jmarshall.com/easy/
+http/ 
+n? ? "Building Secure High-Performance Web Services with OKWS" 
+http://pdos.csail.mit.edu/~max/docs/okws.pdf 
+2 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania The road ahead 
+n? ? I will begin by intro- 
+ducing some basics 
+n? ? Example: Client/server 
+n? ? Some of you have seen 
+some of this already 
+n? ? E.g., in MKSE212 
+n? ? If so, stay tuned! 
+n? ? This is necessary to bring  
+everone to the same page 
+3 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania 
+Salil S. (F0t0Synth), http://www.flickr.com/photos/ss2001/4531189792/ Plan the next two lectures 
+NEXT 
+n? ? Brief discussion of the Lampson paper 
+n? ? The client/server model 
+n? ? An example service: Web/HTTP 
+n? ? Servers with threads 
+n? ? Consistency issues with shared resources 
+n? ? Event-driven servers 
+n? ? State, and where to keep it 
+n? ? Extensible servers 
+n? ? Multi-tier services and replication 
+ 
+4 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Some context 
+n? ? To this point, you’ve probably had significant 
+experience designing programs to solve 
+specific, relatively small tasks 
+ 
+n? ? It’s often a very difficult job to build a system! 
+n? ? What is a computing system? 
+n? ? Why is it harder to build? 
+n? ? We will consider in this course: 
+n? ? Architectural aspects [Butler Lampson article] 
+n? ? Algorithmic aspects [e.g., two-phase commit] 
+n? ? Engineering aspects [e.g., build management] 
+5 
+© 2013 A. Haeberlen, Z. Ives About Butler Lampson 
+n? ? Butler Lampson is a Technical Fellow at  
+Microsoft Corporation and an Adjunct  
+Professor of Computer Science and  
+Electrical Engineering at MIT. 
+n? ? He was one of the designers of the SDS  
+940 time-sharing system, the Alto personal 
+distributed computing system, the Xerox 9700 laser 
+printer, two-phase commit protocols, ...  
+n? ? He received the ACM’s Software Systems Award in 
+1984 for his work on the Alto, the Turing Award in 
+1992, the IEEE Computer Pioneer award in 1996,  
+and the Von Neumann medal in 2001. 
+6 
+© 2013 A. Haeberlen, Z. Ives 
+http://research.microsoft.com/en-us/um/people/blampson/ Historical note: Xerox Alto 
+1972-78 
+n? ? Personal computer  
+for research 
+n? ? The first GUI-based  
+computer (note the  
+mouse!) 
+n? ? 128KB RAM,  
+2.5MB hard disk 
+n? ? Ethernet 
+In many ways, the forerunner to the Xerox Star 
+n? ? … Which begat the Apple Lisa, and the rest is history! 
+7 
+© 2013 A. Haeberlen, Z. Ives Lampson’s advice 
+8 
+© 2013 A. Haeberlen, Z. Ives Plan the next two lectures 
+n? ? Brief discussion of the Lampson paper 
+NEXT 
+n? ? The client/server model 
+n? ? An example service: Web/HTTP 
+n? ? Servers with threads 
+n? ? Consistency issues with shared resources 
+n? ? Event-driven servers 
+n? ? State, and where to keep it 
+n? ? Extensible servers 
+n? ? Multi-tier services and replication 
+ 
+9 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Making the Web work 
+n? ? How can we implement a system like the Web? 
+10 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania The peer-to-peer model 
+Alice 
+n? ? How the Web could work (but doesn't): 
+n? ? Each machine locally stores some documents 
+n? ? If a machine needs a new document, it asks some other 
+machines until it finds one that already has the document 
+n? ? No machine is special - they are all 'peers' 
+n? ? Pros and cons of this approach? 
+11 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania The client-server model 
+Clients 
+Servers 
+n? ? How the Web actually works today: 
+n? ? Some machines (servers) offer documents 
+n? ? Other machines (clients) use documents 
+n? ? Clients can request documents from servers 
+n? ? Model is used for many other services, not just for the web 
+n? ? Pros and cons of this approach? 
+12 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania 
+Request 
+Response Servers 
+n? ? Server: A machine that offers services to 
+other machines 
+n? ? Examples: Mail server, file server, chat server, print server, 
+terminal server, web server, name server, game server, ... 
+n? ? Protocol often uses request/response pattern 
+13 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania 
+Please send email #447 What a server does 
+n? ? Toy example: An 'arithmetic server' that 
+performs computations 
+1.? Wait for an incoming request for computation 
+2.? Read the request 
+3.? Parse the request 
+4.? Verify authorization 
+5.? Perform the requested computation 
+6.? Generate a document with the response 
+7.? Return the response to the requester 
+8.? Repeat 
+n? ? Can build on lower layers 
+n? ? Example: TCP for transferring requests and responses 
+14 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Please send email #447 
+Port numbers and well-known ports 
+80 
+443 
+n? ? A single machine can host multiple services 
+n? ? Typically distinguished by TCP port number 
+n? ? Many services have well-known port numbers, e.g., web 
+servers use port 80, SSH servers use port 22, ... 
+15 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania 
+Please send index.html Challenges for server designers 
+Major issues: 
+n? ? Concurrency 
+n? ? How do we handle multiple simultaneous requests? 
+n? ? Statefulness and sessions 
+n? ? Are requests self-contained, or do they require the server to keep 
+around state? 
+n? ? Communication and consistency 
+n? ? What state is shared across requests? 
+n? ? Do all requests need the same view? 
+n? ? … And, of course, security!!! 
+16 
+© 2013 A. Haeberlen, Z. Ives Recap: Client-server model 
+n? ? What is it? 
+n? ? A particular way to structure a system 
+n? ? Functionality is centralized in one or multiple servers 
+n? ? Clients can communicate with the server(s) to use the 
+functionality 
+n? ? Is it the only way to structure a system? 
+n? ? No - there are alternatives, e.g., peer-to-peer 
+n? ? Each model has its own pros and cons 
+n? ? Some examples of client/server systems? 
+n? ? Web, email, (IMAP/POP), print server, file servers, NTP, ... 
+17 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Plan the next two lectures 
+n? ? Brief discussion of the Lampson paper 
+n? ? The client/server model 
+NEXT 
+n? ? An example service: Web/HTTP 
+n? ? Servers with threads 
+n? ? Consistency issues with shared resources 
+n? ? Event-driven servers 
+n? ? State, and where to keep it 
+n? ? Extensible servers 
+n? ? Multi-tier services and replication 
+ 
+18 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania URIs, URNs, and URLs 
+Scheme-specific part 
+Scheme name 
+http://www.cis.upenn.edu/~cis455/schedule.html 
+Path on the server 
+Identifies a server 
+(for HTTP) 
+(for HTTP) 
+n? ? Uniform Resource Identifier (URI) 
+n? ? Comes in two forms: URN and URL 
+n? ? Uniform Resource Name (URN) 
+n? ? Specifies what to find, independent of its location 
+n? ? Example: urn:isbn:0596521974 (for the course textbook) 
+n? ? Uniform Resource Locator (URL) 
+n? ? Specifies where to find something 
+n? ? <scheme>://[user[:password]@]<server>[:port]/[path][/resource]
+[?param1=value1&param2=value2&...] 
+19 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania 
+ The HTTP protocol 
+n? ? How to communicate with a web server? 
+n? ? Use the HyperText Transfer Protocol (HTTP) 
+n? ? A very simple protocol 
+n? ? First specified in 1990 
+n? ? Runs on top of TCP/IP 
+n? ? Default port 80 (unsecure), or 443 (secure, with SSL) 
+n? ? Originally stateless (HTTP/1.0), but current version (HTTP/
+1.1) added support for persistent connections 
+n? ? Why? 
+n? ? Current work towards SPDY 
+20 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Example: A simple HTTP request 
+URI 
+Method 
+GET /~cis455/foo.html HTTP/1.1 
+Accept: */* 
+Headers 
+Referer: http://www.cis.upenn.edu/~cis455/ 
+User-Agent: Mozilla/4.0 (compatible; MSIE 8.0) 
+If-Modified-Since: Mon, 14 Jan 2013 16:13:21 GMT 
+Status 
+HTTP/1.1 200 OK 
+Date: Mon, 14 Jan 2013 16:14:20 GMT 
+Server: Apache 
+Headers 
+Last-Modified: Mon, 14 Jan 2013 14:38:04 GMT 
+Content-Type: text/html 
+Content-Length: 107 
+Content (optional) 
+ 
+<html><head><title>Test document</title></head> 
+<body><h3>Test</h3><p>This is a test</p></body> 
+</html> 
+21 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Common HTTP methods 
+n? ? GET 
+n? ? Retrieve whatever information is identified by the URI 
+n? ? HEAD 
+n? ? Like GET, but retrieves only metadata, not the actual object 
+n? ? PUT 
+n? ? Store information under the specified URI 
+n? ? DELETE 
+n? ? Delete the information specified by the URI 
+n? ? POST 
+n? ? Adds new information to whatever is identified by the URI 
+n? ? Intended, e.g., for newsgroup posts; today, used mostly to 
+implement dynamic content via forms 
+22 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Status codes 
+n? ? Server sends back a status code to report 
+how the request was processed 
+n? ? Common status codes: 
+n? ? 200 OK 
+n? ? 301 Moved Permanently 
+n? ? 304 Not Modified 
+n? ? 401 Unauthorized 
+n? ? 403 Forbidden 
+n? ? 404 Not Found 
+n? ? 500 Internal Server Error 
+23 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Headers 
+GET /~cis455/assignments.html HTTP/1.1 
+Host: 158.130.53.72:8080 
+User-Agent: Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.2.10)  
+            Gecko/20100914 Firefox/3.6.10 
+Referer: http://www.cis.upenn.edu/~cis455/  
+If-Modified-Since: Tue, 17 Jan 2012 10:13:21 GMT 
+Accept: text/html, application/xhtml+html,application/xml;q=0.9,*/*;q=0.8 
+Accept-Language: en-us,en;q=0.5 
+Accept-Encoding: gzip,deflate 
+Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.7 
+Keep-Alive: 115 
+Connection: keep-alive 
+HTTP/1.1 200 OK 
+n? ? Both the request 
+Date: Tue, 17 Jan 2012 18:13:22 GMT  
+and the response 
+Server: Apache 
+Last-Modified: Tue, 17 Jan 2012 17:38:04 GMT  
+can contain 
+Content-Length: 10528 
+headers with 
+Connection: close 
+Content-Type: text/html; charset=UTF-8 
+additional 
+ 
+information 
+<html><head><title>... 
+ 
+24 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Media types ("MIME types") 
+n? ? Used to specify the nature of the data that is 
+being transferred 
+n? ? Defined in RFC 2046 
+n? ? Included in the 'Content-type' header 
+n? ? At least two parts: Type and subtype 
+n? ? Some common examples: 
+n? ? text/plain 
+n? ? application/octet-stream 
+n? ? audio/mpeg 
+n? ? image/png 
+n? ? image/jpeg 
+n? ? video/quicktime 
+25 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Server attention span 
+26 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania 
+http://xkcd.com/869/ 'Stateless services' 
+n? ? Many of you will have heard that HTTP is 
+'stateless' 
+n? ? What does this mean? 
+n? ? Need to distinguish between: 
+n? ? Service state: State that is maintained independent of 
+particular clients, such as the files on a file server or the web 
+pages on a web server 
+n? ? Session state: State that is maintained for specific client 
+connections or client requests 
+n? ? Tyically, 'stateless' refers only to the latter 
+27 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Statefulness 
+n? ? Very early HTTP was essentially stateless 
+n? ? Make a request; the response is the page that is specified by 
+the URL 
+n? ? More recent HTTP, and other protocols: 
+n? ? Some amount of state is maintained 
+n? ? In HTTP, this requires cookies (more later) 
+n? ? Connection can be kept open, with state preserved at both 
+ends ('persistent connection') - also in many other protocols 
+n? ? Pros and cons of statefulness? 
+28 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Recap: HTTP 
+n? ? A simple example for the client/server model 
+n? ? What does it do? 
+n? ? Transfer web pages from server to client (browser), and 
+input data from client to server 
+n? ? What are some of its features? 
+n? ? Common methods: GET, HEAD, PUT, DELETE, POST 
+n? ? Status codes: 200 OK, 404 Not found, ... 
+n? ? Headers (for additional information) 
+n? ? MIME types 
+n? ? Stateless (in its original form) 
+29 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Plan the next two lectures 
+n? ? Brief discussion of the Lampson paper 
+n? ? The client/server model 
+n? ? An example service: Web/HTTP 
+NEXT 
+n? ? Servers with threads 
+n? ? Consistency issues with shared resources 
+n? ? Event-driven servers 
+n? ? State, and where to keep it 
+n? ? Extensible servers 
+n? ? Multi-tier services and replication 
+ 
+30 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania A simple web server 
+import java.io.*; 
+import java.net.*; 
+ 
+public class HttpServer { 
+  public static void main(String args[]) throws Exception { 
+    ServerSocket serverSocket = new ServerSocket(8080); 
+    while (true) { 
+      Socket socket = serverSocket.accept(); 
+      InputStreamReader reader = new InputStreamReader(socket.getInputStream()); 
+      BufferedReader in = new BufferedReader(reader); 
+      PrintWriter out = new PrintWriter(socket.getOutputStream(), true); 
+ 
+      String request = in.readLine(); 
+      if (request.equals("GET / HTTP/1.1")) 
+        out.println("HTTP/1.1 200 OK\n\n<html><body>Hello world!</body></html>\n"); 
+      else 
+        out.println("HTTP/1.1 500 Error\n\nNot understood: \""+request+"\""); 
+      socket.close(); 
+    } 
+  } 
+} 
+n? ? Is this a good (web) server? If not, why not? 
+31 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania The need for concurrency 
+n? ? What if the server receives lots of requests? 
+n? ? Idea #1: Process them serially 
+n? ? Problem: Slow client can block everyone else 
+n? ? Idea #2: One server for each request 
+n? ? Problem: Wasteful 
+n? ? Server needs to handle requests concurrently 
+n? ? Available resources (CPUs, disks, etc...) are multiplexed 
+between requests 
+n? ? Available techniques: Threads/processes, events, 
+cooperative scheduling, thread pools, ... 
+ 
+32 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Refresher: Threads and processes 
+n? ? Physical machine has some fixed number of 
+processor cores - say, c 
+n? ? What if we need more than c threads of execution? 
+ 
+n? ? Idea: Time-share cores 
+n? ? A single core works on one thread for a while, then  
+context-switch to another one 
+n? ? Switching can be done cooperatively: Each thread yields the 
+core to another thread when it has nothing to do 
+n? ? Switching can also be preemptive: Each thread gets to run 
+for a fixed amount of time (quantum, typ. 10-100ms) 
+n? ? Pros and cons of preemption? 
+n? ? Difference between a thread and a process? 
+33 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Thread-based servers in Java 
+n? ? Relevant Java constructs: 
+n? ? Worker can be a subclass of Thread + implement run() 
+n? ? Worker w = new Worker(); w.start(); 
+n? ? Alternative: Worker implements Runnable 
+n? ? Thread t = new Thread(w); t.start(); 
+n? ? What if the threads share some resources? 
+n? ? Potential race conditions + consistency issues 
+n? ? Can use synchronization and locking 
+n? ? Need to be careful about deadlock, livelock, starvation 
+(more about this later) 
+34 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania A simple thread-based web server 
+worker(connection) { 
+  request = connection.read(); 
+  if (request == "GET <document>") { 
+    data = filesystem.read(document); 
+Worker thread 
+    connection.write("HTTP/1.1 200 OK"); 
+(one per 
+    connection.write(data); 
+connection) 
+  } else { 
+    connection.write("HTTP/1.1 400 Bad req"); 
+  } 
+  close(connection); 
+} 
+ 
+main() { 
+Dispatcher thread 
+  socket = listen(port 80); 
+(accepts new 
+  while (true) { 
+connections and 
+    connection = accept(socket);  
+launches new 
+    (new Thread).run(worker, connection); 
+threads) 
+  } 
+} 
+35 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania The trouble with threads 
+Source: SEDA paper (Welsh et al., SOSP 2001) 
+400 
+30000 
+Throughput 
+25000 
+300 
+20000 
+15000 
+200 
+10000 
+100 
+5000 
+Latency 
+0 
+0 
+16 64 
+1024 
+256 
+4 
+1 
+Number of threads 
+36 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania 
+Throu

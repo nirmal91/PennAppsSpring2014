@@ -1,0 +1,474 @@
+CIS 455/555: Internet and Web Systems 
+MapReduce (continued) 
+ 
+March 11, 2013 
+1 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania Announcements 
+n? ? HW2 MS1 due on March 15, 10:00pm EDT 
+n? ? Please try to finish by Wednesday 
+n? ? Submit only the servlet and web.xml (not the server itself) 
+n? ? Please test your solution carefully before submitting 
+n? ? Reading: 
+n? ? K. Shvachko: "Apache Hadoop - The Scalability Update" 
+n? ? https://www.usenix.org/system/files/login/articles/105470-
+Shvachko.pdf 
+2 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania Plan for today 
+NEXT 
+n? ? MapReduce (continued) 
+n? ? Complex relationships 
+n? ? Sorting 
+n? ? Hadoop and HDFS 
+n? ? Brief history 
+n? ? Architecture 
+n? ? Example task 
+n? ? Using HDFS 
+3 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania Recap: MapReduce dataflow 
+Key range the node  
+is responsible for 
+(apple, 3) 
+(apple, 1) (apple (apple , 1)  , { (apple 1, 1, 1} , 1)  ) 
+(an, 2) 
+Reducer 
+Mapper 
+(an, {1, 1}) 
+(an, 1)  (an, 1) 
+(because, 1) 
+(1-2) (A-G) 
+(1, the apple) 
+(be (be caus caus e, { e, 1)  1}) 
+(green, 1) 
+(green, {1}) 
+(green, 1) 
+(2, is an apple) 
+(is, 2) 
+(is (is , 1)  , {(is 1, 1} , 1)  ) Reducer 
+Mapper 
+(3, not an orange) 
+(not, 2) 
+(H-N) 
+(3-4) 
+(not (n , ot 1) , (  { n1 ot , ,1  1 }) )  
+(4, because the) 
+(5, orange) 
+(orange, 1) (orange, 1) (orange, 1) 
+(orange, {1, 1, 1}) (orange, 3) 
+Mapper Reducer 
+(the, {1, 1, 1}) 
+(the, 1) (the, 1) (the, 1) (the, 3) 
+(6, unlike the apple) 
+(5-6) (O-U) 
+(unlike, {1}) (unlike, 1) 
+(unlike, 1) 
+(7, is orange) 
+(8, not green) 
+Mapper Reducer 
+(7-8) (V-Z) 
+The reducers  
+2 
+1 Each mapper  The mappers 3 Each KV-pair output 4 The reducers  5 
+process their 
+receives some  process the  by the mapper is sent sort their input  
+input one group 
+of the KV-pairs  KV-pairs  to the reducer that is by key  
+at a time 
+as input one by one responsible for it and group it 
+4 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania Filtering algorithms 
+n? ? Goal: Find lines/files/tuples with a particular 
+characteristic 
+n? ? Examples: 
+n? ? grep Web logs for requests to *.upenn.edu/* 
+n? ? find in the Web logs the hostnames accessed by 192.168.2.1 
+n? ? locate all the files that contain the words 'Apple' and 'Jobs' 
+n? ? Generally: map does most of the work, 
+reduce may simply be the identity 
+5 
+© 2013 A. Haeberlen , Z. Ives Aggregation algorithms 
+n? ? Goal: Compute the maximum, the sum, the 
+average, ..., over a set of values 
+n? ? Examples: 
+n? ? Count the number of requests to *.upenn.edu/* 
+n? ? Find the most popular domain 
+n? ? Average the number of requests per page per Web site 
+n? ? Often: map may be simple or the identity 
+6 
+© 2013 A. Haeberlen , Z. Ives A more complex example 
+n? ? Goal: Billing for a CDN like Amazon CloudFront 
+n? ? Input: Log files from the edge servers. Two files per domain: 
+n? ? access_log-www.foo.com-20111006.txt: HTTP accesses 
+n? ? ssl_access_log-www.foo.com-20111006.txt: HTTPS accesses 
+n? ? Example line:  
+158.130.53.72 - - [06/Oct/2011:16:30:38 -0400] "GET /
+largeFile.ISO HTTP/1.1" 200 8130928734 "-" "Mozilla/
+5.0 (compatible; MSIE 5.01; Win2000)" 
+n? ? Mapper receives (filename,line) tuples 
+n? ? Billing policy (simplified): 
+n? ? Billing is based on a mix of request count and data traffic (why?) 
+n? ? 10,000 HTTP requests cost $0.0075 
+n? ? 10,000 HTTPS requests cost $0.0100 
+n? ? One GB of traffic costs $0.12 
+n? ? Desired output is a list of (domain, grandTotal) tuples 
+7 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania Intersections and joins 
+n? ? Goal: Intersect multiple different inputs on 
+some shared values 
+n? ? Values can be equal, or meet a certain predicate 
+n? ? Examples: 
+n? ? Find all documents with the words “data” and “centric” given 
+an inverted index 
+n? ? Find all professors and students in common courses and 
+return the pairs <professor,student> for those cases 
+8 
+© 2013 A. Haeberlen , Z. Ives Partial Cartesian products 
+n? ? Goal: Find some complex relationship, e.g., 
+based on pairwise distance 
+n? ? Examples: 
+n? ? Find all pairs of sites within 100m of each other 
+ 
+n? ? Generally hard to parallelize 
+n? ? But may be possible if we can divide the input into bins or 
+tiles, or link it to some sort of landmark 
+n? ? Overlap the tiles? (how does this scale?) 
+n? ? Generate landmarks using clustering? 
+9 
+© 2013 A. Haeberlen , Z. Ives Sorting 
+n? ? Goal: Sort input 
+n? ? Examples: 
+n? ? Return all the domains covered by Google's index and the 
+number of pages in each, ordered by the number of pages 
+n? ? The programming model does not support 
+this per se, but the implementations do 
+n? ? Let’s take a look at what happens in the Shuffle stage 
+10 
+© 2013 A. Haeberlen , Z. Ives The shuffle stage revisited 
+Node 2 
+Node 1 
+InputFormat InputFormat 
+File 
+File 
+File 
+File 
+Split Split Split Split Split Split 
+File system 
+File system 
+RR RR RR RR RR RR 
+map map map map map map 
+Shuffle really 
+consists of 
+Combine Combine 
+two parts: 
+Partition Partition 
+•? Partition 
+•? Sort 
+Sort Sort 
+Reduce Reduce 
+OutputFormat OutputFormat 
+11 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania Example: Hadoop Shuffle as a sort mechanism 
+n? ? We can exploit the per-node sorting operation 
+done by Shuffle 
+n? ? If we have a single reducer, we will get sorted output 
+n? ? If we have multiple reducers, we can get partly sorted 
+output (or better – consider an order-preserving hash) 
+n? ? Note: It is not difficult to write a last-pass file that merges all of the  
+output files from the reducers 
+12 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania Strengths and weaknesses 
+n? ? What problems can you solve well with 
+MapReduce? 
+n? ? Are there problems you cannot solve 
+efficiently with MapReduce? 
+n? ? Are there problems it can't solve at all? 
+n? ? How does it compare to other ways of doing 
+large-scale data analysis? 
+n? ? Is MapReduce always the fastest/most efficient way? 
+13 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania Plan for today 
+n? ? MapReduce (continued) 
+n? ? Complex relationships 
+n? ? Sorting 
+NEXT 
+n? ? Hadoop and HDFS 
+n? ? Brief history 
+n? ? Architecture 
+n? ? Example task 
+n? ? Using HDFS 
+ 
+14 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania 2002-2004: Lucene and Nutch 
+n? ? Early 2000s: Doug Cutting develops  
+two open-source search projects: 
+n? ? Lucene: Search indexer 
+n? ? Today used e.g., by Wikipedia 
+n? ? Nutch: A spider/crawler (with Mike Carafella) 
+n? ? Nutch 
+n? ? Goal: Web-scale, crawler-based search 
+n? ? Written by a few part-time developers 
+n? ? Distributed, 'by necessity' 
+n? ? Demonstrated 100M web pages on 4 nodes, but true  
+'web scale' still very distant 
+15 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania 2004-2006: GFS and MapReduce  
+n? ? 2003/04: GFS, MapReduce papers published 
+n? ? Sanjay Ghemawat, Howard Gobioff, Shun-Tak Leung: "The 
+Google File System", SOSP 2003 
+n? ? Jeffrey Dean and Sanjay Ghemawat: "MapReduce: Simplified 
+Data Processing on Large Clusters", OSDI 2004 
+n? ? Directly addressed Nutch's scaling issues 
+n? ? GFS & MapReduce added to Nutch 
+n? ? Two part-time developers over two years (2004-2006) 
+n? ? Crawler & indexer ported in two weeks 
+n? ? Ran on 20 nodes at IA and UW 
+n? ? Much easier to program and run, scales to several 100M web 
+pages, but still far from web scale 
+16 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania 2006-2008: Yahoo 
+n? ? 2006: Yahoo hires Cutting 
+n? ? Provides engineers, clusters, users, ... 
+n? ? Big boost for the project; Yahoo spends tens of M$ 
+n? ? Not without a price: Yahoo has a slightly different focus (e.g., 
+security) than the rest of the project; delays result 
+n? ? Hadoop project split out of Nutch 
+n? ? Finally hit web scale in early 2008 
+n? ? Cutting is now at Cloudera 
+n? ? Startup; started by three top engineers from Google, 
+Facebook, Yahoo, and a former executive from Oracle 
+n? ? Has its own version of Hadoop; software remains free, but 
+company sells support and consulting services 
+n? ? 2009: Elected to board of directors of Apache SW Foundation 
+17 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania Plan for today 
+n? ? MapReduce (continued) 
+n? ? Complex relationships 
+n? ? Sorting 
+n? ? Hadoop and HDFS 
+n? ? Brief history 
+NEXT 
+n? ? Architecture 
+n? ? Example task 
+n? ? Using HDFS 
+ 
+18 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania Who uses                      ? 
+n? ? Hadoop is running search on some of the 
+Internet's largest sites: 
+n? ? Helped IBM's Watson to win Jeopardy 
+n? ? Amazon Web Services: Elastic MapReduce 
+n? ? AOL: Variety of uses, e.g., behavioral analysis & targeting 
+n? ? eBay: Search optimization (700-node cluster) 
+n? ? Each node has: 24TB disk, 72GB RAM, 12 cores. Can run 26,000 MapReduce tasks simultaneously 
+n? ? Facebook: Reporting/analytics, machine learning (1100 m.), messaging 
+n? ? 2000-node warehouse cluster, 21PB total storage capacity, ~400 million objects 
+n? ? Fox Interactive Media: MySpace, Photobucket, Rotten T. 
+n? ? IBM: Blue Cloud Computing Clusters 
+n? ? LinkedIn: People You May Know (2x50 machines) 
+n? ? Twitter: Store + process tweets, log files, other data 
+n? ? Apple: iAds platform 
+n? ? Netflix: Streaming summaries, analysis tasks 
+n? ? Yahoo: >36,000 nodes 
+n? ? Largest cluster: 4,000+ nodes, 4x1TB/node, 15TB total capacity,  
+70 million files, 80 million blocks, 50GB Name node heap 
+19 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania Hadoop 
+n? ? A 'modern' open-source 'clone' of MapReduce+GFS 
+n? ? Written in Java 
+n? ? Operates on HDFS, a page-level replicating filesystem 
+n? ? Modeled in part after GFS 
+20 
+ 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania 
+Source: Hadoop HDFS architecture documentation A single node can run  
+more than one of these! 
+Hadoop MapReduce Architecture 
+n? ? Job tracker (~MapReduce master): 
+n? ? Accepts jobs submitted by users 
+n? ? Gives tasks to Tasktrackers – makes scheduling decisions, 
+co-locates tasks to data 
+n? ? Monitors task, tracker status, re-executes tasks if needed 
+n? ? Task trackers (~MapReduce worker): 
+n? ? Run Map and Reduce tasks 
+n? ? Manage storage, transmission of intermediate output 
+n? ? HDFS-related nodes: 
+n? ? Namenode: Handles file-to-chunk mapping (~GFS master) 
+n? ? Plus secondary namenodes if necessary 
+n? ? Data node: Stores chunks (~GFS chunkserver) 
+21 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania Two example configurations 
+Secondary 
+JobTracker NameNode 
+NameNode 
+Small cluster 
+Medium cluster 
+JobTracker 
+NameNode 
+Secondary NameNode 
+TaskTracker 
+DataNode 
+22 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania Plan for today 
+n? ? MapReduce (continued) 
+n? ? Complex relationships 
+n? ? Sorting 
+n? ? Hadoop and HDFS 
+n? ? Brief history 
+n? ? Architecture 
+NEXT 
+n? ? Example task 
+n? ? Using HDFS 
+23 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania What do we need to write? 
+n? ? A mapper 
+n? ? Accepts (key,value) pairs from the input 
+n? ? Produces intermediate (key,value) pairs, which are then 
+shuffled 
+n? ? A reducer 
+n? ? Accepts intermediate (key,value) pairs 
+n? ? Produces final (key,value) pairs for the output 
+n? ? A driver 
+n? ? Specifies which inputs to use, where to put the outputs 
+n? ? Chooses the mapper and the reducer to use 
+n? ? Hadoop takes care of the rest 
+n? ? Default behaviors can be customized by the driver 
+24 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania Hadoop data types 
+Name Description JDK equivalent 
+IntWritable 32-bit integers Integer 
+LongWritable 64-bit integers Long 
+DoubleWritable Floating-point numbers Double 
+Text Strings String 
+n? ? Hadoop uses its own serialization 
+n? ? Java serialization is known to be very inefficient 
+n? ? Result: A set of special data types 
+n? ? All implement the 'Writable' interface 
+n? ? Most common types shown above; also has some more 
+specialized types (SortedMapWritable, ObjectWritable, ...) 
+n? ? Caution: Behavior somewhat unusual 
+25 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania Intermediate format 
+Input format 
+can be freely chosen 
+(file offset, line) 
+The Mapper 
+import org.apache.hadoop.mapreduce.*; 
+import org.apache.hadoop.io.*; 
+ 
+public class FooMapper extends Mapper<LongWritable, Text, Text, Text> { 
+    public void map(LongWritable key, Text value, Context context) { 
+      context.write(new Text("foo"), value);  
+    } 
+} 
+ 
+n? ? Extends abstract 'Mapper' class 
+n? ? Input/output types are specified as type parameters 
+n? ? Implements a 'map' function 
+n? ? Accepts (key,value) pair of the specified type 
+n? ? Writes output pairs by calling 'write' method on context 
+n? ? Mixing up the types will cause problems at runtime (!) 
+26 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania Intermediate format 
+Output format 
+(same as mapper output) 
+The Reducer 
+import org.apache.hadoop.mapreduce.*; 
+import org.apache.hadoop.io.*;  
+ 
+public class FooReducer extends Reducer<Text, Text, IntWritable, Text> { 
+    public void reduce(Text key, Iterable<Text> values, Context context)  
+          throws java.io.IOException, InterruptedException  
+    { 
+      for (Text value: values) 
+Note: We may get 
+        context.write(new IntWritable(4711), value); 
+multiple values for 
+    } 
+the same key! 
+} 
+n? ? Extends abstract 'Reducer' class 
+n? ? Must specify types again (must be compatible with mapper!) 
+n? ? Implements a 'reduce' function 
+n? ? Values are passed in as an 'Iterable' 
+n? ? Caution: These are NOT normal Java classes. Do not store 
+them in collections - content can change between iterations! 
+27 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania The Driver 
+import org.apache.hadoop.mapreduce.*; 
+import org.apache.hadoop.io.*; 
+import org.apache.hadoop.fs.Path; 
+import org.apache.hadoop.mapreduce.lib.input.FileInputFormat; 
+import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat; 
+ 
+public class FooDriver { 
+Mapper&Reducer are 
+  public static void main(String[] args) throws Exception { 
+    Job job = new Job(); 
+in the same Jar as 
+    job.setJarByClass(FooDriver.class); 
+FooDriver 
+     
+    FileInputFormat.addInputPath(job, new Path("in")); 
+    FileOutputFormat.setOutputPath(job, new Path("out")); 
+Input and Output 
+ 
+paths 
+    job.setMapperClass(FooMapper.class); 
+    job.setReducerClass(FooReducer.class); 
+ 
+Format of the (key,value) 
+    job.setOutputKeyClass(Text.class); 
+pairs output by the 
+    job.setOutputValueClass(Text.class); 
+   reducer 
+    System.exit(job.waitForCompletion(true) ? 0 : 1); 
+  } 
+} 
+n? ? Specifies how the job is to be executed 
+n? ? Input and output directories; mapper & reducer classes 
+28 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania Manual compilation 
+n? ? Goal: Produce a JAR file that contains the classes for 
+mapper, reducer, and driver 
+n? ? This can be submitted to the Job Tracker, or run directly through Hadoop 
+n? ? Step #1: Put hadoop-core-1.1.1.jar into classpath: 
+ 
+       export CLASSPATH=$CLASSPATH:/path/to/hadoop/hadoop-core-1.1.1.jar 
+ 
+n? ? Step #2: Compile mapper, reducer, driver: 
+ 
+       javac FooMapper.java FooReducer.java FooDriver.java 
+ 
+n? ? Step #3: Package into a JAR file: 
+ 
+       jar cvf Foo.jar *.class 
+29 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania Running a job in standalone mode 
+n? ? Step #1: Create & populate input directory 
+n? ? Configured in the Driver via addInputPath() 
+n? ? Put input file(s) into this directory (ok to have more than 1) 
+n? ? Output directory must not exist yet 
+ 
+n? ? Step #2: Run Hadoop 
+n? ? As simple as this: hadoop jar <jarName> <driverClassName> 
+n? ? Example: hadoop jar foo.jar FooDriver 
+n? ? In verbose mode, Hadoop will print statistics while running 
+ 
+n? ? Step #3: Collect output files 
+30 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania Plan for today 
+n? ? MapReduce (continued) 
+n? ? Complex relationships 
+n? ? Sorting 
+n? ? Hadoop and HDFS 
+n? ? Brief history 
+n? ? Architecture 
+n? ? Example task 
+NEXT 
+n? ? Using HDFS 
+31 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania Accessing data in HDFS 
+[ahae@carbon ~]$ ls -la /tmp/hadoop-ahae/dfs/data/current/ 
+total 209588 
+drwxrwxr-x 2 ahae ahae     4096 2013-02-13 15:46 . 
+drwxrwxr-x 5 ahae ahae     4096 2013-02-13 15:39 .. 
+-

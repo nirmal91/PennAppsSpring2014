@@ -1,0 +1,495 @@
+CIS 455/555: Internet and Web Systems 
+Distributed transactions 
+ 
+April 3, 2013 
+1 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Announcements 
+n? ? HW3 is due on Friday 
+n? ? Project plan is due on April 10 
+n? ? 2-page PDF that describes your project architecture 
+(components, interfaces, interaction between them) 
+n? ? Must describe division of labor (who does what) and project 
+milestones (what will be completed when) 
+ 
+n? ? Second midterm: April 22 (4:30pm, DRL A1) 
+n? ? Reading for today: 
+n? ? Tanenbaum chapters 8.5-8.6 
+2 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Plan for today 
+NEXT 
+n? ? Transactions 
+n? ? ACID properties 
+n? ? Serializability 
+n? ? Concurrency control: 2PL 
+n? ? Log-based recovery: ARIES 
+n? ? Distributed transactions: 2PC 
+n? ? Distributed concurrency control 
+3 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania We need more than synchronization 
+n? ? What needs to happen when you… 
+n? ? Click on “purchase” on Amazon? 
+Suppose you purchased by credit card? 
+n? ? Use online bill-paying services from your bank? 
+n? ? Place a bid in an eBay-like auction system? 
+n? ? Order music from iTunes? 
+What if your connection drops in the middle of downloading? 
+n? ? Is this more than a case of making a simple 
+Web Service (-like) call? 
+4 
+© 2013 A. Haeberlen, Z. Ives A problem confronted by eBay 
+n? ? eBay wants to sell an item to: 
+n? ? The highest bidder, once the auction is over, or 
+n? ? The person who’s first to click “Buy It Now!” 
+n? ? But: What if the bidder doesn’t have the cash? 
+n? ? A solution: 
+n? ? Tentatively record the item as sold 
+rd
+n? ? Validate the PayPal or credit card info with a 3 party 
+n? ? If not valid, discard this bidder and resume in prior state 
+5 
+© 2013 A. Haeberlen, Z. Ives “No Payment” isn’t the only source of failure 
+n? ? Suppose we start to transfer the money, but 
+a server goes down… 
+Purchase: 
+sb = Seller.bal 
+bb = Buyer.bal 
+Write Buyer.bal= bb - $100 
+CRASH! 
+ 
+Write Item.sellTo = Buyer 
+ 
+Write Seller.bal= sb + $100 
+6 
+© 2013 A. Haeberlen, Z. Ives Transactions 
+n? ? There are many (especially, financial) 
+applications where we want to create atomic 
+operations that either commit or roll back  
+n? ? ... despite hardware/software/application/other failures 
+n? ? ... whether or not other operations are executed concurrently 
+n? ? This is one of the most basic services provided 
+by database management systems, but we 
+want to do it in a broader sense 
+n? ? Part of “ACID” semantics… 
+7 
+© 2013 A. Haeberlen, Z. Ives ACID Semantics 
+n? ? Atomicity: operations are atomic, either 
+committing or aborting as a single entity 
+n? ? Consistency: the state of the data is 
+internally consistent 
+n? ? Isolation: all operations act as if they were 
+run by themselves 
+n? ? Durability: all writes stay persistent! 
+n? ? What would a violation of each property  
+look like? 
+8 
+© 2013 A. Haeberlen, Z. Ives Providing Atomicity and Consistency 
+n? ? Database systems provide transactions with the 
+ability to abort a transaction upon some failure 
+condition 
+n? ? Based on transaction logging – record all operations and 
+undo them as necessary 
+n? ? Database systems also use the log to perform 
+recovery from crashes 
+n? ? Undo all of the steps in a partially-complete transaction 
+n? ? Then redo them in their entirety 
+n? ? This is part of a protocol called ARIES 
+n? ? These can be the basis of persistent storage, and we 
+can use middleware like J2EE to build distributed 
+transactions with the ability to abort database 
+operations if necessary 
+9 
+© 2013 A. Haeberlen, Z. Ives Plan for today 
+n? ? Transactions 
+n? ? ACID properties 
+NEXT 
+n? ? Serializability 
+n? ? Concurrency control: 2PL 
+n? ? Log-based recovery: ARIES 
+n? ? Distributed transactions: 2PC 
+n? ? Distributed concurrency control 
+10 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Recall: Need for isolation 
+void transferMoney(customer A, customer B, int amount)  
+{ 
+  showMessage("Transferring "+amount+" to "+B); 
+  int balanceA = getBalance(A); 
+  int balanceB = getBalance(B); 
+  setBalance(B, balanceB + amount); 
+  setBalance(A, balanceA - amount); 
+  showMessage("Your new balance: "+(balanceA-amount)); 
+} 
+n? ? What if more than one transaction runs? 
+n? ? Desirable - system throughput is higher! 
+n? ? Challenging - need to maintain isolation! 
+n? ? Earlier example: Accounting system in a bank 
+n? ? Maintains the current balance of each customer's account 
+n? ? Customers can transfer money to other customers 
+11 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Recall: The bank example 
+$100 
+$500 
+Alice 
+Bob 
+1) A=Balance(Alice) 
+1) B=Balance(Bob) 
+2) B=Balance(Bob) 
+2) A=Balance(Alice) 
+3) SetBalance(Alice,A+500) 
+3) SetBalance(Bob,B+100) 
+4) SetBalance(Bob,B-500) 
+4) SetBalance(Alice,A-100) 
+n? ? What can happen if this code runs concurrently? 
+2 
+1 3 4 
+Time 
+2 3 4 
+1 
+$200 $700 $700 $100 
+$200 
+Alice's balance: 
+Bob's balance: $900 
+$800 $900 $300 $300 
+12 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania What is a 'good' execution? 
+Actual 
+Core #1: 
+T2 T4 T5 
+execution 
+Core #2: T1 T3 
+T6 
+Time 
+Hypothetical 
+execution 
+Single core: 
+T1 T2 T3 T6 T4 T5 
+Time 
+Same start 
+Same  
+state 
+result 
+n? ? We would like result to be the same as if the 
+transactions had executed in some sequential 
+order (serializability) 
+n? ? Similar to sequential consistency, but for transactions 
+n? ? How can we achieve this? (remember from earlier) 
+n? ? What needs to be changed to support transactions? 
+13 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Plan for the next two lectures 
+n? ? Transactions 
+n? ? ACID properties 
+n? ? Serializability 
+NEXT 
+n? ? Concurrency control: 2PL 
+n? ? Log-based recovery: ARIES 
+n? ? Distributed transactions: 2PC 
+n? ? Distributed concurrency control 
+14 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Concurrency control 
+n? ? A means of ensuring that transactions are 
+serializable 
+n? ? There are many methods, of which we’ll 
+see one 
+n? ? Lock-based concurrency control (2-phase locking) 
+n? ? Optimistic concurrency control (no locks – based on 
+timestamps) 
+n? ? Multiversion CC 
+n? ? … 
+15 
+© 2013 A. Haeberlen, Z. Ives Lock-based concurrency control 
+time 
+time 
+Strict 
+Non-strict 
+n? ? Strict Two-phase Locking (Strict 2PL) Protocol: 
+n? ? Each transaction must obtain: 
+n? ? a S (shared) lock on object before reading 
+n? ? an X (exclusive) lock on object before writing 
+n? ? An owner of an S lock can upgrade it to X if no one else is  
+holding the lock 
+n? ? All locks held by a transaction are released when the 
+transaction completes 
+n? ? Locks are handled in a “growing” phase, then a “shrinking” phase 
+n? ? (Non-strict) 2PL Variant: Release locks anytime, but cannot acquire  
+locks after releasing any lock. 
+© 2013 A. Haeberlen, Z. Ives 
+#locks held 
+#locks held Benefits of Strict 2PL 
+n? ? Strict 2PL allows only serializable schedules. 
+n? ? Additionally, it simplifies transaction aborts 
+n? ? (Non-strict) 2PL also allows only serializable schedules, but 
+involves more complex abort processing 
+17 
+© 2013 A. Haeberlen, Z. Ives Aborting a transaction 
+n? ? If a transaction T is aborted, all its actions have to be 
+i
+undone 
+n? ? Not only that, if T reads an object last written by T,  T must 
+j i j
+be aborted as well! 
+n? ? Most systems avoid such cascading aborts by 
+releasing a transaction’s locks only at commit time 
+n? ? If T writes an object, T can read this only after T commits 
+i j i
+n? ? Actions are undone by consulting the transaction log 
+mentioned earlier 
+© 2013 A. Haeberlen, Z. Ives A danger with locks: Deadlocks 
+n? ? Deadlock: Cycle of transactions waiting for 
+locks to be released by each other 
+n? ? A waits for a lock that B holds 
+n? ? B waits for a lock that A holds 
+ 
+n? ? Three ways of dealing with deadlocks: 
+n? ? Deadlock prevention 
+n? ? Deadlock avoidance 
+n? ? Deadlock detection 
+© 2013 A. Haeberlen, Z. Ives Deadlock avoidance 
+n? ? Need to break symmetry somehow! 
+n? ? When we notice that a cyclic dependency may be abort to form (unsafe!), 
+we abort one of the involved transactions. 
+n? ? Idea: Assign priorities based on timestamps 
+n? ? Let's say we have two transactions: T and T 
+old young
+n? ? Wait-die approach: 
+n? ? If T wants a lock T holds, T waits.  
+old  young old 
+n? ? If T wants a lock T holds, T dies.  
+young  old young 
+n? ? Wound-wait approach: 
+n? ? If T wants a lock T holds, T dies.  
+old  young young 
+n? ? If T wants a lock T holds, T waits.  
+young  old young 
+n? ? Older transactions never have to wait for younger transactions! 
+n? ? If a transaction re-starts, make sure it keeps its original 
+timestamp (keeps it from always getting aborted!) 
+© 2013 A. Haeberlen, Z. Ives Plan for the next two lectures 
+n? ? Transactions 
+n? ? ACID properties 
+n? ? Serializability 
+n? ? Concurrency control: 2PL 
+NEXT 
+n? ? Log-based recovery: ARIES 
+n? ? Distributed transactions: 2PC 
+21 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Challenge: Atomicity and Durability 
+n? ? Recall: We need to ensure that... 
+n? ? a transaction is either applied completely, or not at all (A) 
+n? ? the effects of a committed transaction are persistent (D) 
+n? ? How can we do this? 
+n? ? Clearly, for D we need some persistent storage (hard disk?) 
+n? ? How about the following: 
+n? ? Two copies of the database on disk, plus a file that says 
+which copy is 'current' 
+n? ? Execute transactions one at a time: Copy current to non-
+current, apply to non-current, then update the file to swap 
+current and non-current 
+n? ? Is this a good solution? 
+22 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania STEAL and NOFORCE 
+n? ? To achieve good performance, we want to 
+n? ? have only one copy of the database on disk 
+n? ? keep parts of the database in memory 
+n? ? When do changes get written to the disk? 
+n? ? One approach: 
+n? ? Keep all changes in memory until committed (NOSTEAL) 
+n? ? Write all changes to disk before committing (FORCE) 
+n? ? Minor problem: How to make sure all changes are written atomically? 
+n? ? Is this good for performance? 
+n? ? No! We would much rather have 
+n? ? STEAL: May write changes to disk before committing 
+n? ? NOFORCE: May keep changes in memory after committing 
+23 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Problem: How to recover? 
+n? ? What if the machine with the database fails? 
+n? ? Power outage, OS crash, operator error, ... 
+n? ? Problem: Database is inconsistent 
+n? ? Some changes by uncommitted transactions may have made 
+it to disk already (due to STEAL) 
+n? ? Some changes by committed transactions may not yet have 
+made it to disk (due to NOFORCE) 
+n? ? Idea: Additionally keep a log of all changes 
+n? ? Write each change to the log first and only then to the DB 
+n? ? After a crash, we can use this log to recover 
+n? ? Use strict 2PL (reason will become clear soon) 
+24 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania The transaction log 
+T0:  read(A) T1:  read(C) 
+Log:  <T0, start> 
+ A := A - 50  C := C - 100 
+ <T0, A, 1000?950> 
+ write(A)  write(C) 
+ <T1, start> 
+ read(B) 
+ <T0, B, 2300?2350> 
+ B := B + 50 
+ <T1, C, 700?600> 
+ write (B) 
+ <T1, commit> 
+ 
+ <T0, commit> 
+ 
+n? ? The log contains entries for: 
+n? ? Starting, committing, and aborting transactions 
+n? ? Changes to values in the database (old value + new value) 
+25 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Recovery: ARIES 
+n? ? After a crash, we can do the following: 
+n? ? Step 1: Analysis 
+n? ? Read the log from beginning to end to find all pending transactions and 
+all unwritten pages 
+n? ? Step 2: Redo 
+n? ? Reapply all the updates to unwritten pages. This brings the database to 
+the exact state it was in before the crash happened. 
+n? ? Step 3: Undo 
+n? ? Using the old values in the log entries, undo all the changes made by 
+uncommitted transactions. (why is this allowed?) 
+n? ? This algorithm is called ARIES 
+n? ? Used in most modern database systems 
+n? ? Some additional wrinkles: Handling crashes during recovery, 
+avoiding the need to read the entire log (checkpointing), ... 
+26 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania A simplified example 
+n? ? Suppose we see the following after a crash: 
+<T0, start> 
+<T0, A, 30->32> 
+<T1, start> 
+B: 80 
+<T1, B, 80->20> 
+<T2, start> 
+D: 90 
+<T2, D, 90->60> 
+<T1, C, 4->7> 
+C: 2 
+<T1, commit> 
+<T3, start> 
+A: 30 
+<T2, abort> 
+<T4, start> 
+E: 89 
+<T4, D, 90->30> 
+<T3, B, 20->40> 
+<T4, commit> 
+Data (on disk) 
+<T0, C, 7->2> 
+Log 
+27 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Recap: Transactions and Concurrency Control 
+n? ? The basic goal was to guarantee ACID 
+properties 
+n? ? Transactions and logging provide Atomicity and Consistency 
+n? ? Locks ensure Isolation 
+n? ? The transaction log (plus RAID, backups, etc.) is also used 
+to ensure Durability 
+n? ? So far, we’ve been in the realm of databases 
+– how does this extend to the distributed 
+context? 
+28 
+© 2013 A. Haeberlen, Z. Ives Plan for the next two lectures 
+n? ? Transactions 
+n? ? ACID properties 
+n? ? Serializability 
+n? ? Concurrency control: 2PL 
+n? ? Recovery: ARIES 
+NEXT 
+n? ? Distributed transactions: 2PC 
+n? ? Distributed concurrency control 
+29 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Distributed transactions 
+Client 
+n? ? We generally rely on a 
+middleware layer called 
+application servers, aka  
+App Server 
+TP monitors, to provide  
+Web 
+Server 
+transactions across systems 
+n? ? Tuxedo, iPlanet, WebSphere, etc. 
+Msg Workflow 
+n? ? For atomicity, two-phase commit 
+Queue Controller 
+protocol 
+Transact 
+Transact 
+n? ? For isolation, need distributed 
+Server 
+Server 
+concurrency control 
+DB 
+DB 
+30 
+© 2013 A. Haeberlen, Z. Ives Why two-phase commit? 
+n? ? Terminology: 
+n? ? Site at which a transaction originates is the coordinator 
+n? ? Other sites at which it executes are subordinates 
+ 
+n? ? Naïve implementation: One-phase commit 
+n? ? Coordinator sends commit or abort to all the subordinates 
+n? ? Each subordinate executes the action and acknowledges 
+n? ? Is this a good solution? 
+31 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania COMMIT 
+Why one-phase commit fails 
+Coordinator crashes  
+in the middle 
+But I already 
+aborted! 
+??? 
+OK! 
+n? ? Problem #1: Subordinate can't independently abort 
+the transaction (e.g., because of a deadlock) 
+n? ? Problem #2: Subordinate might crash before receiving 
+the message; partial transaction results are lost 
+32 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania 
+COMMIT Two-Phase Commit (2PC) 
+n? ? Two rounds of communication, initiated by the 
+coordinator: 
+n? ? Phase #1: Voting 
+n? ? Coordinator sends prepare messages, waits for yes or no votes 
+n? ? Phase #2: Decision or termination 
+n? ? Coordinator sends commit or rollback messages, waits for acks 
+n? ? Any site can decide to abort a transaction! 
+© 2013 A. Haeberlen, Z. Ives Steps in 2PC 
+n? ? When a transaction wants to commit: 
+n? ? Coordinator sends prepare message to each subordinate 
+n? ? Subordinate force-writes an abort or prepare log record and 
+then sends a no (abort) or yes (prepare) message to 
+coordinator 
+n? ? Coordinator considers votes: 
+n? ? If unanimous yes votes, force-writes a commit log record and 
+sends commit message to all subordinates 
+n? ? Else, force-writes abort log record, and sends abort message 
+n? ? Subordinates force-write abort/commit log records based on 
+message they get, then send ack message to coordinator 
+n? ? Coordinator writes end log record after getting all acks 
+34 
+© 2013 A. Haeberlen, Z. Ives Illustration of 2PC 
+Coordinator Subordinate 1 Subordinate 2 
+force-write  
+begin log entry 
+send “prepare” 
+send “prepare” 
+force-write  force-write 
+prepared log entry prepared log entry 
+send “yes” 
+send “yes” 
+force-write 
+commit log entry 
+send “commit” 
+send “commit” 
+force-write force-write 
+commit log entry commit log entry 
+send “ack” 
+send “ack” 
+write 
+end log entry 
+35 
+© 2013 A. Haeberlen, Z. Ives Comments on 2PC 
+n? ? Every message reflects a decision by the sender; to 
+ensure that this decision survives failures, it is first 
+recorded in the local log 
+n? ? All log records for a transaction contain its ID and  
+the coordinator’s ID 
+n? ? The coordinator’s abort/commit record also includes IDs of 
+all subordina

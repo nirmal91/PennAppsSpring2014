@@ -1,0 +1,507 @@
+CIS 455/555: Internet and Web Systems 
+Web services 
+ 
+March 13, 2013 
+1 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania Announcements 
+n? ? HW2 MS1 is due on Friday at 10:00pm 
+n? ? Strongly recommended: Try to finish it today 
+n? ? Don't forget to test your submission! 
+n? ? On Monday: Info about the final project 
+n? ? You may want to start thinking about possible teams 
+n? ? Important choice - please choose wisely! 
+n? ? Reading: 
+n? ? Tanenbaum Chapters 4.2 and 10.3 
+n? ? SOAP and WSDL tutorials (links on course web page) 
+2 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania Map service 
+What is a web service? 
+(used by Alice) 
+Web page combines 
+data from different 
+sources ('mashup') 
+Charlie 
+Bob Alice 
+Bob 
+Alice 
+n? ? Intuition: An application that is accessible to 
+other applications over the web 
+n? ? Examples: Google Search, Google Maps API, Facebook 
+Graph API, eBay APIs, Amazon Web Services, ... 
+3 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania A more detailed definition 
+"A Web service is a software system designed to support interoperable 
+machine-to-machine interaction over a network. It has an interface 
+described in a machine-processable format (specifically WSDL). Other 
+systems interact with the Web service in a manner prescribed by its 
+description using SOAP messages, typically conveyed using HTTP with 
+an XML serialization in conjunction with other Web-related standards." 
+http://www.w3.org/TR/ws-arch/ 
+n? ? Key elements: 
+n? ? Machine-to-machine interaction 
+n? ? Interoperable (with other applications and services) 
+n? ? Machine-processable format 
+n? ? Key technologies: 
+n? ? SOAP (and also REST, both of which we've already seen) 
+n? ? WSDL (Web Services Description language; XML-based) 
+4 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania Plan for today 
+NEXT 
+n? ? Remote Procedure Calls 
+n? ? Abstraction 
+n? ? Mechanism 
+n? ? Stub-code generation 
+n? ? Web services 
+n? ? REST 
+n? ? SOAP 
+n? ? WSDL 
+5 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania Motivation for RPCs 
+n? ? Coding your own messaging is hard 
+n? ? Example: Look up a name on our directory server 
+n? ? Assemble the message at the sender, parse at the receiver... 
+n? ? Need to think carefully about message flow etc. 
+n? ? Can we hide this in the programming 
+language or middleware? 
+n? ? Similar strategy works great for many other hard or 
+cumbersome tasks, e.g., memory management 
+n? ? Wouldn't it be nice if we could simply call a function 
+lookup(name) in the client code, and it executes remotely  
+on the name server? 
+n? ? That is the abstraction provided by Remote Procedure Calls 
+6 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania The intuition behind RPCs 
+void foo() 
+void bar(int a, int *b, bool c) 
+{ 
+{ 
+  int x, y; 
+  ... 
+  ... 
+  if (!c) 
+    *b = a + 17; 
+  x = bar(45, &y, false); 
+  ... 
+  ... 
+} 
+} 
+retaddr 
+false 
+&y 
+"Message" 
+y 
+45 
+Stack 
+Machine B 
+Machine A 
+7 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania Remote Procedure Calls 
+n? ? Remote procedure calls have been around forever 
+n? ? Goes back to at least 1976; Birrell/Nelson paper is from 1984 
+n? ? Implementation examples: COM+, CORBA, DCE, Java RMI, ... 
+n? ? An RPC API defines a format for: 
+n? ? Initiating a call on a given server, generally in a reliable way 
+n? ? At-most-once, at-least-once, exactly-once semantics 
+n? ? Sending parameters (marshalling) to the server 
+n? ? Receiving a return value - may require marshalling as well 
+n? ? Different language bindings may exist  
+n? ? Java client can call C++ server, Fortran client can call Pascal server, … 
+n? ? RPC calls typically are synchronous 
+n? ? Caller blocks until response is received from callee 
+n? ? Exception: One-way RPCs  
+8 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania response 
+RPC visualized 
+server waits for  
+function 
+server is busy 
+next request 
+executing 
+RPC 
+Server 
+RPC 
+Client 
+working client 
+client blocked 
+continues 
+(waiting for response) 
+9 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania How RPC generally works 
+n? ? You write an application with a series of functions 
+n? ? Some of these functions will be distributed remotely 
+n? ? You call a stub-code generator, which produces 
+n? ? A client stub, which emulates each function F: 
+n? ? Marshals all the parameters and produces a request message 
+n? ? Opens a connection to the server and sends the request 
+n? ? Receives response, unmarshals+returns F’s return values, status 
+n? ? A server stub, which emulates the caller on the server side: 
+n? ? Receives a request for F with parameters 
+n? ? Unmarshals the parameters, invokes F 
+n? ? Takes F’s return status (e.g., protection fault), return value, 
+marshals it, produces a response, and sends it back to the client 
+n? ? Waits for the next request (or returns to the server loop) 
+10 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania Passing value parameters 
+n? ? Steps involved in doing remote computation through RPC 
+2-8 
+11 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania RPC components 
+n? ? Generally, you need to write: 
+n? ? Your function, in a compatible language 
+n? ? An interface definition, analogous to a C header file, so other 
+people can program for F without having its source 
+n? ? Includes annotations for marshalling, e.g., [in] and [out] 
+n? ? Special interface definition languages (IDLs) exist for this 
+n? ? Stub-code generator takes the interface 
+definition and generate the appropriate stubs 
+n? ? (In the case of Java, RMIC knows enough about Java to run 
+directly on the source file) 
+n? ? The server stubs will generally run in some 
+type of daemon process on the server 
+n? ? Each function will need a globally unique name or GUID 
+12 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania An example 
+module StockObjects  
+{  
+  struct Quote {  
+    string symbol;  
+    long at_time;  
+    double price;  
+    long volume;  
+  };  
+ 
+  exception Unknown{};  
+ 
+  interface Stock {  
+    // Returns the current stock quote.  
+    Quote get_quote() raises(Unknown);  
+ 
+    // Sets the current stock quote.  
+    void set_quote(in Quote stock_quote);  
+ 
+    // Provides the stock description, e.g. company name.  
+    readonly attribute string description;  
+  };  
+ 
+  interface StockFactory {  
+    Stock create_stock(in string symbol, in string description );  
+  };  
+}; 
+13 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania 
+http://java.sun.com/developer/onlineTraining/corba/corba.html Remote-object references 
+n? ? R1 essentially represented as (server,object) 
+n? ? Result: Can pass references as parameters to RPCs 
+14 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania What are the hard problems with RPC?   
+n? ? Resolving different data formats between 
+languages (e.g., Java vs. Fortran arrays) 
+n? ? Reliability, security 
+n? ? Finding remote procedures in the first place 
+n? ? Extensibility/maintainability 
+n? ? (Some of these might look familiar from when 
+we talked about data exchange!) 
+15 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania Plan for today 
+n? ? Remote Procedure Calls 
+n? ? Abstraction 
+n? ? Mechanism 
+n? ? Stub-code generation 
+NEXT 
+n? ? Web services 
+n? ? REST 
+n? ? SOAP 
+n? ? WSDL 
+16 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania Web services 
+n? ? Goal: Provide an infrastructure for connecting 
+components, building applications in a way similar to 
+hyperlinks between data 
+n? ? Concept of a mashup 
+n? ? It’s another distributed computing platform for  
+the Web 
+n? ? Goal: Internet-scale, language-independent, upwards-
+compatible where possible 
+n? ? This one is based on many familiar concepts 
+n? ? Standard protocols: HTTP 
+n? ? Standard marshalling formats: XML-based, XML Schemas 
+n? ? All new data formats are XML-based 
+17 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania The “Standard” for Web Services 
+Three parts: 
+1.? “Wire” / messaging protocols 
+n? ? Data encodings, RPC calls or document passing, etc. 
+n? ? We will discuss: SOAP and REST 
+2.? Describing what goes on the wire 
+n? ? Schemas for the data 
+n? ? We have already discussed: XML Schema 
+3.? “Service discovery” 
+n? ? Means of finding web services 
+n? ? UDDI 
+18 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania REST and SOAP 
+n? ? Example: Access AWS from your program 
+n? ? Via the REST or SOAP protocols 
+n? ? Example: Launch an EC2 instance, store a value in S3, ... 
+ 
+n? ? Simple Object Access protocol (SOAP) 
+n? ? Not as simple as the name suggests 
+n? ? XML-based, extensible, general, standardized, but also 
+somewhat heavyweight and verbose 
+ 
+n? ? Representational State Transfer (REST) 
+n? ? Much simpler to develop than SOAP 
+n? ? Web-specific; lack of standards 
+19 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania Representational State Transfer (REST) 
+n? ? One example of a messaging protocol 
+n? ? Not really a standard – a style of development 
+n? ? Data is represented in XML, e.g., with a schema 
+n? ? Function call interface uses URIs 
+n? ? Server is to be stateless 
+n? ? And the HTTP request type specifies the operation 
+n? ? e.g., GET http://my.com/rest/service1 
+n? ? e.g., POST http://my.com/rest/service1 {body} adds the body to the 
+service  
+20 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania Example: REST Invoked 
+Response 
+method 
+elements 
+<PutAttributesResponse> 
+https://sdb.amazonaws.com/?Action=PutAttributes 
+<ResponseMetadata> 
+&DomainName=MyDomain 
+<StatusCode>Success</StatusCode> 
+&ItemName=Item123 
+<RequestId>f6820318-9658-4a9d-89f8-
+Parameters &Attribute.1.Name=Color&Attribute.1.Value=Blue 
+b067c90904fc</RequestId> 
+&Attribute.2.Name=Size&Attribute.2.Value=Med 
+<BoxUsage>0.0000219907</BoxUsage> 
+&Attribute.3.Name=Price&Attribute.3.Value=0014.99 
+</ResponseMetadata> 
+&AWSAccessKeyId=<valid_access_key> 
+</PutAttributesResponse> 
+&Version=2009-04-15 
+ 
+Credentials &Signature=[valid signature] 
+&SignatureVersion=2 
+&SignatureMethod=HmacSHA256 
+&Timestamp=2010-01-25T15%3A01%3A28-07%3A00 
+Sample request Sample response 
+Source: http://awsdocs.s3.amazonaws.com/SDB/latest/sdb-dg.pdf 
+21 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania The 'protocol stacks' of web services 
+High-level 
+state transition + 
+WS-AtomicTransaction, 
+Orchestration  
+Other extensions 
+messaging 
+WS-Coordination 
+(WS-BPEL) 
+diagrams 
+MTOM / SOAP Attachments 
+Message 
+WS-Addressing between modules 
+Sequencing 
+WS-Security, SAML 
+Service Capabilities 
+(WS-Capability) 
+Directory 
+Service Description  
+SOAP, XML-RPC 
+(WSDL) (UDDI) 
+XML Schema Inspection 
+XML 
+Description Stack 
+Wire Format Stack 
+Discovery Stack 
+22 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania 
+Enhanced + expanded from a figure from IBM’s “Web Services Insider”, http://www.ibm.com/developerworks/webservices/library/ws-ref2/index.html Simple Object Access Protocol (SOAP) 
+n? ? Another example of a messaging protocol 
+Envelope 
+n? ? XML-based format for passing parameters 
+Header 
+n? ? Has a SOAP header and body inside an envelope 
+Body 
+n? ? Has a defined HTTP binding (POST with  
+content-type of application/soap+xml) 
+n? ? A companion SOAP Attachments encapsulates other 
+(MIME) data 
+n? ? The header defines information about processing:  
+encoding, signatures, etc. 
+n? ? It’s extensible, and there’s a special attribute called 
+mustUnderstand that is attached to elements that must be 
+supported by the callee 
+n? ? The body defines the actual application-defined data 
+23 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania Making a SOAP Call 
+n? ? To execute a call to service PlaceOrder: 
+POST /PlaceOrder HTTP/1.1 
+Host: my.server.com 
+Content-Type: application/soap+xml; charset=“utf-8” 
+Content-Length: nnn 
+ 
+<SOAP-ENV:Envelope> 
+ … 
+</SOAP-ENV:Envelope> 
+24 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania SOAP Return Values 
+n? ? If successful, the SOAP response will generally be 
+another SOAP message with the return data values, 
+much like the request 
+n? ? If failure, the contents of the SOAP envelop will 
+generally be a Fault message, along the lines of: 
+ 
+<SOAP-ENV:Body> 
+ <SOAP-ENV:Fault xmlns=“mynamespace”> 
+  <faultcode>SOAP-ENV:Client</faultcode> 
+  <faultstring>Could not parse message</faultstring> 
+… 
+25 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania Example: SOAP envelope 
+<?xml version="1.0"?> 
+<?xml version='1.0' encoding='UTF-8'?> 
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://
+<SOAP-ENV:Envelope 
+schemas.xmlsoap.org/soap/envelope/"> 
+xmlns:SOAP-ENV='http://schemas.xmlsoap.org/soap/envelope/' 
+<SOAP-ENV:Body> 
+xmlns:SOAP-ENC='http://schemas.xmlsoap.org/soap/encoding/' 
+<PutAttributesResponse> 
+xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' 
+<ResponseMetadata> 
+xmlns:xsd='http://www.w3.org/2001/XMLSchema'> 
+<RequestId>4c68e051-fe45-43b2-992a-
+<SOAP-ENV:Body> 
+a24017ffe7ab</RequestId> 
+<PutAttributesRequest xmlns='http://sdb.amazonaws.com/doc/ 
+<BoxUsage>0.0000219907</BoxUsage> 
+2009-04-15'> 
+</ResponseMetadata> 
+<Attribute><Name>a1</Name><Value>2</Value></Attribute> 
+</PutAttributesResponse> 
+<Attribute><Name>a2</Name><Value>4</Value></Attribute> 
+</SOAP-ENV:Body> 
+<DomainName>domain1</DomainName> 
+</SOAP-ENV:Envelope> 
+<ItemName>eID001</ItemName> 
+<Version>2009-04-15</Version> 
+</PutAttributesRequest> 
+</SOAP-ENV:Body> 
+</SOAP-ENV:Envelope> 
+Sample response 
+Sample request 
+Source: http://awsdocs.s3.amazonaws.com/SDB/latest/sdb-dg.pdf 
+26 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania Plan for today 
+n? ? Remote Procedure Calls 
+n? ? Abstraction 
+n? ? Mechanism 
+n? ? Stub-code generation 
+n? ? Web services 
+n? ? REST 
+n? ? SOAP 
+NEXT 
+n? ? WSDL 
+27 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania How do we declare functions? 
+n? ? Remember interface definition languages? 
+n? ? CORBA IDL, DCE IDL, ... 
+n? ? In Java, the interface uses the same language as the Java 
+code 
+n? ? Web Services Description Language (WSDL) 
+is the interface definition language for  
+web services 
+n? ? Defines notions of protocol bindings, ports, and services 
+n? ? Generally describes data types using XML Schema 
+ 
+28 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania A WSDL Service 
+Service 
+Port 
+Port Port 
+PortType PortType 
+PortType 
+Operation 
+Operation 
+Operation 
+Operation 
+Operation 
+Operation 
+Binding 
+Binding Binding 
+29 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania Web service terminology 
+n? ? Service: The entire Web Service 
+n? ? Port: Maps a set of port types to a transport 
+binding (a protocol, frequently SOAP, COM, 
+CORBA, …) 
+n? ? Port Type: Abstract grouping of operations, 
+i.e. a class 
+n? ? Operation: The type of operation – request/
+response, one-way 
+n? ? Input message and output message; maybe also fault 
+message 
+n? ? Types: The XML Schema type definitions 
+30 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania WSDL example 
+<message name="getTermRequest"> 
+  <part name="term" type="xs:string"/> 
+</message> 
+ 
+<message name="getTermResponse"> 
+<definitions> 
+  <part name="value" type="xs:string"/> 
+ 
+Uses 
+</message> 
+<types> 
+XML 
+  definition of types...... 
+<portType name="glossaryTerms"> 
+Schema 
+</types> 
+  <operation name="getTerm"> 
+ 
+    <input message="getTermRequest"/> 
+<message> 
+    <output message="getTermResponse"/> 
+  definition of a message.. 
+  </operation> 
+</message> 
+</portType> 
+ 
+<portType> 
+  definition of a port..... 
+<binding type="glossaryTerms" name="b1"> 
+</portType> 
+   <soap:binding style="document" transport= 
+ 
+   "http://schemas.xmlsoap.org/soap/http" /> 
+<binding> 
+   <operation> 
+  definition of a binding.. 
+     <soap:operation  
+</binding> 
+      soapAction="http://example.com/getTerm"/> 
+ 
+     <input><soap:body use="literal"/></input> 
+</definitions> 
+     <output><soap:body use="literal"/></output> 
+  </operation> 
+</binding> 
+31 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania http://www.w3schools.com/wsdl/ More examples 
+http://soap.amazon.com/schemas2/AmazonWebServices.wsdl 
+ 
+http://s3.amazonaws.com/doc/2006-03-01/AmazonS3.wsdl 
+ 
+https://fps.amazonaws.com/doc/2008-09-17/AmazonFPS.wsdl 
+ 
+http://docs.aws.amazon.com/AWSEC2/latest/APIReference/Welcome.html 
+32 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania JAX-RPC: Java and web services

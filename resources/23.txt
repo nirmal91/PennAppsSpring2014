@@ -1,0 +1,209 @@
+CIS 455/555: Internet and Web Systems 
+Bigtable and Percolator 
+ 
+April 15, 2013 
+1 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Announcements 
+n? ? Second midterm: April 22 (4:30pm, DRL A1) 
+n? ? Covers all material after the first midterm, up to (and 
+including) next week's lectures 
+n? ? Open-book, open-notes - just like the first midterm 
+n? ? Course evaluations start today 
+n? ? Please do complete the form and give me feedback! 
+n? ? Let me know what you liked, and what you didn't like 
+n? ? Based on last year's feedback, I changed HW1, added lab sessions, 
+changed the due dates on HW2, É 
+n? ? Reading:  
+n? ? Peng & Dabek: "Large-scale Incremental Processing Using 
+Distributed Transactions and Notifications", OSDI 2010 
+n? ? http://www.google.com/research/pubs/archive/36726.pdf 
+2 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Plan for today 
+NEXT 
+n? ? Bigtable 
+n? ? Percolator 
+n? ? Transactions and locking 
+n? ? Snapshot isolation 
+n? ? Observers 
+3 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Different 
+Bigtable 
+"Column family" 
+versions 
+Source: Bigtable paper (OSDI2006) 
+n? ? Implements a multidimensional sorted map 
+n? ? Keys are (row, column, timestamp); provides versioning 
+n? ? Data is maintained in lexicographic order (by row key) 
+n? ? Atomic lookup and update operations on each row, but no 
+atomic cross-row operations 
+n? ? Used by many Google projects, including Google Earth, 
+Google Finance, the web index, and possibly others 
+4 
+ 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Bigtable implementation 
+n? ? A single-master system, similar to GFS 
+n? ? Table is broken into tablets, which each contain a contiguous 
+region of key space. Stored by tablet servers. 
+n? ? There is a master that assigns tablets to tablet servers 
+n? ? Persistent state is stored in GFS files; recently committed 
+data is kept in a memtable in memory 
+n? ? Designed to be scalable: Handles petabytes of data, runs 
+reliably on large numbers of unreliable machines 
+memtable Read op 
+tablet log 
+Write op 
+SSTable Files 
+5 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Source: BigTable paper (OSDI 2006) Some services that use Bigtable 
+Source: Bigtable paper (OSDI 2006) 
+n? ? In 2006, there were 388 non-test Bigtable 
+clusters at Google 
+n? ? Combined total: 24,500 tablet servers 
+n? ? Example: Google Analytics 
+n? ? Raw click table (~200TB): 1 row for each end-user session 
+n? ? Summary table (~20TB): Predefined summaries per website 
+6 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Flashback 
+n? ? Bigtable uses many of the technologies we've 
+been looking at in this course: 
+n? ? Lock service is made fault-tolerant with Paxos 
+n? ? Tablet location hierarchy is basically a B+ tree 
+n? ? Clients can run per-row transactions 
+n? ? Data is persisted in a scalable file system, GFS 
+n? ? Bigtable can be used as source or target for MapReduce jobs 
+n? ? More details are in the paper: 
+n? ? F. Chang, J. Dean, S. Ghemawat, W. Hsieh, D. Wallach, M. 
+Burrows, T. Chandra, A. Fikes, R. Gruber: "Bigtable: A 
+Distributed Storage System for Structured Data", OSDI 2006 
+n? ? http://research.google.com/archive/bigtable-osdi06.pdf 
+7 
+ 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Plan for today 
+n? ? Bigtable 
+NEXT 
+n? ? Percolator 
+n? ? Transactions and locking 
+n? ? Snapshot isolation 
+n? ? Observers 
+8 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Why Percolator? 
+n? ? Scenario: Web crawler 
+n? ? We have a huge index (Google: Tens of Petabytes) 
+n? ? We need to run some  computation on the index (e.g.,  
+PageRank updates, clustering, ...) 
+n? ? Google's indexing system is a chain of many MapReduces 
+n? ? Every day we recrawl a small part of the web 
+n? ? How do we update the index? 
+n? ? Alternative #1: Run MapReduce on changed pages only 
+n? ? Problem: Not accurate; for example, there may be links between the 
+new pages and the rest of the web 
+n? ? Alternative #2: Re-run MapReduce on entire data 
+n? ? Problem: Wasteful; discards work done in earlier runs 
+n? ? This is what Google actually used to do prior to Percolator 
+n? ? Alternative #3: Update incrementally 
+9 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Example 
+... 
+map 
+reduce 
+invert 
+links... 
+URL Checksum PageRank IsCanonical 
+nyt.com 0xabcdef01 6 yes no 
+nytimes.com 
+9 yes 
+0xabcdef01 
+Checksum Canonical 
+nytimes.com 
+0xabcdef01 nyt.com 
+10 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania What is Percolator? 
+n? ? A system for incrementally processing 
+updates to a large data set 
+n? ? Percolator-based indexing system is known as 'Caffeine' 
+n? ? Reduced average age of documents in Google search 
+results by 50%; documents move through Caffeine about 
+100x faster than through the previous system 
+n? ? Published at OSDI 2010 
+n? ? Peng & Dabek: "Large-scale Incremental Processing Using 
+Distributed Transactions and Notifications", OSDI 2010 
+n? ? http://www.google.com/research/pubs/archive/36726.pdf 
+ 
+11 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania What Percolator provides 
+n? ? Percolator builds on Bigtable, but additionally 
+it provides the following two abstractions: 
+n? ? ACID transactions (as seen earlier) with snapshot isolation 
+n? ? Observers - a way to organize incremental computation 
+n? ? What is an observer? 
+n? ? Essentially, a small piece of code that is invoked whenever a 
+specific column changes 
+n? ? Percolator applications are structured as a series of 
+observers: 
+n? ? An external process (e.g., the crawler) triggers updates in the table 
+n? ? Update is handled by an observer, which then produces more updates 
+and thus more work for other observers, etc. 
+12 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Why ACID semantics? 
+n? ? Couldn't they have built this system without 
+transactions? 
+n? ? Transactions are not 'free' - they have some overhead 
+n? ? Yes - but transactions...  
+n? ? ... make it easier to reason about the state of the system, 
+especially when many updates are performed concurrently 
+n? ? ... avoid introduction of errors into long-lived repository 
+n? ? These could be introduced by bugs, crashes, ... 
+n? ? ... allow easy construction of consistent, up-to-date indexes 
+n? ? Interesting change of perspective 
+n? ? Given the earlier debates (e.g., Stonebraker/DeWitt) 
+13 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Write 
+Snapshot isolation 
+timestamp 
+Time 
+1 
+2 
+Read 
+timestamp 
+3 
+n? ? What is snapshot isolation? 
+n? ? Conceptually, each transaction performs all its reads at a start 
+timestamp, and all its writes at a commit timestamp 
+n? ? In the above example, transaction 2 does not see writes from  
+transaction 1, but transaction 3 sees writes from both 1 and 2 
+n? ? Implemented using versioning 
+n? ? Protects against write-write conflicts: If two transactions write 
+to the same cell, at least one aborts 
+n? ? Comparison to serializability? 
+14 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Locking in Percolator 
+key bal:data bal:lock bal:write 
+6: 6: 6: data @ 5 
+Bob 
+5: $10 5: 5: 
+6: 6: 6: data @ 5 
+Joe 
+5: $2 5: 5: 
+n? ? Quite different from DBMS locking 
+n? ? Locks are kept in special BigTable columns 
+n? ? Ensures persistence and provides high throughput 
+n? ? Remember: Accesses to individual rows are already atomic 
+in BigTable! 
+15 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Transactions in Percolator 
+1.? At the beginning, obtain start timestamp 
+n? ? Comes from a timestamp oracle 
+2.? Buffer all writes until commit time 
+3.? At commit time, try to lock all the cells being 
+written ('prewrite') 
+n? ? If existing locks are found, transaction aborts 
+n? ? A random cell is designated as the 'primary'; other cells 
+contain a reference to the primary 
+4.? Obtain commit timestamp from oracle 
+5.? Release locks and make writes visible 
+n? ? Start with primary (ensures that roll-forward is possible) 
+16 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Handling faulty nodes in Percolator 
+n? ? What if a node fails in transaction? 
+n? ? What would happen in a DBMS? 
+n? ? What is the effect in P

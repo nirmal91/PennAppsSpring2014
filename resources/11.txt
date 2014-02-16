@@ -1,0 +1,231 @@
+CIS 455/555: Internet and Web Systems 
+GFS and MapReduce 
+ 
+February 20, 2013 
+1 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Announcements 
+n? ? HW1MS2 is due today 
+n? ? PLEASE TEST YOUR SOLUTION CAREFULLY 
+n? ? Please make sure your submission is complete and builds 
+properly! 
+n? ? Please check your solution into svn after you submit it 
+n? ? HW2MS1/MS2 due date? 
+n? ? Midterm exam February 27 
+n? ? Open-book, open-notes, closed-Wikipedia 
+n? ? Computers permitted only for viewing slides or assigned reading 
+n? ? Covers all the material up to, and including,  
+the lecture on Monday, February 25th 
+2 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Looking ahead 
+THU SUN 
+MON TUE WED FRI SAT 
+18 20 
+HW1MS2 due 
+27 
+25 1 
+Midterm 
+Spring 
+break 
+4 6 
+8 
+HW2MS1 due? 
+11 13 
+18 20 22 
+HW2MS2 due? 
+25 27 
+1 3 5 
+HW3 due 
+8 10 
+17 
+15 
+22 
+Midterm 
+29 
+6 
+Project demos 
+3 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania 
+February 
+May April 
+March Plan 
+NEXT 
+n? ? Google File System 
+n? ? Comparison to NFS 
+n? ? Key assumptions 
+n? ? Architecture and operation 
+n? ? Introduction to MapReduce 
+n? ? Programming model 
+n? ? Data flow 
+n? ? A few simple example tasks 
+n? ? Hadoop and HDFS 
+4 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Message passing architecture 
+n? ? With key-based routing, we use messages to 
+coordinate behavior among different nodes in 
+an application 
+n? ? Send a request to the “owner” of a key 
+n? ? Request contains a custom-formatted message type 
+n? ? Each node has an event handler loop 
+switch (msg.type) { 
+case one: 
+case two: 
+… 
+n? ? The request handler may send back a result, as appropriate 
+n? ? Requires that the message include info about who the requestor was, 
+how to return the data 
+5 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Review: Distributed hash table with KBR 
+n? ? We want the following: 
+n? ? put (key, value) 
+n? ? remove (key) 
+n? ? valueSet = get (key) 
+n? ? How can we use Chord to do this? 
+n? ? Suppose Chord provides a function route(key, message) 
+n? ? When route(k, msg) is invoked on a node X, Chord routes 
+the message to the node Y that is currently responsible for 
+key k, and calls deliver(k, msg) on Y 
+n? ? How can we implement put, remove, and get using the route
++deliver primitives? 
+n? ? What about replication? Can we support writes? Consistency? 
+6 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania GFS + MapReduce 
+n? ? An alternate programming abstraction 
+n? ? Instead of sending messages, different pieces 
+of code communicate through files 
+n? ? Code is going to take a very “stylized” form; at each stage 
+each machine will get input from files, send output to files 
+n? ? Files are generally persistent, name-able (in contrast to DHT 
+messages, which are transient) 
+n? ? Files consist of blocks, which are the basic unit of 
+partitioning (in contrast to object / data item IDs) 
+7 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Background: Distributed filesystems 
+n? ? Many distributed filesystems have been 
+developed: 
+n? ? NFS, SMB are the most prevalent today 
+n? ? Andrew FileSystem (AFS) was also fairly popular 
+n? ? Hundreds of other research filesystems, e.g., Coda, Sprite, 
+… with different properties 
+8 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania NFS in a Nutshell 
+n? ? (Single) server, multi-client architecture 
+n? ? Server is stateless, so clients must send all context 
+(including position to read from) in each request 
+n? ? Plugs into VFS APIs, mostly mimics UNIX 
+semantics 
+n? ? Opening a file requires opening each dir along the way 
+n? ? fd = open(“/x/y/z.txt”) will do a  
+n? ? lookup for x from the root handle 
+n? ? lookup for y from x’s handle 
+n? ? lookup for z from y’s handle 
+n? ? Server must commit writes immediately 
+n? ? Client does heavy caching – requires frequent polling for 
+validity, and/or use of external locking service 
+9 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania The Google File System (GFS) 
+n? ? Goals: 
+n? ? Support millions of huge (many-TB) files 
+n? ? Partition & replicate data across thousands of unreliable 
+machines, in multiple racks (and even data centers) 
+n? ? Willing to make some compromises to get 
+there: 
+n? ? Modified APIs – doesn’t plug into POSIX APIs 
+n? ? In fact, relies on being built over Linux file system 
+n? ? Doesn’t provide transparent consistency to apps! 
+n? ? App must detect duplicate or bad records, support checkpoints 
+n? ? Performance is only good with a particular class of apps: 
+n? ? Stream-based reads 
+n? ? Atomic record appends 
+10 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Key assumptions in GFS 
+n? ? Component failures are the common case 
+n? ? Thousands of storage machines, built from commodity parts 
+n? ? Need monitoring, error detection, fault tolerance, recovery! 
+n? ? Special application workload 
+n? ? Small number of very large, multi-GB files 
+n? ? Primarily large streaming reads + small random reads 
+n? ? Many large, sequential appends (e.g., many-way merging or 
+producer/consumer); random writes are rare 
+n? ? Multiple clients may be writing/appending concurrently 
+n? ? Exact sequence of appended records does not matter 
+n? ? Benefits from co-designing file system & apps  
+n? ? For example, can relax consistency w/o burdening application 
+11 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania GFS Basic architecture & lookups 
+n? ? Files broken into 64MB “chunks” 
+n? ? Master stores metadata; 3 chunkservers store each chunk 
+n? ? A single 'flat' file namespace maps to chunks + replicas 
+n? ? As with Napster, actual data transfer from chunkservers to client 
+n? ? No client-side caching! 
+12 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Wait a second... 
+n? ? After last week's lectures, you may be 
+surprised by some design decisions in GFS 
+n? ? Which ones? 
+n? ? Do you expect this design to work well... 
+n? ? ... for Google? 
+n? ? ... for other kinds of systems? 
+13 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Primary/backup 
+Ordered requests 
+X?7 
+Y?4, X?2, X?7 
+Y?4 
+Primary 
+Backups 
+X?2 
+n? ? Scenario: Multiple replicas, concurrent 
+requests from different clients 
+n? ? How to ensure consistency? 
+n? ? Idea: Designate one replica as primary 
+n? ? Accepts all requests, orders them, and then forwards 
+ordered requests to the backups 
+n? ? When should the primary report success to a client? 
+n? ? What has to happen when the primary fails? 
+n? ? What kind of consistency does this provide? 
+14 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania 
+ The Master: Metadata and versions 
+n? ? Controls (and locks as appropriate): 
+n? ? Mapping from files -> chunks within each namespace 
+n? ? Controls reallocation, garbage collection of chunks 
+n? ? Maintains a log (replicated to backups) of all 
+mutations to the above 
+n? ? Also knows mapping from chunk ID -> 
+<version, {machines}> 
+n? ? Doesn’t have persistent knowledge of what’s on 
+chunkservers 
+n? ? Instead, during startup, it polls them 
+n? ? … Or when one joins, it registers 
+15 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Chunkservers 
+n? ? Each holds replicas of some of the chunks 
+n? ? For a given write operation, one of the 
+owners of the chunk gets a lease – becomes 
+the primary and all others the secondary 
+n? ? Receives requests for mutations 
+n? ? Assigns an order 
+n? ? Notifies the secondary nodes 
+n? ? Waits for all to say they received the message 
+n? ? Responds with a write-succeeded message 
+n? ? Failure results in inconsistent data!! 
+n? ? How bad is this? 
+16 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Step-by-step: A write operation 
+1.? Client asks Master for lease-owning 
+chunkserver 
+2.? Master gives ID of primary, 
+secondary chunkservers; client 
+caches 
+3.? Client sends its data to all replicas, 
+in any order (in a chain; why?) 
+4.? Once client gets ACK, it requests 
+primary to do a write of those data 
+items.  Primary assigns serial 
+numbers to these operations. 
+5.? Primary forwards write to 
+secondaries 
+6.? Secondaries reply “SUCCESS” 
+7.? Primary replies to client 
+17 
+© 2013 A. 

@@ -1,0 +1,672 @@
+CIS 455/555: Internet and Web Systems 
+Security essentials 
+ 
+April 10, 2013 
+1 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Announcements 
+n? ? Project plan is due today 
+n? ? 2-page PDF with architecture overview, division of labor, and 
+milestones 
+n? ? Second midterm: April 22 (4:30pm, DRL A1) 
+n? ? Covers all material after the first midterm, up to (and 
+including) next week's lectures 
+n? ? Open-book, open-notes - just like the first midterm 
+n? ? Reading:  
+n? ? Tanenbaum Chapter 9 (Security) 
+2 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Distributed security and e-commerce 
+n? ? Transactions and replicated state machines 
+make sure things happen when we want 
+them to… 
+n? ? Security makes sure things don’t happen 
+when we don’t want them to! 
+n? ? Let’s look at some essentials of security in distributed 
+environments 
+3 
+© 2013 A. Haeberlen, Z. Ives Plan for today 
+NEXT 
+n? ? Web security 
+n? ? Security basics 
+n? ? Terminology 
+n? ? Capabilities, ACLs, view-based security 
+n? ? Cryptography basics 
+n? ? Symmetric vs. public-key 
+n? ? Signatures 
+n? ? Network attacks 
+n? ? Kerberos 
+n? ? TLS 
+4 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania 
+ Some types of threats 
+Malicious clients Malicious servers 
+(state manipulation, injection, ...) (site forgery, phishing, ...) 
+Eavesdropping Man-in-the-middle attack 
+(Example: Firesheep) (e.g., via DNS hijacking) 
+5 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Client state manipulation 
+<html> 
+  <head><title>BMW order form</title></head> 
+  <body> 
+    <form method="get" action="/order.php"> 
+      How many BMWs? <input type="text" size="3" name="quantity"> 
+      <input type="hidden" name="price" value="50000"> 
+      <input type="submit" value="Order"> 
+    </form> 
+  </body> 
+</html> 
+n? ? Bad idea: Store critical information on the client 
+n? ? Examples: In cookies, hidden form fields, URLs, or really 
+anywhere users have access to 
+n? ? What can happen in the above example? 
+n? ? Potential solutions:  
+n? ? Keep authoritative state on server 
+n? ? Sign information before giving it to the client (beware of replay attacks!) 
+6 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Injection attacks 
+public void doGet(HttpServletRequest request, HttpServletResponse response) 
+{ 
+  String subject = request.getParameter("emailSubject"); 
+  Runtime.exec("mail feedback@mysite.com -s "+subject+" </tmp/content"); 
+  response.setContentType("text/html"); 
+  PrintWriter out = response.getWriter(); 
+  out.println("<html><head><title>Email sent</title></head>"); 
+  out.println("<body>Thank you for your feedback</body></html>"); 
+} 
+public void doGet(HttpServletRequest request, HttpServletResponse response) 
+{ 
+  String pennID = request.getParameter("pennID"); 
+  String query = "SELECT midterm FROM grades WHERE user="+pennID; 
+  result = database.runQuery(query); 
+  response.setContentType("text/html"); 
+  PrintWriter out = response.getWriter(); 
+  out.println("<html><head><title>Midterm grades</title></head>"); 
+  out.println("<body>Your midterm grade is: "+result+"</body></html>"); 
+} 
+n? ? Bad idea: Use input from the client directly 
+n? ? What can happen in the above examples? 
+n? ? Solutions: Whitelisting (NOT blacklisting!); scrubbing 
+7 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Injection attacks 
+8 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania 
+http://xkcd.com/327/ Injection attacks are serious 
+n? ? Example: CardSystems incident 
+n? ? CardSystems processed credit card transactions 
+n? ? Hacked in 2005; 43 million (!) accounts exposed 
+n? ? 263,000 credit card numbers actually stolen 
+n? ? Stored unencrypted (!) in a file for 'research purposes' 
+n? ? Company went out of business; sold to Pay By Touch in 
+October 2005 
+n? ? Example: April 2008 SQL vulnerabilities 
+n? ? Mass SQL injection attack; many thousands of servers found 
+to be vulnerable (some reports claim 510,000) 
+9 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Interactions between web apps 
+n? ? User may interact with more than one web app 
+n? ? What if one of them is malicious? 
+ 
+10 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Example: Credential caching 
+n? ? Web site may require credentials, e.g., login 
+n? ? Might use HTTP authentication or store a cookie 
+n? ? These credentials can remain cached even if the user closes 
+the app that created them 
+n? ? Transient cookies stay around until the browser is closed, permanent 
+ones until they expire 
+n? ? HTTP credentials may be cached and are shared across all windows of 
+the same browser instance 
+ 
+n? ? Could the malicious web app access these? 
+n? ? Same-origin policy: Credentials are only sent back to the site 
+that created them (we've seen this for cookies) 
+n? ? So this shouldn't be a problem - right? 
+11 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Cross-site request forgery (XSRF) 
+n? ? Problem: Malicious web app can initate HTTP 
+requests on user's behalf, w/o her knowledge 
+n? ? Cached credentials are sent to the server regardless of who 
+originally initiated the request 
+n? ? Example: 
+n? ? Alice opens bank.com, logs in, uses the site, closes window 
+n? ? Later, in the same session, Alice navigates to malicious.com, 
+which contains the following code: 
+<form method="POST" name="X" action="bank.com/pwdchange.php"> 
+<input type="hidden" name="password" value="evilhacker"> 
+</form><iframe name="hiddenframe" style="display: none;"> 
+ 
+ </iframe><script>document.X.submit();</script> 
+n? ? Malicious.com can't read the response, but it doesn't need to 
+12 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Defending against XSRF 
+n? ? Idea #1: Inspect Referer header 
+n? ? Only requests coming from bank site are allowed 
+n? ? Problem: Not all browsers submit it; user can block or forge 
+n? ? Idea #2: Ask user to input secret 
+n? ? E.g., ask current password when changing password 
+n? ? Problem: Not convenient for the user 
+n? ? Idea #3: Action token 
+n? ? Legitimate form contains a hidden field with a value that is 
+signed by the server (or a MAC) 
+n? ? Problem: Attacker can reuse token from a legitimate session 
+in another browser 
+n? ? Must bind token to specific browser (e.g., to a cookie)! 
+13 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania GET /index.html 
+<html> ... <script src="Y.com/z.js"> ... </html> 
+Referential integrity / "Malvertising" 
+X.com 
+Y.com 
+n? ? Page on X.com loads something from Y.com 
+n? ? Common, e.g., in online advertising 
+n? ? What the content on Y.com is malicious? 
+n? ? It may be malicious from the start, or change later! 
+n? ? Y.com might give different content to different users! 
+n? ? Solutions: e.g., Yahoo! AdSafe, Facebook's FBJS 
+n? ? Remember John Mitchell's talk? 
+14 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania 
+GET /z.js 
+(evil script) Example: ModMail 
+HackNY 3rd place, SendGrid prize (http://vimeo.com/63535236) 
+15 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Recap: Web security 
+n? ? Many potential threats to web applications 
+n? ? Malicious clients, man-in-the-middle attacks, eavesdropping... 
+n? ? We have seen four examples: 
+n? ? Client state manipulation 
+n? ? Injection attack 
+n? ? Cross-site request forgery 
+n? ? Malvertising 
+n? ? ... but (unfortunately) there are many others 
+n? ? Take-away message: Security is HARD 
+n? ? But very necessary, esp. for critical apps (banking etc) 
+n? ? Need to be aware of threats, and be very careful when 
+implementing defenses - vulnerabilities may be very subtle 
+16 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania 
+ Plan for today 
+n? ? Web security 
+NEXT 
+n? ? Security basics 
+n? ? Terminology 
+n? ? Capabilities, ACLs, view-based security 
+n? ? Cryptography basics 
+n? ? Symmetric vs. public-key 
+n? ? Signatures 
+n? ? Network attacks 
+n? ? Kerberos 
+n? ? TLS 
+17 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania 
+ Basic terminology 
+n? ? Authorization:  determines mode of access allowed 
+n? ? Common solutions:  access control lists, capabilities, … 
+n? ? We previously discussed how views could be used to define authorization 
+levels 
+n? ? Authentication:  means of verifying identity 
+n? ? Common cases:  password/UID, PIN, fingerprint, demonstration of ability to 
+encrypt with private key, etc. 
+n? ? Encryption:  used to protect data 
+n? ? A common notation is the following: 
+ciphertext = K [plaintext] 
+sender
+plaintext = K [K [plaintext]] 
+receiver sender
+ 
+n? ? Let’s look at encryption in detail… 
+18 
+© 2013 A. Haeberlen, Z. Ives Authorization (Access control) 
+n? ? Capabilities 
+n? ? Special, hard-to-forge “handles” or “pointers” to objects/
+services 
+n? ? Independent of authentication of who a user is 
+n? ? Possessing a capability à? you can use the service/object 
+n? ? e.g., pass-phrase; SHA-1 key; private key; etc. 
+n? ? Capabilities are easy to pass on to others, but hard to 
+Most  
+revoke 
+common 
+n? ? Access Control Lists (ACLs) 
+approach 
+today 
+n? ? During each access to an object/service,  
+authorization is checked against a list 
+n? ? Usually a notion of different groups, rights 
+n? ? e.g., Unix or Windows file system; most databases 
+n? ? Easy to revoke rights; hard to pass them on 
+n? ? Requires a scheme for authenticating a user 
+19 
+© 2013 A. Haeberlen, Z. Ives Granularity: What to control 
+n? ? In a file system, ACLs are checked at the 
+granularity of an open, a read, a write, etc. 
+to a whole file 
+n? ? Analogous process holds HTTP server, when we protect 
+directories, files 
+n? ? This is great for large, atomic units, e.g., images 
+n? ? But sometimes we need finer-grained detail 
+n? ? If exporting XML, we may want to expose different data to 
+marketing than we do order fulfillment 
+n? ? Add access control lists over views of the data, i.e., query 
+results 
+20 
+© 2013 A. Haeberlen, Z. Ives Hypothetical View-Based Protection Example 
+define function MarketingView() returns purchase* 
+{ 
+   for $p in doc(“purchases.xml”)/purchases/purchase 
+   where $p/date() >= fn:todays-date()–fn:dateInterval(0,1,0) 
+   return <purchase> 
+            { $p/isbn } 
+            { $p/addr/state } 
+         </purchase> 
+} 
+ 
+define function OrderFulfillmentView() returns purchase* 
+{ 
+   for $p in doc(“purchases.xml”)/purchases/purchase 
+   return $p 
+} 
+ 
+grant permission read on MarketingView to MarketerGroup 
+grant permission read on OrderFulfillmentView to 
+   WarehouseGroup 
+21 
+© 2013 A. Haeberlen, Z. Ives View-based security 
+n? ? Views restrict attributes and values that are visible 
+n? ? Thus restricting the queries that can be posed 
+n? ? Much more powerful than simply restricting documents 
+n? ? Caveat: not always enough to guarantee security – 
+sometimes information is inadvertently “leaked” 
+n? ? Might correlate info from multiple tables with different 
+attributes 
+n? ? Might know, e.g., that there’s only one customer in a given 
+state… 
+n? ? We will see a defense against this later (differential privacy) 
+n? ? OK, so how do we enforce that data is limited only to 
+those who are authorized to access it? 
+22 
+© 2013 A. Haeberlen, Z. Ives Plan for today 
+n? ? Web security 
+n? ? Security basics 
+n? ? Terminology 
+n? ? Capabilities, ACLs, view-based security 
+NEXT 
+n? ? Cryptography basics 
+n? ? Symmetric vs. public-key 
+n? ? Signatures 
+n? ? Network attacks 
+n? ? Kerberos 
+n? ? TLS 
+23 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania 
+ Scenario 
+P 
+P 
+C 
+Decryption 
+Encryption 
+Sender 
+key key 
+Receiver 
+Adversary 
+n? ? Sender S wants to send plaintext P to receiver 
+n? ? Sender encrypts P with a key? Ciphertext C 
+ 
+n? ? Sender sends ciphertext to receiver 
+n? ? Adversary may be able to intercept, modify, or forge messages 
+n? ? Receiver decrypts C with a (possibly different) key 
+24 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Symmetric cryptography 
+n? ? Uses the same key for encryption and decryption 
+n? ? Aka secret-key crytography 
+n? ? Block cipher: block of text à? ciphertext block 
+n? ? Substitution cipher – simple substitutions of char(s) for char(s) 
+n? ? Transposition cipher – reorder the chars in the block 
+n? ? DES (Data Encryption Standard) – only 56bit key 
+n? ? Sequence of stages that encrypt one another’s output 
+n? ? Makes it less vulnerable to frequency analysis attack 
+n? ? AES (Advanced Encryption Standard) - state of the art 
+n? ? Non-block cipher 
+n? ? Bitstream cipher 
+n? ? XORs plaintext with pseudo-random numbers generated when 
+key is used as seed value 
+n? ? What if the random number generator isn’t very random? 
+n? ? Vernam (one-time pad) 
+25 
+© 2013 A. Haeberlen, Z. Ives Public-key cryptosystems 
+n? ? Each party has a public key and a private key 
+n? ? The public key is published or made available to communication partners 
+n? ? The private key is kept as a secret 
+n? ? For two-way communication, use a second key-pair 
+priv pub 
+n? ? M = K [K [M]] 
+C C
+n? ? What are some advantages over symmetric crypto? 
+n? ? For instance, if A shares the same symmetric key with B and C, B can read 
+C's encrypted communication with A, and vice versa 
+n? ? Could be avoided by sharing different keys with each sender, but complex! 
+n? ? With public-key crypto, we can publish the public key for all to see! 
+n? ? First proposed public-key encryption scheme was 
+Diffie-Hellman ’76 
+n? ? But today, RSA is more common 
+26 
+© 2013 A. Haeberlen, Z. Ives The RSA algorithm 
+n? ? To generate a keypair: 
+n? ? Choose two very large prime numbers, p and q 
+n? ? The bigger, the more secure; 2048 bits are common today 
+n? ? Compute n=p*q and z=(p-1)*(q-1) 
+n? ? Choose a number d that is relatively prime to z 
+n? ? Compute the number e such that e*d=1 mod z 
+n? ? Common values: 3, 17, or 65537 
+n? ? Result: Encyption key is (e,n); decryption key is (d,n) 
+n? ? To encrypt a message M: 
+n? ? Break M into blocks and treat them as integers from 0..n-1 
+e
+n? ? Ciphertext C of a block B: C=B (mod pq) 
+d
+n? ? To decrypt: B= C (mod pq) 
+e d
+n? ? Works because M = (M (mod pq)) (mod pq)  
+(elementary number theory) 
+27 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania 
+ Why does this work? 
+n? ? If (e,n) is public and n=p*q, why can't an 
+attacker simply factor n and break the key? 
+n? ? Factoring large numbers is really really hard 
+n? ? From the RSA challenge: 
+n? ? In 12/2009, factoring a 768-bit number took almost 2000 
+2.2GHz-Opteron CPU years, (~3 years of calendar time) 
+n? ? (and a lot of smart people) 
+n? ? http://www.rsa.com/rsalabs/node.asp?id=3723 
+n? ? Downside: Working with such large numbers 
+is also costly  
+n? ? On a Core-duo E8400 (3GHz), a RSA-2048 signature takes 
+about 7.3ms! How many messages can we sign per second? 
+ 
+28 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania RSA signatures take a long time 
+[ahae@carbon ~]$ openssl speed rsa 
+Doing 512 bit private rsa's for 10s: 45778 512 bit private RSA's in 10.00s 
+Doing 512 bit public rsa's for 10s: 552977 512 bit public RSA's in 9.99s 
+Doing 1024 bit private rsa's for 10s: 8666 1024 bit private RSA's in 10.00s 
+Doing 1024 bit public rsa's for 10s: 170143 1024 bit public RSA's in 10.00s 
+Doing 2048 bit private rsa's for 10s: 1359 2048 bit private RSA's in 10.00s 
+Doing 2048 bit public rsa's for 10s: 46950 2048 bit public RSA's in 10.00s 
+Doing 4096 bit private rsa's for 10s: 190 4096 bit private RSA's in 10.01s 
+Doing 4096 bit public rsa's for 10s: 11965 4096 bit public RSA's in 10.00s 
+OpenSSL 1.0.0-fips-beta3 15 Jul 2009 
+built on: Fri Oct 16 07:44:17 EDT 2009 
+options:bn(64,32) md2(int) rc4(4x,int) des(ptr,risc1,16,long) aes(partial) blowfish(idx)  
+compiler: gcc -fPIC -DOPENSSL_PIC -DZLIB -DOPENSSL_THREADS -D_REENTRANT -DDSO_DLFCN -DHAVE_DLFCN_H 
+-DKRB5_MIT -DL_ENDIAN -DTERMIO -Wall -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fexceptions -
+fstack-protector --param=ssp-buffer-size=4 -m32 -march=i686 -mtune=atom -fasynchronous-unwind-
+tables -Wa,--noexecstack -DOPENSSL_BN_ASM_PART_WORDS -DOPENSSL_IA32_SSE2 -DOPENSSL_BN_ASM_MONT -
+DSHA1_ASM -DSHA256_ASM -DSHA512_ASM -DMD5_ASM -DRMD160_ASM -DAES_ASM -DWHIRLPOOL_ASM 
+                  sign    verify    sign/s verify/s 
+rsa  512 bits 0.000218s 0.000018s   4577.8  55353.1 
+rsa 1024 bits 0.001154s 0.000059s    866.6  17014.3 
+rsa 2048 bits 0.007358s 0.000213s    135.9   4695.0 
+rsa 4096 bits 0.052684s 0.000836s     19.0   1196.5 
+[ahae@carbon ~]$ 
+n? ? Numbers from Intel Core 2 duo E8400 (3GHz) 
+n? ? Consequence: Try to avoid doing too many of these 
+n? ? Examples: Session keys; signing digests 
+29 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Digital signatures 
+n? ? Public-key crypto can maintain secrecy 
+n? ? Sender looks up public key, encrypts message with it 
+? Only the owner of the private key can read it 
+n? ? But sometimes we also need to authenticate 
+messages 
+n? ? In other words, given a message m that was supposedly sent 
+by S, we want to verify whether m was really sent by S 
+n? ? Idea: Can use public-key crypto 
+pub priv 
+n? ? ... provided that M = K [K [M]] (commutative cipher) 
+C C
+n? ? Sender encrypts message with private key, receiver decrypts 
+it with the public key 
+30 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Digital signatures 
+n? ? But wait - don't RSA operations take a long time? 
+n? ? Less costly: message digests 
+n? ? Compute a one-way hash, f(M), with these properties: 
+n? ? All values in f’s range are equally likely (? unlikely that we can find M’ 
+where f(M’) = f(M) because large number of Ms map to same region) 
+n? ? If any bit of the message is changed, every bit in f(M) has a 50% 
+chance of changing (? f(M), f(M’) aren’t similar simply because M, M’ 
+are similar) 
+n? ? Example: SHA-256 (the 'old' SHA-1 is still fairly common, but a 
+mathematical weakness has been found in it) 
+priv
+n? ? Encrypt this, K [f(M)] and send with M 
+C
+n? ? Just given this, what attacks might be possible? 
+31 
+© 2013 A. Haeberlen, Z. Ives Plan for today 
+n? ? Web security 
+n? ? Security basics 
+n? ? Terminology 
+n? ? Capabilities, ACLs, view-based security 
+n? ? Cryptography basics 
+n? ? Symmetric vs. public-key 
+n? ? Signatures 
+NEXT 
+n? ? Network attacks 
+n? ? Kerberos 
+n? ? TLS 
+32 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania 
+ Common single-machine attacks 
+n? ? Social engineering – e.g., phishing, malware – 
+enables a machine to authenticate as you 
+n? ? Often, this enables it to do things – e.g., purchase items  
+as you (on the Internet), or modify your files  
+(on your machine) 
+n? ? Privilege escalation – finding a design flaw in 
+software allowing normally-disallowed privileges 
+n? ? e.g., finding a way to get root permissions through an 
+exception 
+n? ? Code injection – finding a way to send data to a 
+system, such that it will execute it as code 
+n? ? e.g., SQL injection, stack smashing, cross-site scripting (one 
+site injects data that gets interpreted as JavaScript in 
+another protection zone) 
+33 
+© 2013 A. Haeberlen, Z. Ives Network-centric attacks 
+n? ? How do we ensure, on a TCP/IP network: 
+n? ? We know who we’re talking to, so we give them the right 
+permissions? 
+n? ? Nobody can eavesdrop on our communication and steal our 
+data? 
+n? ? Let’s start with some vulnerabilities 
+34 
+© 2013 A. Haeberlen, Z. Ives Message-dropping attacks 
+n? ? Can happen if someone 
+manages to get between 
+“us” and whomever we’re 
+conversing with 
+n? ? How might this happen? 
+n? ? By and large, our C S 
+“order” 
+protocols are resilient to 
+occasional dropped 
+messages 
+“confirm?” 
+n? ? Not much happens without 
+C S 
+acknowledgement – we 
+frequently time out 
+n? ? Possible defenses? 
+35 
+© 2013 A. Haeberlen, Z. Ives Denial-of-service (DoS) attacks 
+n? ? Goal: Attacker tries to prevent legitimate 
+users from accessing a service 
+n? ? Why would the attacker be interested in doing this? 
+n? ? Common ways to effect a DoS attack? 
+n? ? Overload the server with nonsensical requests 
+n? ? Flood the server's network links with packets 
+n? ? Distributed Denial-of-Service attack: Many client machines 
+are attacking the same server(s) 
+n? ? Usually done through botnets 
+n? ? How to defend against a DoS attack? 
+n? ? Try to filter out the attack (difficult - why?) 
+n? ? Massive redundancy (Akamai?) 
+36 
+© 2013 A. Haeberlen, Z. Ives Replay attacks 
+n? ? A very simple attack 
+n? ? Intruder doesn’t need 
+“buy 5 copies” 
+to understand or alter 
+“buy 5 copies” 
+the contents of a 
+message – just send it 
+C S 
+I 
+multiple times 
+n? ? Can be all at once, or can 
+play the message again a 
+week later… 
+n? ? Possible defenses? 
+37 
+© 2013 A. Haeberlen, Z. Ives Nonces prevent replay attacks 
+n? ? To prevent replay attacks, we need to ensure that a 
+message would be different each time it’s sent, and 
+we keep track of what we’ve already seen 
+n? ? A nonce is a special bit string that’s difficult to forge 
+but easy to authenticate 
+n? ? Commonly, the client or server will pick some value N and 
+encrypt it 
+n? ? Responses will return N+1 (encrypted), etc. 
+n? ? Frequently, the initial N is a timestamp or message 
+counter 
+n? ? A form of a nonce called salt is often added not for 
+authentication, but to make it harder to guess the 
+message content 
+38 
+© 2013 A. Haeberlen, Z. Ives Message forging attacks 
+“buy 5000 copies, 
+ship to Hawaii” 
+“buy 5 copies” 
+C I S 
+n? ? Generally more difficult than the first two classes 
+n? ? Needs the ability to modify messages from the sender 
+n? ? Possible defenses? 
+39 
+© 2013 A. Haeberlen, Z. Ives “Man in the Middle” attacks 
+“Hi, amazon.com, 
+“Hi, amazon.com, 
+my password 
+my password 
+is 1234…” 
+is 1234” 
+amazon.com 
+client 
+schuylkill.com 
+C I S 
+“… and I’d 
+“Welcome to like to buy a 
+amazon.com” red Ferrari!" 
+n? ? The intruder impersonates both client and sender 
+n? ? Sometimes, this is by “IP spoofing” – pretending that 
+packets originate from a different host 
+n? ? Intruder can masquerade as the client from then on 
+n? ? Possible defenses? 
+40 
+© 2013 A. Haeberlen, Z. Ives Plan for today 
+n? ? Web security 
+n? ? Security basics 
+n? ? Terminology 
+n? ? Capabilities, ACLs, view-based security 
+n? ? Cryptography basics 
+n? ? Symmetric vs. public-key 
+n? ? Signatures 
+n? ? Network attacks 
+NEXT 
+n? ? Kerberos 
+n? ? TLS 
+41 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania 
+ Key distribution 
+n? ? Whether public or secret key crypto is used, 
+must be able to tell who we’re talking with: 
+n? ? Need to negotiate a session key (Kerberos) ... 
+n? ? ... or need to get a public key (SSL) 
+n? ? Idea: Every user establishes a shared key 
+with every server in the system 
+n? ? Is this practical? 
+n? ? What can we do instead? 
+42 
+© 2013 A. Haeberlen, Z. Ives The Kerberos Protocol (from MIT) 
+n? ? Used commonly to authenticate to a server 
+n? ? Relies on a trusted third party, a Key 
+Distribution Server 
+n? ? Users and servers have Kerberos authentication keys, K , 
+C,KDS
+K , used to authenticate with the KDS 
+S,KDS
+n? ? The KDS creates a session key and distributes it in a ticket 
+that’s used for conversing with the server S 
+n? ? Can also provide single sign-on: One 
+authentication that is shared across machines 
+n? ? Give a ticket-granting ticket that is used to talk with a ticket-
+granting server in a similar way 
+43 
+© 2013 A. Haeberlen, Z. Ives Authentication in Kerberos 
+Not yet known 
+Ticket 
+to the workstation 
+login 
+A 
+Authentication 
+server 
+K (K , K (A, K )) 
+A,AS A,TGS AS,TGS A,TGS
+password? 
+pwd Ticket 
+K (A, K ), B, K (t) 
+AS,TGS A,TGS A,TGS
+Ticket-granting 
+K (B, K ), K (A, K ) server 
+A,TGS A,B B,TGS A,B
+Converted 
+to K
+A,AS 
+foo(a1,a2) 
+K (A, K ), K (foo, a1, a2, t') 
+B,TGS A,B A,B
+Some server 
+Alice needs to 
+invoke a 
+K (result, t') 
+A,B
+result 
+function on 
+44 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Illustration from Tanenbaum, 9-23 
+Alice 
+Alice's workstation 
+B TGS AS Plan for today 
+n? ? Web security 
+n? ? Security basics 
+n? ? Terminology 
+n? ? Capabilities, ACLs, view-based security 
+n? ? Cryptography basics 
+n? ? Symmetric vs. public-key 
+n? ? Signatures 
+n? ? Network attacks 
+n? ? Kerberos 
+NEXT 
+n? ? TLS 
+45 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania 
+ E-Commerce 
+n? ? Clearly, one of the biggest uses of authentication on 
+the Web today 
+n? ? B2B: can often negotiate secret keys between pairs 
+n? ? Selling to consumer (B2C/C2B) often requires several 
+levels of authorization and authentication: 
+n? ? Want to authenticate the user 
+n? ? Want to authenticate the credit card company server 
+n? ? Want to check for user authorization to purchase 
+n? ?

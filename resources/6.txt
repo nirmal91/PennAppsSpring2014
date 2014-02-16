@@ -1,0 +1,525 @@
+CIS 455/555: Internet and Web Systems 
+Data representation and XML 
+ 
+February 4, 2013 
+1 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Announcements 
+n? ? HW1 MS1 is due ON WEDNESDAY 
+n? ? Reminder: No late submissions accepted without an extension; 
+no extensions for avoidable scheduling problems 
+n? ? Submission is via turnin; the project name is 'hw1ms1' 
+n? ? Please do test your submission carefully (Basic Testing Guide, 
+apachebench, curl, ...) 
+n? ? Do not be too quick to attribute problems to apachebench! 
+n? ? Reading: 
+n? ? Doan, Halevy, Ives: XML  
+http://www.seas.upenn.edu/~zives/cis555/doan-et-al-
+chap8.pdf 
+2 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Plan for the next few lectures 
+NEXT 
+n? ? Data interchange 
+n? ? Extensible Markup Language (XML) 
+n? ? DTDs and XML Schema; DOM 
+n? ? XPath 
+n? ? XSLT 
+3 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Kinds of content 
+n? ? Keyword search and inverted indices are 
+great for locating text documents 
+n? ? But what if we want to index and/or share 
+other kinds of content? 
+n? ? Spreadsheets 
+n? ? Maps 
+n? ? Purchase records 
+n? ? Objects 
+n? ? etc. 
+n? ? Let’s talk about structured data! 
+n? ? Now: Representation and transport 
+n? ? Later: Indexing and retrieval 
+4 
+© 2013 A. Haeberlen, Z. Ives Sending data 
+n? ? How do we send data within a program? 
+n? ? What is the implicit model? 
+n? ? How does this change when we need to make the data 
+persistent? 
+n? ? What happens when we are coupling systems? 
+n? ? How do we send data between programs  
+n? ? on the same machine? 
+n? ? on different machines? 
+5 
+© 2013 A. Haeberlen, Z. Ives Motivating example: Web services 
+Map service Web page combines 
+(used by Alice) data from different 
+sources ('mashup') 
+Charlie 
+Bob Alice 
+Bob 
+Alice 
+n? ? Intuition: An application that is accessible to 
+other applications over the web 
+n? ? Examples: Google Search, Google Maps API, Facebook 
+Graph API, eBay APIs, Amazon Web Services, ... 
+6 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Mashup example: Google Transit 
+7 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania A key challenge 
+Marshalling 
+Unmarshalling 
+17 
+17 
+01 17 02 48 3F 12 9E ... 
+n? ? Nodes need to communicate with each other 
+n? ? E.g., using remote procedure calls 
+n? ? Network messages are strings of bytes 
+n? ? No particular structure - must be defined by the application 
+n? ? Sender marshals the data and produces a string of bytes 
+n? ? Pointers must be encoded somehow 
+n? ? Specific byte order; metadata to describe the data 
+n? ? Receiver unmarshals the data again 
+8 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Marshalling 
+n? ? Converting from an in-memory data structure 
+to something that can be sent elsewhere 
+n? ? Pointers -> something else 
+n? ? Specific byte orderings 
+n? ? Metadata 
+n? ? Note that the same logical data gets a 
+different physical encoding 
+n? ? A specific case of Codd’s idea of logical-physical separation 
+n? ? “Data model” vs. “data” 
+9 
+© 2013 A. Haeberlen, Z. Ives Communication and streams 
+n? ? When storing data to disk, we have a 
+combination of sequential and random access 
+n? ? When sending data on “the wire”, data is 
+only sequential 
+n? ? “Stream-based communication” based on packets 
+n? ? What are the implications here? 
+n? ? Pipelining, incremental evaluation, … 
+10 
+© 2013 A. Haeberlen, Z. Ives Data interchange is hard 
+Alice 
+Bob 
+n? ? What does Bob need to know to understand 
+Alice's document? 
+n? ? Physical data model (data encoding) 
+n? ? Code: ASCII or Unicode or ...? 
+n? ? Byte order: Little-endian? Big-endian? 
+n? ? Marshalling format: Tagged? Fixed? Which field sizes? 
+n? ? Logical data model (data representation) 
+n? ? Semantic heterogeneity 
+n? ? Imprecise and ambiguous values or descriptions 
+n? ? ... 
+11 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Data comes in many formats 
+Data type Formats 
+ASCII, Word document, RTF, TeX, 
+Text 
+PDF, HTML, ... 
+MySQL, Oracle, Access, Works, 
+Database 
+OpenOffice, ... 
+JPG, GIF, BMP, PNG, RAW, TIFF, 
+Image 
+Corel, Photoshop, ... 
+AIFF, MP3, AAC, RA, Ogg, MID, 
+Music 
+MOD, SWA, ... 
+AVI, M4V, MPEG, Ogg, WMV, RM, 
+Video 
+DVD, MOV, ... 
+Probably at least as many as there 
+Scientific data 
+are researchers 
+n? ? What happens if we interconnect different machines? 
+12 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Example: ID3v1 tags in MP3 
+"TAG" "Members Only" 
+Offs Len Description 
+0 3 Identifier: "TAG"  
+... 
+006d3720  da 00 54 41 47 4d 65 6d  62 65 72 73 20 4f 6e 6c  
+3 30 Song title string 
+006d3730  79 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00 
+33 30 Artist string 
+006d3740  00 00 00 53 68 65 72 79  6c 20 43 72 6f 77 00 00 
+006d3750  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00 
+63 30 Album string 
+006d3760  00 54 68 65 20 47 6c 6f  62 65 20 53 65 73 73 69 
+93 4 Year string 
+006d3770  6f 6e 73 00 00 00 00 00  00 00 00 00 00 00 00 31 
+006d3780  39 39 38 00 00 00 00 00  00 00 00 00 00 00 00 00 
+97 28 Comment string 
+006d3790  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00 
+125 1 Zero byte separator 
+006d37a0  0a ff 
+126 1 Track byte 
+"1998" 
+"Sheryl Crow" 
+127 1 Genre byte 
+Track #10 
+Genre not 
+"The Globe Sessions" 
+specified 
+13 
+© 2013 A. Haeberlen, Z. Ives Example: JPEG header 
+JPEG “JFIF” header: 
+n? ? Start of Image (SOI) marker -- two bytes (FFD8) 
+n? ? JFIF marker (FFE0) 
+n? ? length -- two bytes  
+n? ? identifier -- five bytes: 4A, 46, 49, 46, 00  
+(the ASCII code equivalent of a zero terminated "JFIF" string)  
+n? ? version -- two bytes: often 01, 02 
+n? ? the most significant byte is used for major revisions  
+n? ? the least significant byte for minor revisions  
+n? ? units -- one byte: Units for the X and Y densities 
+n? ? 0 => no units, X and Y specify the pixel aspect ratio  
+n? ? 1 => X and Y are dots per inch  
+n? ? 2 => X and Y are dots per cm  
+n? ? X -- two bytes  
+density
+n? ? Y -- two bytes  
+density
+n? ? X -- one byte: 0 = no thumbnail  
+thumbnail
+n? ? Y -- one byte: 0 = no thumbnail  
+thumbnail
+n? ? (RGB)n -- 3n bytes: packed (24-bit) RGB values for the 
+thumbnail pixels,  
+n = X * Y
+14 
+thumbnail thumbnail 
+© 2013 A. Haeberlen, Z. Ives Problem: Too many formats 
+n? ? You need to look into a manual to find a 
+specific file format 
+n? ? http://en.wikipedia.org/wiki/List_of_file_formats 
+n? ? http://www.wotsit.org/ 
+n? ? Automating data exchange is very hard 
+2
+n? ? O(N ) problem: Everyone needs to understand everyone 
+else's data format 
+n? ? The web is about making data exchange 
+easier... maybe we can do better? 
+n? ? Goal: "The mother of all file formats" 
+15 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Problem: Too many formats 
+16 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania 
+http://xkcd.com/927/ Desiderata for data interchange 
+n? ? Ability to represent many kinds of information 
+n? ? Different data structures 
+ 
+n? ? Hardware-independent encoding 
+n? ? Endian-ness, UTF vs. ASCII vs. EBCDIC 
+ 
+n? ? Standard tools and interfaces 
+ 
+n? ? Ability to define “shape” of expected data 
+n? ? With forwards- and backwards-compatibility! 
+n? ? That’s XML… 
+17 
+© 2013 A. Haeberlen, Z. Ives Recap: Data interchange 
+n? ? Applications need to communicate 
+n? ? Example: Combine data from multiple sources in a 'mashup' 
+n? ? Key problem: Data interchange 
+n? ? Receiver needs to understand data encoding+representation 
+n? ? There is a huge number of formats today 
+n? ? This complicates data exchange enormously 
+n? ? Could be solved with some kind of über-format (?XML) 
+ 
+  
+18 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Plan for the next few lectures 
+n? ? Data interchange 
+NEXT 
+n? ? Extensible Markup Language (XML) 
+n? ? Data model 
+n? ? Encoding data in XML 
+n? ? Namespaces 
+n? ? Well-formed and valid 
+n? ? DTDs and XML Schema; DOM 
+n? ? XPath 
+n? ? XSLT 
+19 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Extensible Markup Language (XML) 
+n? ? What is it? 
+n? ? A set of rules for encoding documents 
+n? ? A subset of SGML 
+n? ? Who uses it? 
+n? ? Document Object Model (DOM) -- OO representation of XML 
+n? ? Simple API for XML (SAX) -- event-driven parser for XML 
+n? ? Ant -- Java's 'make' tool, whose 'Makefile uses XML 
+n? ? XPath, XQuery, XSL, XSLT 
+n? ? Web service standards (e.g., SOAP) 
+n? ? Anything Ajax ("mash-ups") 
+20 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Example XML document 
+Processing 
+<?xml version="1.0" encoding="ISO-8859-1" ?>  
+instruction 
+<dblp> 
+  <mastersthesis mdate="2002-01-03" key="ms/Brown92"> 
+    <author>Kurt P. Brown</author>  
+    <title>PRPL: A Database Workload Specification Language</title>  
+    <year>1992</year>  
+    <school>Univ. of Wisconsin-Madison</school>  
+Element 
+  </mastersthesis> Attribute 
+  <article mdate="2002-01-03" key="tr/dec/SRC1997-018"> 
+    <editor>Paul R. McJones</editor>  
+Open and 
+    <title>The 1995 SQL Reunion</title>  
+close tags 
+    <journal>Digital System Research Center Report</journal>  
+(case- 
+    <volume>SRC1997-018</volume>  
+sensitive) 
+    <year>1997</year>  
+    <ee>db/labs/dec/SRC1997-018.html</ee>  
+    <ee>http://www.mcjones.org/System_R/SQL_Reunion_95/</ee>  
+  </article> 
+n? ? Structure is very similar to HTML 
+n? ? This is not an accident - both are subsets of SGML 
+21 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania XML data model 
+n? ? To model an XML document, we need at least 
+the following ('XML information set'): 
+n? ? Document (root) 
+n? ? Element 
+n? ? Attribute 
+n? ? Processing instruction 
+n? ? Text (content) 
+n? ? Namespace 
+n? ? Comment 
+n? ? ... and a few more obscure items 
+22 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania attribute 
+root 
+XML data model visualized 
+element 
+p-i 
+Root 
+text 
+dblp 
+?xml 
+mastersthesis 
+article 
+mdate mdate 
+key 
+key 
+2002… author title year school 
+editor title journal volume year ee ee 
+2002… 
+1992 
+1997 
+ms/Brown92 The… 
+tr/dec/… 
+PRPL… 
+Digital… 
+db/labs/dec 
+Univ…. 
+Paul R.  
+Kurt P…. 
+SRC… 
+http://www. 
+23 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania A few common uses of XML 
+n? ? Serves as an extensible HTML 
+n? ? Allows custom tags (used, e.g., by MS Word, OpenOffice) 
+n? ? Supplement it with style sheets (XSL) to define formatting 
+n? ? Provides an exchange format for data 
+n? ? Tables, objects, ... 
+n? ? Still need to agree on terminology 
+n? ? Format for marshalled data in Web Services 
+n? ? Example: SOAP (used, e.g., in AWS) 
+24 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania XML easily encodes relations 
+<student-course-grade> 
+  <tuple> 
+    <sid>1</sid> 
+    <course>330-f03</course> 
+ID Course Grade 
+    <grade>B</grade> 
+  </tuple> 
+1 330-f03 B+ 
+  <tuple> 
+    <sid>23</sid> 
+23 455-s04 A 
+    <course>455-s04</course> 
+"student-course-grade" relation 
+    <grade>A</grade> 
+  </tuple> 
+</student-course-grade> 
+25 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania XML also encodes objects 
+<projects> 
+  <project class=“cis455”> 
+cis455 cis330 
+    <type>Programming</type> 
+Type: Programming Type: Other     <memberList> 
+URL: cis455.com URL: cis330.com 
+      <teamMember>Joan</teamMember> 
+Incorporates: Incorporates: - 
+      <teamMember>Jill</teamMember> 
+Members: Members:     </memberList> 
+    <codeURL>www….</codeURL> 
+    <incProjectFrom class=“cis330”/> 
+Frank Steven 
+Jill 
+Joan 
+  </project> 
+  <project class=“cis330”> 
+  ... 
+  </project> 
+</projects> 
+n? ? What do we do about the pointers? 
+n? ? Can be represented as IDs and indirection/references 
+26 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania XML and code 
+n? ? Some web services use XML to encode 
+messages, e.g., for remote procedure calls 
+n? ? Example: SOAP + WSDL 
+n? ? Sender marshals parameters into XML 
+n? ? Pros and cons? 
+n? ? Easy to be forward compatible 
+n? ? Easy to read and validate (?) 
+n? ? At least lots of tools available 
+n? ? Generally compatible with firewalls 
+n? ? Drawback: XML is verbose and not an efficient encoding 
+n? ? But, when we are sending only 100s of bytes, does it really matter?  
+27 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Handling name clashes 
+<html> 
+  <head><title>Book Review</title></head>  
+  <body>  
+    <bookreview>  
+    <title>XML: A Primer</title>  
+ 
+    <table>  
+ 
+Confuses software that is 
+      <tr align="center">  
+ 
+parsing this document 
+        <td>Author</td><td>Price</td> 
+ 
+        <td>Pages</td><td>Date</td> 
+ (book title or page title?) 
+      </tr>  
+ 
+Review will be inserted here 
+      <tr align="left">  
+ 
+        <td><author>Simon St. Laurent</author></td>  
+ 
+        <td><price>31.98</price></td> 
+ 
+        <td><pages>352</pages></td>  
+ 
+         <td><date>1998/01</date></td>  
+      </tr>  
+ 
+    </table>  
+ 
+    </bookreview>  
+  </body>  
+</html>  
+n? ? What if a tag is used by multiple sources? 
+n? ? Example: XML document with book reviews that includes 
+HTML for display formatting 
+28 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania 
+http://www.xml.com/pub/a/1999/01/namespaces.html XML namespaces 
+<html xmlns="http://www.w3.org/HTML/1998/html4" xmlns:xdc="http://
+www.xml.com/books"> 
+  <head><title>Book Review</title></head>  
+  <:body>  
+Default namespace 
+    <xdc:bookreview>  
+(to avoid cluttering  
+      <xdc:title>XML: A Primer</xdc:title>  
+the document) 
+      <table>  
+        <tr align="center">  
+Qualified 
+          <td>Author</td><td>Price</td> 
+names 
+          <td>Pages</td><td>Date</td> 
+        </tr>  
+        <tr align="left">  
+          <td><xdc:author>Simon St. Laurent</xdc:author></td>  
+          <td><xdc:price>31.98</xdc:price></td> 
+          <td><xdc:pages>352</xdc:pages></td>  
+          <td><xdc:date>1998/01</xdc:date></td>  
+        </tr>  
+      </table>  
+    </xdc:bookreview>  
+  </body>  
+</html>  
+n? ? Solution: XML namespaces 
+n? ? Part 1: Bind namespaces to URIs 
+n? ? Part 2: Qualitifed names 
+29 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania 
+http://www.xml.com/pub/a/1999/01/namespaces.html XML is not enough on its own 
+n? ? Too unconstrained for many cases! 
+NEXT 
+n? ? How will we know when we're getting garbage? 
+n? ? How will we query data in an XML document? 
+n? ? How will we understand the data we've got? 
+30 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Well-formed and valid 
+<addresses>> <addresses> 
+  <address num="1" ancestor="2">   <address num="1" ancestor="2"> 
+    <name>Andreas Haeberlen     <name>Andreas Haeberlen</name> 
+    <street>3330 Walnut St     <street>3330 Walnut St</street> 
+  </address>   </address> 
+  <address num="2">   <name num="2"> 
+    <name>Ben Franklin</street>     <name>Ben Franklin</name> 
+    <street>834 Chestnut St</name>     <street>834 Chestnut St</street> 
+  </address>   </name> 
+</addresses> </addresses> 
+Not well-formed 
+Well-formed, but not valid 
+n? ? How will we know whether document is ok? 
+n? ? Idea: Check whether begin and end tags are correctly 
+nested, special characters (<, &) are properly used, etc. 
+n? ? If this (and a few other conditions) hold, the document is 
+well-formed 
+n? ? But is the document valid, i.e., is the structure okay? 
+n? ? Need some form of specification for valid documents 
+31 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Recap: XML 
+n? ? Textual data format 
+n? ? Familiar from HTML: Tags, elements, attributes, ... 
+n? ? Can encode complex data structures: Relations, pointers, ... 
+n? ? Used as a data exchange format, for marshalling, ... 
+n? ? Namespaces to help with name clashes 
+n? ? Not enough on its own 
+n? ? Need a way to detect whether document is valid/well-formed 
+n? ? Need a way to query data in XML documents 
+n? ? Need a way to understand/work with the data  
+  
+32 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Plan for the next few lectures 
+n? ? Data interchange 
+n? ? Extensible Markup Language (XML) 
+n? ? Data model 
+n? ? Encoding data in XML 
+n? ? Namespaces 
+n? ? Well-formed and valid 
+NEXT 
+n? ? DTDs and XML Schema; DOM 
+n? ? Document Type Definitions (DTDs) 
+n? ? XML Schema 
+n? ? Document Object Model (DOM) 
+n? ? XPath 
+n? ? XSLT 
+33 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Document Type Definitions (DTDs) 
+<!ELEMENT addresses ANY>  
+<!ELEMENT address (name, street)>  
+<!ELEMENT name (#PCDATA)>  
+<!ELEMENT street (#PCDATA)>  
+<!

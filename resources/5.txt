@@ -1,0 +1,248 @@
+CIS 455/555: Internet and Web Systems 
+Indexing 
+ 
+January 30, 2013 
+1 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Announcements 
+n? ? HW1 MS1 is due IN ONE WEEK 
+n? ? At this point, you should have a feature-complete prototype, 
+so you have time to debug and test your solution 
+n? ? When in doubt about protocol details, please look in the HTTP/
+1.1 spec (RFC2616; linked from HTTP Made Really Easy) 
+n? ? Reminder: You have three jokers; the late penalty  
+without jokers is 20% per day 
+n? ? Reading: 
+n? ? D. Comer: "The Ubiquitous B-Tree" 
+http://dl.acm.org/citation.cfm?id=356776 
+2 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Plan for today 
+NEXT 
+n? ? Inverted indices 
+n? ? B+ trees 
+3 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Finding data by content 
+n? ? We’ve seen two approaches to search: 
+n? ? Flood the network with requests (example: Gnutella), and do 
+all the work at the data stores 
+n? ? Have a directory based on names (example: LDAP) 
+n? ? Which of these is the 'best'? 
+n? ? An alternative, two-step process: 
+n? ? Build a content index over what’s out there 
+n? ? An index is a key?value map 
+n? ? Typically limited in what kinds of queries can be supported 
+n? ? Most common instance: an index of document keywords 
+4 
+© 2013 A. Haeberlen, Z. Ives A common model for search 
+n? ? Index the words in every document 
+n? ? “Forward index”: document (ID) à? list of 
+words 
+n? ? “Inverted index”:  word à? document (ID) 
+5 
+© 2013 A. Haeberlen, Z. Ives Inverted indices 
+n? ? A conceptually very simple map-multiset data 
+structure:  <keyword, {list of occurrences}> 
+ 
+n? ? In its simplest form, each occurrence includes a 
+document pointer (e.g., URI), perhaps a count and/
+or position 
+n? ? What might a count be useful for? A position? 
+n? ? Requires two components, an indexer and a 
+retrieval system 
+n? ? We’ll consider the cost of building the index, plus 
+searching the index using a single keyword 
+n? ? Storage efficiency is also a concern 
+6 
+© 2013 A. Haeberlen, Z. Ives How do we lay out an inverted index? 
+n? ? Some data structures we could use: 
+n? ? Unordered list (e.g., a log) 
+n? ? Ordered list 
+n? ? Tree 
+n? ? Hash table 
+7 
+© 2013 A. Haeberlen, Z. Ives Unordered and ordered lists 
+n? ? Assume that we have entries such as: 
+ <keyword, #items, {occurrences}> 
+n? ? What does ordering buy us? 
+n? ? Assume that we adopt a model in which we use: 
+ <keyword, item> 
+ <keyword, item> 
+n? ? Do we get any additional benefits? 
+n? ? How about: 
+ <keyword, {items}>  
+where we fix the size of the keyword and the number 
+of items? 
+8 
+© 2013 A. Haeberlen, Z. Ives Tree-based indices 
+n? ? Trees have several benefits over lists: 
+n? ? Potentially logarithmic search time, as with a well-designed 
+sorted list  
+n? ? if it is balanced! 
+n? ? Ability to handle variable-length records 
+n? ? We’ve already seen how trees might make a natural 
+way of distributing data, as well 
+n? ? How does a binary search tree fare? 
+n? ? Cost of building? 
+n? ? Cost of finding an item in it? 
+9 
+© 2013 A. Haeberlen, Z. Ives Recap: Inverted indices 
+n? ? Useful for search 
+n? ? Different data structures can be used 
+n? ? Pros / cons 
+10 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Plan for today 
+n? ? Inverted indices 
+NEXT 
+n? ? B+ trees 
+11 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania The B+ tree 
+n? ? A flexible, height-balanced, high-fanout tree 
+n? ? Insert/delete at log N cost (F = fanout, N = # leaf pages) 
+F
+n? ? Need to keep tree height-balanced 
+n? ? Minimum 50% occupancy (except for root) 
+n? ? Each node contains 0.5d <=  m  <= d entries 
+n? ? d is called the order of the tree 
+n? ? Can search efficiently based on equality (or also 
+range, though we don’t need that here) 
+Index Entries 
+(Direct search) 
+Linked list 
+Data Entries 
+... 
+(compare to  
+("Sequence set") 
+B-tree!) 
+© 2013 A. Haeberlen, Z. Ives Example B+ Tree 
+n? ? Data (inverted list pointers) is at the leaves; 
+intermediate nodes have copies of search keys 
+n? ? Search begins at root, and key comparisons direct it 
+to a leaf 
+n? ? Search for be ?, bobcat ? ... 
+Root 
+dog 
+art best but 
+fox? 
+am  ? an? best? bit? bob? but? can? elf? 
+a? ant? art? be? cry? dog? dry? 
+Ø? ? Based on the search for bobcat*, we know it is not in the tree! 
+© 2013 A. Haeberlen, Z. Ives Inserting data into a B+ Tree 
+n? ? Find correct leaf L 
+n? ? Put data entry onto L 
+n? ? If L has enough space, done! 
+n? ? Else, must split leaf node L (into L and a new node L2) 
+n? ? Redistribute entries evenly, copy up middle key 
+n? ? Insert index entry pointing to L2 into parent of L 
+n? ? This can happen recursively 
+n? ? To split index node, redistribute entries evenly, but push up 
+middle key.  (Contrast with leaf splits.) 
+n? ? Splits “grow” tree; root split increases height 
+n? ? Tree growth: gets wider or one level taller at the top 
+© 2013 A. Haeberlen, Z. Ives Inserting “and ?” Example: Copy up 
+Root 
+dog 
+art best but 
+fox? 
+am  ? an? best? bit? bob? but? can? cry? dog? dry? elf? 
+a? ant? art? be? 
+Want to insert here; no room, so split & copy up: 
+and? 
+Entry to be inserted in parent node. 
+(Note that key “an” is copied up and 
+an 
+continues to appear in the leaf.) 
+But where? Parent node 
+am ? an? and? ant? 
+a? 
+is already "full"! 
+15 
+© 2013 A. Haeberlen, Z. Ives Inserting “and ?” Example: Push up 1/2 
+Root 
+Need to split node  
+& push up 
+dog 
+art best but 
+an 
+am ? best? bit? bob? but? can? elf? fox? 
+a? art? be? cry? dog? dry? 
+an? and? 
+ant? 
+16 
+© 2013 A. Haeberlen, Z. Ives Inserting “and ?” Example: Push up 2/2 
+Entry to be inserted in parent node. 
+(Note that best is pushed up and only 
+appears once in the index. Contrast 
+Root 
+best 
+this with a leaf split.) 
+an art 
+but dog 
+best? bit? bob? but? can? fox? 
+am ? art? be? cry? elf? 
+a? dog? dry? 
+an? 
+ant? and? 
+17 
+© 2013 A. Haeberlen, Z. Ives Summary: Copying vs. splitting 
+n? ? Every keyword (search key) appears in at 
+most one intermediate node 
+n? ? Hence, in splitting an intermediate node, we push up 
+n? ? Every inverted list entry must appear in the 
+leaf 
+n? ? We may also need it in an intermediate node to define a 
+partition point in the tree 
+n? ? We must copy up the key of this entry 
+n? ? Note that B+ trees easily accommodate 
+multiple occurrences of a keyword 
+18 
+© 2013 A. Haeberlen, Z. Ives Some details 
+n? ? How would you choose the order of the tree? 
+n? ? How would you find all the words starting 
+with the letters 'com'? 
+n? ? How would you delete something? 
+n? ? Do you always have to split/merge? 
+19 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Virtues of the B+ Tree 
+n? ? B+ tree and other indices are quite efficient: 
+n? ? Height-balanced; log N cost to search 
+F
+n? ? High fanout (F) means depth rarely more than 3 or 4 
+n? ? Almost always better than maintaining a sorted file 
+n? ? Typically, 67% occupancy on average 
+n? ? Berkeley DB library (C, C++, Java; Oracle) is a  
+toolkit for B+ trees that you will be using  
+later in the semester: 
+n? ? Interface: open B+ Tree; get and put items based on key 
+n? ? Handles concurrency, caching, etc. 
+© 2013 A. Haeberlen, Z. Ives Example: B+ tree 
+130 187 
+65 
+9 25 45 70 80 101 122 138 150 159 180 
+65? 70? 
+67? 68? 69? 72? 75? 79? 
+1? 9? 25? 45? 
+4? 6? 14? 16? 31? 38? 41? 61? 63? 64? 
+n? ? Insert 15, 11, 12, 32, 74 
+21 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania How do we distribute a B+ Tree? 
+n? ? We need to host the root 
+at one machine and 
+distribute the rest 
+n? ? What are the implications 
+for scalability? 
+n? ? Consider building the index 
+as well as searching 
+22 
+© 2013 A. Haeberlen, Z. Ives Eliminating the root 
+n? ? Sometimes we don’t want a tree-structured 
+system because the higher levels can be a 
+central point of congestion or failure 
+n? ? Two strategies: 
+n? ? Modified tree structure (e.g., the BATON p2p tree; see  
+Jagadish et al., VLDB 2005) 
+n? ? Non-hierarchical structure (distributed hash table, 
+discussed in a couple of weeks) 
+23 
+© 2013 A. Haeberlen, Z. Ives Recap: B+ trees 
+n? ? A very common data structure for indices 
+n? ? Used, e.g., in many file systems and many DBMS 
+n? ? Very e

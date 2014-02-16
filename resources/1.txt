@@ -1,0 +1,414 @@
+CIS 455/555: Internet and Web Systems 
+Introduction 
+ 
+January 9, 2013 
+1 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Welcome! 
+n? ? My name: Andreas Haeberlen 
+n? ? Faculty member at CIS 
+n? ? Affiliated with the NETS program (formerly MKSE) 
+n? ? Research interests: 
+n? ? Large-scale distributed systems 
+n? ? ... such as cloud computing platforms! 
+n? ? Security and privacy 
+n? ? Interaction between social and technical networks 
+n? ? See also: http://www.cis.upenn.edu/~ahae/ 
+ 
+2 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania What this course is about 
+3 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Wait a minute... 
+n? ? What is actually going on behind the curtains? 
+n? ? How is the machine responsible for 'www.google.com' found? 
+n? ? What systems and protocols are involved in getting the page from 
+California to my laptop? 
+n? ? How do services like Google or Facebook scale to millions of 
+requests every day?  
+n? ? How come they are almost always available? 
+n? ? How would you program a system of this scale? 
+n? ? How does Google download 'the entire web'? What kind of system 
+can hold that much data? 
+n? ? How do you answer a search in 0.13 seconds, and find the most 
+relevant pages among 91,000,000 candidates? 
+n? ? Why do the best results always seem to be on the first page? 
+n? ? How did Google know I meant the city center in Philadelphia? 
+n? ? ... 
+4 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Why should I care? 
+n? ? Understand what's underneath the Web 
+n? ? How does it work? What are its strengths? Its shortcomings? 
+n? ? Technologies: Interdomain routing, DNS, HTTP, XML, ... 
+n? ? Understand the underlying principles 
+n? ? How do you build something that scales so well, is so robust, etc.? 
+n? ? Lots of clever algorithms, e.g., scalable storage, consensus, ... 
+n? ? Be able to use the right approach when designing 
+new protocols and web systems 
+n? ? How would you go about building the next Facebook/Google/...? 
+n? ? Need to scale, be efficient, avoid failures, prevent intrusions, ... 
+ 
+5 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Why should I care? (continued) 
+n? ? Gain practical experience with web technologies 
+n? ? Often, the best way to understand something is to build it yourself 
+n? ? In this course, you will learn how to build a cloud-based mini-Google 
+n? ? Understand the impact on society 
+n? ? Net neutrality, filter bubble, personalization, the death of privacy, ... 
+n? ? Need to understand the current state of the technology! 
+n? ? Anticipate what's possible in the future 
+6 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Main themes 
+n? ? CIS455 focuses on services like Google, Akamai, 
+iTunes, Facebook, eBay, ... 
+n? ? Main goals: 
+n? ? Understand the technology (DNS, HTTP, TCP/IP, cookies, ...) 
+n? ? Underlying principles (consistency models, scalable algortihms, ...) 
+n? ? Basics of system design / how to make the right choices 
+n? ? Case studies of concrete systems (Google, AWS, BitTorrent, ...) 
+n? ? How to handle massive amounts of data 
+n? ? Find it, gather it, encode it, store it, process it, integrate it, keep it consistent, 
+extract useful answers from it, rank it, deliver it quickly, prevent its loss, ... 
+n? ? Technical skills (using cloud platform, programming a data center) 
+n? ? Hands-on experience with a concrete system (web search) 
+n? ? Working in teams, evaluating your solution, ... 
+n? ? Understanding risks, e.g., security/privacy, and countermeasures 
+n? ? This is not a course on building web sites! 
+7 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Relationship to other courses at Penn 
+n? ? CIS 330/550 (databases) 
+n? ? 455/555 focuses on data with respect to interoperability 
+n? ? CIS 350/573 (software engineering) 
+n? ? Focus is on building software products  
+n? ? CIS 505 (software systems) 
+n? ? Less project-oriented than CIS 555 
+n? ? CIS 555 covers web services + cloud in more detail 
+n? ? MKSE 212 (scalable/cloud computing) 
+n? ? Introductory course; broader than CIS455 but less deep 
+n? ? Some overlap with CIS455, but focus is more on the cloud 
+8 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Topics 
+n? ? Servers + Internet protocols 
+n? ? Concurrency, threads vs events, communication, state/sessions 
+n? ? Web protocols, cookies, forms, authentication, servlets 
+n? ? Assignment: Multithreaded web server + servlet engine 
+n? ? Search 
+n? ? Examples: LDAP, DNS, P2P systems, ... 
+n? ? Data structures: Inverted index, lists, B+ tree, ... 
+n? ? XML 
+n? ? Data formats, marshalling, RPC, various encodings 
+n? ? DTDs, XML Schema, DOM, XPath, XSLT 
+n? ? Crawling 
+n? ? Crawler etiquette, XFilter, FSMs 
+n? ? Assignment: Topic-specific web crawler + XPath engine 
+ 
+9 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Topics (continued) 
+n? ? Decentralized systems 
+n? ? Consistent hashing, overlays, DHTs, key-based routing, join 
+n? ? Chord, Pastry; finger tables, successor lists, replication 
+n? ? Assignment: P2P Caching system 
+n? ? Scalable programming models 
+n? ? Distributed file systems: NFS, Google file system 
+n? ? MapReduce; Hadoop; comparison to message passing 
+n? ? Integration 
+n? ? Web services: REST, SOAP, WSDL, UDDI, ... 
+n? ? Schema mapping 
+n? ? Information retrieval 
+n? ? Basic concepts; vector model 
+10 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Topics (continued) 
+n? ? Web search 
+n? ? HITS, PageRank; Google architecture; Mercator 
+n? ? Transactions 
+n? ? ACID, concurrency control, consistency models, 2PL, 2PC, ... 
+n? ? Security / privacy 
+n? ? Various types of attacks; some basic crypto 
+n? ? Kerberos; SSL 
+n? ? Final team project: P2P web crawler + search engine 
+11 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Plan the next two lectures 
+n? ? Introduction 
+NEXT 
+n? ? Course logistics 
+n? ? Let's get started... 
+12 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Course staff 
+Name Andreas Dhruv Santhosh Kumar Ping 
+Haeberlen Arya Balakrishnan Fu 
+Role Instructor TA TA TA 
+Email ahae@cis adhruv@seas bsanth@seas fuping@seas 
+Name Saurabh Chetan Anand 
+Garg Singh Subramanian 
+Role TA TA TA 
+Email saurabhg@seas chetans@seas anandsub@seas 
+13 
+© 2013 A. Haeberlen, Z. Ives Course discussion group 
+n? ? We will be using                for discussions related to  
+this course 
+n? ? Examples: Questions about homework assignments 
+n? ? The TAs and I will read the posts and respond to questions 
+n? ? Piazza will also be used for 
+n? ? Announcements, e.g., cancelled classes (if necessary) 
+n? ? Supplemental materials, e.g., links to relevant papers or articles 
+n? ? Corrections and clarifications, e.g., bugs in the homework handouts 
+n? ? Please check the group frequently! 
+n? ? Please sign up at 
+n? ? https://piazza.com/upenn/spring2013/cis455555 
+14 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Textbook 
+n? ? Tanenbaum/van Steen: Distributed  
+Systems: Principles and Paradigms  
+(2nd edition) 
+n? ? We'll read from the book ~50% of the time 
+n? ? Frequent supplementary handouts 
+n? ? Excerpts from several books; many recent research papers 
+n? ? First one (please read by Wednesday): 
+n? ? B. Lampson, "Hints for Computer Systems Design", SOSP 1983  
+n? ? http://research.microsoft.com/en-us/um/people/blampson/33-hints/Acrobat.pdf 
+15 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Prerequisites and workload 
+n? ? You will need: 
+n? ? Ability to code in Java (substantial implementation project!) 
+n? ? Good debugging skills -- this will be the biggest time sink! 
+n? ? Ability to work in a team with classmates (towards the end) 
+n? ? Willingness to learn how to read API documentation 
+n? ? Some exposure to threads / concurrent programming 
+n? ? Expected workload: 
+n? ? Three programming-based homework assignments (estimate) 
+n? ? Substantial term project with experimental evaluation + report 
+n? ? Two mid-term exams 
+n? ? Warning: This course should be considered 1.5 CU! 
+n? ? Typical feedback: "The course was hard, but we learned a lot" 
+16 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Expected payoff 
+n? ? Your payoff: 
+n? ? Lots of practical development and debugging experience 
+n? ? Good working knowledge of fundamentals behind scalable/web systems 
+n? ? A working "academic clone of Google" hosted on Amazon EC2! 
+17 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania The Google award 
+n? ? The team with the best search engine will receive an 
+award (sponsored by             ) 
+n? ? Likely award: Four Android cell phones 
+n? ? Winners will be announced on the course web page 
+18 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Last year's winners 
+n? ? Team "Hitchhiker" 
+n? ? Dhruv Arya, Shantosh Kumar Balakrishnan, Saurabh Garg, and 
+Chetan Singh 
+n? ? All four are serving as TAs this year! 
+19 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania The CIS455/555 Virtual Machine 
+n? ? We will provide a VM image 
+with the necessary software 
+n? ? Use with VMware Player/VirtualBox 
+n? ? Safe to experiment with 
+n? ? Standardized environment makes it 
+easier to get help from TAs 
+n? ? Homework 0: Install VM, write 'Hello World' 
+n? ? Opportunity to familiarize yourself with this environment 
+n? ? Gives us a chance to iron out technical problems before HW1 
+n? ? Handout will be available on the course webpage soon 
+n? ? http://www.cis.upenn.edu/~cis455/ 
+20 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Policies: Waiting list 
+n? ? There is a waiting list for this course 
+n? ? Reason: Limited room capacity (82) 
+n? ? I've asked about bigger classrooms, but they're all taken 
+n? ? If you're on the waiting list, I cannot guarantee that 
+you will get a spot 
+n? ? But we will enroll you if spots become available, i.e., if someone 
+else drops the course 
+n? ? If you have questions about the waiting list, please 
+contact Mike Felker 
+21 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Policies: Collaboration 
+n? ? All assignments must be done individually 
+n? ? Only exception is the final project (teams of four allowed) 
+n? ? All the code you submit has to be your own 
+n? ? Only exception: Code we have provided or explicitly authorized 
+n? ? NO code you have found on the web. NO sharing with others. 
+n? ? Penn's Code of Academic Integrity applies  
+n? ? No cheating, plagiarism, fabrication, multiple submissions, gaining an unfair 
+advantage, or facilitating (!) academic dishonesty 
+n? ? It's not worth it!! Penalties can be severe: 
+http://www.upenn.edu/academicintegrity/ai_violations.html  
+ 
+n? ? Zero tolerance policy to ensure fairness 
+n? ? We will use various tools to actively look for cheating 
+n? ? These tools work: We have caught several cases in the past 
+© 2013 A. Haeberlen, Z. Ives Policies: Collaboration 
+23 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Policies: Collaboration 
+Yes 
+No 
+n? ? Can we work on assignments together? 
+Yes 
+No 
+n? ? Can I discuss the assignment with  
+others (in general terms)? 
+Yes No 
+n? ? Can I use code I copied from the web? 
+n? ? Can I ask questions about the  
+Yes No 
+assignments on Piazza? 
+n? ? I just happened to leave my svn  
+password on my table, and XYZ 
+just happened to find it. Will I be 
+Yes No 
+penalized for this? 
+n? ? Can I come to the lab with my friends 
+Yes No 
+and work on the assignments with them? 
+24 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Policies: Extensions 
+n? ? Everyone gets three 'joker days' 
+n? ? Each joker automatically extends any  
+homework deadline by 1 day 
+n? ? Cannot be used for the final project / final report 
+n? ? No questions asked 
+n? ? We will provide a web interface for redeeming jokers 
+n? ? I am planning to award some extra jokers in class 
+n? ? Absolutely no extensions without jokers 
+n? ? 20% penalty for each late day without a joker 
+n? ? Some recommendations: 
+n? ? Please start the homeworks early!!! 
+n? ? Save your jokers for unforeseen events 
+n? ? Interview calls, deadlines in other courses, tricky bugs in your code, ... 
+25 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Policies: Slides 
+n? ? I will make the slides available after the lecture 
+n? ? On the course web page: http://www.cis.upenn.edu/~cis455/ 
+n? ? However, not everything will be on the slides 
+n? ? Sometimes the slides will just contain a question for us to discuss 
+n? ? I'd encourage you to take some notes 
+26 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Disclaimer 
+n? ? This remains a "bleeding edge" course 
+n? ? We are looking at some of today's hottest topics 
+n? ? This means that we'll be using some immature technology 
+n? ? Not everything has been tested and validated ahead of time; we'll do 
+the best we can to smooth over the bugs 
+n? ? Focus is on hands-on experience 
+n? ? Substantial implementation project; goal is a level of comfort in 
+managing large, complex software development with 3rd party code 
+n? ? As in the real world: learning APIs, dealing with inadequate tools, 
+working with incomplete and/or ambiguous specifications (RFCs etc.)!  
+n? ? Most of you will find this a struggle!   
+n? ? You’ll spend many hours debugging! 
+n? ? We hope it will be a fun course, though… 
+n? ? … and an interesting one! 
+27 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Any questions? 
+28 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Plan the next two lectures 
+n? ? Introduction 
+n? ? Course logistics 
+NEXT 
+n? ? Let's get started... 
+29 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania What exactly is the Internet? 
+Google's servers 
+(far, far away) 
+My laptop 
+(at Penn) 
+"Backbone" 
+Many 
+of some large 
+access 
+networks 
+networks 
+n? ? Tens of thousands of interconnected networks 
+n? ? Examples: AT&T, Comcast, Level 3, Penn, Verizon, ... 
+n? ? Provides global connectivity 
+30 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania The Internet is built in layers 
+Your Application 
+… … 
+Web Services,  
+Middleware 
+distrib. transactions, … 
+SSH, FTP, Lightweight 
+Session 
+HTTP, IM, P2P, … streaming, etc. 
+Transport 
+TCP (session-based) UDP (sessionless) 
+IP 
+IPv4, IPv6 Unicast, (multicast) 
+Link 
+WiFi, UMTS, ZigBee, Ethernet, WiMax, ... 
+© 2013 A. Haeberlen, Z. Ives What exactly is the Web? 
+n? ? A collection of documents and other resources that 
+are interconnected (via URLs) 
+n? ? Implemented by HTTP servers that publish HTML, XML, and a few 
+other content types, plus a huge number of web clients 
+n? ? Builds on a number of Internet protocols: DNS, TCP, IP, ...  
+(other Internet services exist and use other protocols) 
+n? ? Web services and custom applications sometimes use HTTP in ways 
+it was not designed for 
+32 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania What is an Internet system? 
+n? ? Not just a web server or web application… 
+n? ? An application built over the Internet, whose 
+functionality is distributed across multiple machines 
+n? ? Typically, at least in a client-server or server-to-server 
+fashion, but may have many more participants 
+n? ? Typically, data and/or code must be exchanged in 
+distributed fashion for the functioning of the application 
+n? ? Often, the data must be partitioned, replicated, translated, 
+etc. (“shards” in Google-speak) 
+n? ? Often, there is heterogeneity, e.g., code runs in multiple 
+different environments, is written in different languages, etc. 
+n? ? Often, there are concerns about handling failures, firewalls, 
+attacks, … 
+33 
+© 2013 A. Haeberlen, Z. Ives Example: Web search 
+Many different components 
+client 
+working together! 
+client 
+client 
+HTML forms; 
+queries 
+results 
+Web pages 
+Search Interface  
+Servers 
+Uses a model of  
+Content 
+document/word  
+similarity to  
+results 
+query 
+rank matches 
+Crawlers 
+keywords + 
+Index Servers 
+locations 
+© 2013 A. Haeberlen, Z. Ives Cooling 
+Data centers 
+plant 
+Data centers 
+(size of a  
+football field) 
+Google data center in The Dalles, Oregon 
+Source: 1&1 
+35 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Example: Social networking site 
+Examples: Facebook, 
+client 
+client 
+LinkedIn, Twitter, ... 
+client 
+pages &  
+clicks 
+notifications 
+User Page 
+updates, posts 
+Servers 
+suggestions 
+Users & 
+entities 
+common properties,  
+Recommender 
+usage logs, … 
+© 2013 A. Haeberlen, Z. Ives Exam

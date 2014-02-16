@@ -1,0 +1,404 @@
+CIS 455/555: Internet and Web Systems 
+Fault tolerance 
+ 
+April 8, 2013 
+1 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Announcements 
+n? ? Project plan is due on April 10 
+n? ? 2-page PDF that describes your project architecture 
+(components, interfaces, interaction between them) 
+n? ? Must describe division of labor (who does what) and project 
+milestones (what will be completed when) 
+n? ? More details posted on Piazza later today 
+n? ? Second midterm: April 22 (4:30pm, DRL A1) 
+n? ? Reading:  
+n? ? One of the following two Paxos papers (your choice): 
+n? ? http://research.microsoft.com/en-us/um/people/lamport/pubs/paxos-simple.pdf 
+n? ? http://research.microsoft.com/en-us/um/people/lamport/pubs/lamport-paxos.pdf 
+n? ? WARNING: The second one is a rather unusual paper - but fun to read! 
+n? ? Fred Schneider: Replication Management using the State Machine 
+Approach 
+n? ? http://pdos.csail.mit.edu/6.824/papers/schneider-rsm.pdf 
+2 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Plan for today 
+NEXT 
+n? ? Replicated state machines 
+n? ? Paxos 
+n? ? Fault models 
+n? ? Crash 
+n? ? Rational 
+n? ? Byzantine 
+n? ? Byzantine Fault Tolerance 
+ 
+3 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Why should we care? 
+n? ? Some services are so important that a failure 
+or downtime would be a disaster 
+n? ? Examples: Google's central synchronization service,  
+Yahoo's ZooKeeper service, ... 
+n? ? For such a service, even the best individual 
+machine may not be reliable enough! 
+n? ? Idea: Multiple machines implement the service collectively  
+n? ? Result: Service is available as long as a certain fraction of 
+the machines are working 
+4 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Goal: Replicated service 
+n? ? How does this work? 
+n? ? Client sends its request to each of the machines 
+n? ? The machines coordinate and each return a result 
+n? ? Client chooses one of the results, e.g., the one that is 
+returned by the largest number of machines 
+n? ? If a small fraction of the machines returns the wrong result, 
+or no result at all, they are 'outvoted' by the other machines 
+5 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Challenges 
+n? ? Faults must not be correlated 
+n? ? Otherwise, all machines may fail at the same time 
+n? ? Challenge: Bugs, power failures, misconfiguration, ... 
+n? ? Each of the machines must process the 
+requests in the same way 
+n? ? Otherwise, their state will diverge ? Not obvious what the 
+'correct' result should be 
+n? ? Idea: Machines can implement a deterministic state machine! 
+n? ? All machines must process the requests in the 
+same order 
+n? ? Otherwise, their state may diverge 
+n? ? Idea: Need consensus on the order in which to process 
+6 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Deterministic state machine 
+1,3,7,2 
+1,3,7,2 
+State: ABC 
+State: ABC 
+Foo, bar 
+Foo, bar 
+n? ? What does this mean? 
+n? ? IF two instances of the program start in the same state, and 
+n? ? IF both are given the same sequence of inputs, 
+n? ? THEN both instances produce the same sequence of outputs 
+n? ? Is this the case for real software? 
+n? ? What could be possible sources of nondeterminism? 
+n? ? Can something be done about this? 
+7 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Consensus 
+n? ? Intuition: Each process may propose a value, 
+and then the processes agree on which value 
+they want to use 
+n? ? Formally, a solution must satisfy the following: 
+n? ? Termination: Every correct process eventually decides 
+n? ? Validity: If all processes propose the same value v, then every 
+correct process decides v 
+n? ? Integrity: Every correct process decides at most one value, 
+and it can only decide values that have been proposed 
+n? ? Agreement: If some correct process decides v, then every 
+other correct process also decides v 
+8 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania FLP: Consensus is "impossible"! 
+n? ? No asynchronous algorithm for agreeing on a 
+one-bit value can guarantee that it will 
+terminate in the presence of crash faults 
+n? ? Even if no crash faults actually occur 
+n? ? What now? 
+n? ? Change the problem statement: Randomized algorithms, 
+approximate agreement, k-set agreement, ... 
+n? ? Change the assumptions: Assume bounds on message 
+delays, or that we have an unreliable oracle (failure 
+detector) that tells us when a node crashed 
+n? ? Paxos: Guarantees safety, but not liveness 
+M. Fischer, N. Lynch, M. Paterson, "Impossibility of distributed consensus with one faulty process",  
+Journal of the ACM, April 1985, 32(2):374-382. ACM Knuth Prize 2007! 
+9 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania ????? (Island of Paxos) 
+10 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Plan for today 
+n? ? Replicated state machines 
+NEXT 
+n? ? Paxos 
+n? ? Fault models 
+n? ? Crash 
+n? ? Rational 
+n? ? Byzantine 
+ 
+11 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania The Paxos algorithm 
+... 
+37. Add 7 to X 
+38. Read Y 
+39. (nop) 
+40. Z:=X+Y 
+... 
+n? ? Scenario: 
+n? ? There is a replicated append-only log ("ledgers" in the paper) 
+n? ? The instances of this log are kept consistent by the protocol 
+n? ? We can use this log to record the sequence of operations 
+? All nodes will process them in the same order 
+12 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania The Paxos algorithm 
+n? ? How it approximately works:  
+n? ? Three different roles: Proposers, acceptors, learners 
+n? ? Nodes can propose a new entry to append, and they can 
+accept proposals made by other nodes 
+n? ? Each proposal has a version number 
+n? ? If multiple proposals are made concurrently, some nodes 
+may even accept more than one proposal 
+n? ? But, if a node has accepted a proposal with version number n, it will 
+not accept any further proposals with version numbers smaller than n 
+n? ? A proposal accepted by a majority of the nodes is decided as 
+the final value, and is communicated to the learners 
+n? ? Note: Each proposal is for a specific entry 
+n? ? Multiple instances of the protocol can be active concurrently 
+n? ? Example: Propose XYZ as entry 12 and ABC as entry 13 
+13 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Model 
+n? ? Network: 
+n? ? May lose messages (messenger leaves forever) 
+n? ? May duplicate messages 
+n? ? Asynchronous (messages can be delayed arbitrarily) 
+n? ? But: No message corruption 
+n? ? Nodes: 
+n? ? Can fail by crashing (legislator leaves the Chamber) 
+n? ? No central clock (hourglass timers) 
+n? ? But: Have some persistent memory (ledgers) 
+n? ? But: Strictly follow the protocol - no lying, data corruption... 
+14 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Phase 1: Prepare 
+n? ? Suppose a node A wants to propose a value X 
+for entry n: 
+n? ? Node A chooses a new version number v  
+n? ? Node A sends PREPARE(n, v) to a majority of the other nodes 
+(this is called a 'quorum') 
+n? ? Intuition: PREPARE(n, v) means 
+n? ? May I make a proposal for entry n with version number v? 
+n? ? If so, can you suggest a value I should use? 
+n? ? Note: Fairness is not a goal; even though A is 
+suggesting X, it is happy with other values too 
+n? ? Why? (Remember what the values are!) 
+15 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Phase 1: Prepare 
+n? ? If a node B receives PREPARE(n, v) from A: 
+n? ? If B has already acknowledged a PREPARE(n, v') with v'>v, 
+then it does nothing 
+n? ? If B has previously accepted any proposals for entry n, it 
+responds with ACK(n, v, v', X'), where v' is the highest 
+version number of any proposal it has accepted for entry n, 
+and X' is the corresponding value 
+n? ? Otherwise, B responds with ACK(n, v, -, -) 
+n? ? Intuition: An ACK means 
+n? ? Yes, go ahead and make your proposal 
+n? ? You should choose value X' (if v' and X' are given), or: any 
+value is fine with me (if v' and X' are not given) 
+n? ? I won't accept any further proposals with version numbers <v 
+16 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Phase 2: Accept 
+n? ? If A receives ACKs from a majority of the 
+other nodes, it issues ACCEPT(n, v, X'') 
+n? ? X'' is the value from the ACK with the highest version 
+number, or the original X if none of the ACKs had a value 
+n? ? If B receives ACCEPT(n, v, X'') 
+n? ? If B has already responded to a PREPARE(n, v') with v'>v, 
+then B does nothing 
+n? ? Otherwise B accepts the proposal and sends ACCEPT(n, v, 
+X'') to all the learners 
+n? ? If a learner L receives ACCEPT(n, v, X'') from 
+a majority of the acceptors, it decides X'' 
+n? ? L then sends DECIDE(n, X'') to all the other learners 
+n? ? If another learner receives DECIDE(n, X''), it decides X'' 
+17 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Let's think about this 
+n? ? What happens if two nodes concurrently 
+propose different values? 
+18 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Example 
+A's quorum 
+B's quorum 
+A 
+B D E F G H I 
+C 
+A: PREPARE(3,5) 
+C,D,E,G,H: ACK(3,5,-,-) 
+A: ACCEPT(3,5,X) 
+B: PREPARE(3,8) 
+D,F,G,I: ACK(3,8,-,-) 
+E: ACK(3,8,5,X) 
+B: ACCEPT(3,8,X) 
+D,..,I: ACCEPT(3,8,X) 
+A: DECIDE(3,X) 
+19 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Recap: Paxos 
+n? ? Goal: Build a replicated service 
+n? ? Multiple machines acting 'as if' they were a single machine 
+n? ? Can mask faults if not too many happen simultaneously 
+n? ? Paxos implements an important building block: 
+A consistent append-only log 
+n? ? Useful to make the replicas agree on the order in which to 
+process requests ? prevent divergence 
+n? ? More generally, consensus is useful in many other scenarios 
+n? ? But: Paxos assumes crash faults 
+n? ? Malicious nodes can easily disrupt the algorithm by telling lies 
+n? ? Can we build a similar protocol that can tolerate malicious 
+nodes as well? 
+20 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Plan for today 
+n? ? Replicated state machines 
+n? ? Paxos 
+NEXT 
+n? ? Fault models 
+n? ? Crash 
+n? ? Rational 
+n? ? Byzantine 
+ 
+21 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Problem: Faults and misbehavior 
+A and B 
+shall store 
+data 
+I need the 
+B 
+A 
+space for 
+something 
+else 
+System designer 
+n? ? System designer assigns each node a well-
+defined function, its expected behavior 
+n? ? But in practice, not all nodes will follow the 
+expected behavior 
+n? ? Faults: Technical problem (node on fire, software bug, ...) 
+n? ? Misbehavior: Social problem (user has manipulated the node 
+and installed different software, or is attacking the system) 
+22 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Challenges specific to web systems 
+n? ? Misbehavior does not come from outside 
+attackers, but from within the system 
+n? ? Access restrictions, authentication etc. do not help 
+ 
+n? ? Faults and misbehavior are the common case, 
+not the exception 
+n? ? In a 1,000-node system, there will always be a few faulty 
+nodes and misbehaving domains 
+n? ? Waiting for a fault-free system is not an option 
+n? ? New forms of misbehavior to consider 
+n? ? Example: Selfish/rational behavior 
+23 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Why do we need models? 
+n? ? Goal: Build systems that have useful properties 
+even in the presence of faults/misbehavior 
+n? ? No guarantees possible if all nodes can fail at the same time 
+n? ? But that is not realistic ? Need to model the faults we expect 
+n? ? Model is always an assumption; can be wrong in practice! 
+n? ? Common types of models: 
+n? ? Type: Only X, Y and Z can happen on affected nodes (e.g., data 
+loss, but not data corruption) 
+n? ? Pattern: At most f nodes can be affected at the same time 
+(or: nodes A and B can never be affected at the same time) 
+n? ? Power: Affected node cannot do X (e.g., factor large numbers) 
+n? ? Simple example: Crash fault model 
+ 
+24 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Common fault models 
+n? ? Crash model: Faulty nodes simply stop 
+n? ? The most common model. Often appropriate, but not always. 
+n? ? Rational model: Faulty nodes have a specific, 
+known goal (such as making money) 
+n? ? Pro: Good approximation for many systems 
+n? ? Pro: Powerful; gives us a lot of leverage 
+n? ? Con: Not everyone is perfectly rational, and it can be diffficult 
+to anticipate the nodes' real goals 
+n? ? Byzantine model: Faulty nodes can behave 
+arbitrarily (within their power) 
+n? ? Pro: Very pessimistic. Assumption almost always holds. 
+n? ? Con: Very pessimistic. Requires very expensive techniques. 
+25 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania The rational model 
+n? ? Assumption: Each participant chooses his 
+actions to maximize his own utility 
+n? ? Example: Participant wants to download all the pieces (in 
+BitTorrent) while sending as few bytes as possible 
+n? ? Participants modify software on the nodes under their 
+control if the relevant action is not offered 
+n? ? Rational vs selfish 
+n? ? What does this buy us? 
+n? ? More realistic than assuming everyone is altruistic (i.e., does 
+what the protocol tells them to do) ? Systems built for 
+rational nodes tend to be more robust in practice 
+n? ? Model is simple enough to treat analytically 
+n? ? Can apply rich literature on game theory, economics, ... 
+26 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Only if you 
+Give me 
+Handling rational nodes 
+give me one 
+a block 
+in return 
+of data 
+n? ? Approach #1: Incentives 
+n? ? Rational nodes will do work if they  
+get something in return 
+n? ? Example: Tit for tat (BitTorrent) 
+n? ? Approach #2: Reputations 
+n? ? Domains can rate their interactions with other  
+domains as satisfactory or unsatisfactory  
+n? ? Similar to Ebay recommendations, only for 
+nodes in networks 
+n? ? If a domain acquires a bad reputation,  
+others stop working with it 
+n? ? ... and other approaches 
+27 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Rational model: Theory and practice 
+Model Reality 
+Some aspects of a participant's 
+Utility functions of all 
+utility may not be fully known 
+participants are known 
+Example: Script kiddie derives pleasure from 
+gaming the system, doesn't care about bandwidth 
+Participants may be ignorant or 
+Each participant is able to 
+misinformed (bounded rationality) 
+determine his optimal action 
+Example: Participant is not aware that he can 
+underreport pieces 
+Participants may be lazy or make 
+Each participant chooses the 
+mistakes 
+actions to maximize his utility 
+Example: Participant misconfigures his client, 
+accidentally uploads at twice the intended rate  
+n? ? In practice, not all participants act rationally 
+and/or selfishly all the time 
+n? ? But it often is a good approximation 
+28 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Protocol analysis is difficult 
+n? ? How can we be sure that our new protocol is 
+robust against rational nodes? 
+n? ? This is REALLY hard! 
+n? ? Case study: BitTorrent 
+n? ? Tit for tat provides incentives - sounds really simple, right? 
+n? ? But the devil is in the details... 
+n? ? A small selection of BitTorrent papers: 
+n? ? 2003: "Incentives build robustness in BitTorrent" - Cohen, IPTPS 2003 
+n? ? 2004: "Modeling and performance analysis of BitTorrent-like peer-to-peer networks" - 
+Qiu and Srikant, SIGCOMM 2004 
+n? ? 2006: "Rarest first and choke algorithms are enough" - Legout et al., IMC 2006 
+n? ? 2006: "Exploiting BitTorrent for fun (but not profit)" - Liogkas et al., IPTPS 2006 
+n? ? 2006: "Free riding in BitTorrent is cheap" - Locher et al., HotNets 2006 (BitThief) 
+n? ? 2007: "Do incentives build robustness in BitTorrent?" - Piatek et al., NSDI 2007 
+n? ? 2008: "BitTorrent is an auction" - Levin et al., SIGCOMM 2008 
+29 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania The Byzantine model 
+Byzantine 
+Rational 
+All 
+Crash 
+n? ? Assumption: Faulty nodes can behave arbitrarily 
+n? ? Subsumes all the other models we've discussed so far 
+n? ? Examples: Faulty nodes can crash, deviate from the protocol, 
+act selfishly, lie, equivocate, attack other nodes, ... 
+n? ? Usually it is assumed that the faulty nodes still have limited 
+capabilities (cannot suddenly factor large numbers or cut 
+network links between other nodes) 
+30 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania The Byzantine model 
+n? ? What does this buy us? 
+n? ? Extremely high resilience 
+n? ? Fe

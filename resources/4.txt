@@ -1,0 +1,442 @@
+CIS 455/555: Internet and Web Systems 
+Naming and Lookup; LDAP and DNS(SEC) 
+ 
+January 28, 2013 
+1 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Announcements 
+n? ? HW1MS1 is due on February 6th 
+n? ? You should have a multi-threaded server by now! 
+n? ? Leave some time for debugging! 
+n? ? Reading: 
+n? ? Wikipedia: Domain Name System 
+n? ? http://en.wikipedia.org/w/index.php?
+title=Domain_Name_System&oldid=409603089 
+n? ? Marshall LDAP intro 
+n? ? http://quark.humbug.org.au/publications/ldap/introldap.html 
+n? ? Tanenbaum Chapter 5 ("Naming") 
+2 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania How do we find things on the Internet? 
+n? ? Generally, using one of three means: 
+n? ? Addresses or locations: we know where it is 
+n? ? Just like a physical address, we may still need a map! 
+n? ? In the Internet, addresses are typically IP addresses – the 
+routers know the map 
+n? ? Content-based addressing: we know what it is 
+n? ? For instance, some keywords, hash of the content, ... 
+n? ? Basis of pub-sub systems, certain peer-to-peer architectures, 
+indices (search engines like Google) 
+n? ? Names: we know what it is called 
+n? ? Best-known example on the Internet: DNS name 
+n? ? Identifiers are special names (1:1 mapping, no reuse) 
+n? ? Cell phone numbers, email addresses, etc. are becoming names 
+n? ? Need a way to map the name to an address/a location 
+   ? Name resolution 
+© 2013 A. Haeberlen, Z. Ives Challenge: Find the 'right' architecture 
+n? ? Should we use names or addresses? 
+n? ? If names, what kind of names? 
+n? ? Need to define a namespace: Flat, hierarchical, ... 
+n? ? How are names assigned? 
+n? ? Random, choose-your-own, explicit registration... 
+n? ? Do conflicts need to be handled? Who has authority? 
+n? ? How do we resolve names? 
+n? ? Many different architectures: Flooding, centralized directory, 
+hierarchical directory, decentralized directory ... 
+n? ? Is performance important? Can name mappings change? 
+Should mappings depend on location, load, ...? 
+n? ? How can we secure the resolution system? 
+n? ? What threats exist? What defenses are available/appropriate? 
+4 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Plan for today 
+NEXT 
+n? ? Flat naming 
+n? ? Attribute-based naming; LDAP 
+n? ? Structured naming 
+n? ? The Domain Name System (DNS) 
+n? ? Attacks on DNS 
+n? ? DNSSEC 
+5 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Two simple architectures 
+Directory server 
+Client 
+machines 
+Directoryless 
+Directory-based 
+Gnutella, ARP 
+LDAP, DNS, Napster 1.0 
+n? ? Directories can make lookup more efficient 
+n? ? Special data structures can further increase performance 
+(inverted index etc. - stay tuned!) 
+n? ? Directory can be distributed/hierarchical 
+6 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Case study: ARP 
+n? ? How does the switch know on which port it 
+can reach a machine with a given IP address? 
+n? ? Address resolution protocol (ARP); also uses flooding 
+n? ? MACs are flat 48-bit IDs, but have some structure (OUI/NIC) 
+7 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania 
+http://en.wikipedia.org/wiki/File:Switch-and-nest.jpg Case study: Gnutella 
+n? ? Nodes choose their own file names 
+n? ? Searches are flooded through the network 
+n? ? Node A wants a data item; it asks B and C 
+n? ? If B and C don’t have it, they ask their neighbors, etc. 
+n? ? Implications? Pros and Cons? 
+G 
+D 
+H 
+C 
+B 
+A 
+E 
+I 
+F 
+© 2013 A. Haeberlen, Z. Ives Case study: Napster 1.0 (ca. 2002) 
+n? ? Hybrid of peer-to-peer storage with central 
+directory showing what’s currently available 
+n? ? What are the trade-offs implicit in this model?  Why did it fail? 
+Peer1 
+los-del-rio-macarena.mp3 
+Directory 
+los-del-rio-macarena 
+Napster 
+.com 
+bspears-oops 
+Peer2 
+bspears-oops.mp3 
+Peer3 
+los-del-rio-macarena.mp3 
+© 2013 A. Haeberlen, Z. Ives What happened to Napster? 
+n? ? May 1999: Napster founded by Shawn Fanning and Sean Parker 
+n? ? Dec 1999: RIAA sues Napster for copyright infringement 
+n? ? Apr 2000: Metallica & Dr. Dre sue Napster 
+n? ? Jul 2000: U.S. District Judge Marylin Hall Patel orders Napster 
+shut down 
+n? ? Jul 2000: Appeals cort stays injunction 
+n? ? Feb 2001: Federal court rules Napster must stop trading in 
+copyrighted material 
+n? ? Jul 2001: Napster shuts down entire network 
+n? ? Sep 2001: Case partially settled; Napster attempts to convert to 
+a subscription system; filters copyrighted content 
+n? ? Jun 2002: Napster files for Chapter 11 protection 
+n? ? Brand purchased by Best Buy in 2008, sold to Rhapsody in December 2011 
+10 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Recap: Flat naming 
+n? ? There are several ways to look for things 
+n? ? Addresses/locations, names/identifiers, content 
+n? ? How can we map names to locations? 
+n? ? Flooding: Robust but very expensive 
+n? ? Directories: Efficient but vulnerable 
+n? ? Examples: Gnutella, Napster, ARP (there are many others) 
+11 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Plan for today 
+n? ? Flat naming 
+NEXT 
+n? ? Attribute-based naming; LDAP 
+n? ? Structured naming 
+n? ? The Domain Name System (DNS) 
+n? ? Attacks on DNS 
+n? ? DNSSEC 
+12 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania directory node 
+Name spaces 
+leaf node 
+/ 
+bin 
+usr 
+etc 
+home 
+bash 
+local 
+include 
+bcpierce 
+ahae zives 
+bin 
+foo.txt 
+public_html 
+gcc scp 
+index.html 
+n? ? Names are taken from name spaces 
+n? ? Simplest example: Flat name space (Gnutella) 
+n? ? Also very common: Hierarchical name spaces 
+n? ? Typically can be represented as a DAG (e.g., File system) 
+13 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Naming people and devices: LDAP 
+n? ? Lightweight Directory Access Protocol 
+n? ? Derived from X.500's DAP protocol, hence the 'L' 
+n? ? Hierarchical naming system that can be 
+partitioned and replicated 
+n? ? See 
+http://www.seas.upenn.edu/cets/answers/ldap.html 
+to set up your email client to access Penn’s LDAP server 
+© 2013 A. Haeberlen, Z. Ives LDAP’s schema 
+n? ? LDAP entries consist of attributes (name-value pairs) 
+and are organized in a tree 
+n? ? Each entry has a unique identifier (distinguished name) 
+n? ? DN consists of some attributes in the entry itself, followed by the parent's DN 
+n? ? Goes from most-specific to least-specific (as in DNS names) 
+n? ? Common attributes in DNs: o = organization; dc = domain component;  
+ou = organizational unit; uid = user ID; cn = common name; 
+c = country; st = state; l = locality;  
+n? ? Can also have objectClass – the type of entity 
+n? ? LDAP has a schema 
+n? ? Defines the kinds of entries that may exist, the kinds of attributes 
+these entries may have, the kinds of values, etc. 
+n? ? Entries have an objectClass attribute that specifies what class(es) 
+of entries they belong to 
+© 2013 A. Haeberlen, Z. Ives LDAP Hierarchy 
+Mapping of the DIT to servers 
+Part of a Directory Information Tree 
+("Directory Service Agents") 
+16 
+© 2013 A. Haeberlen, Z. Ives Source: Brad Marshall LDAP Tutorial, quark.humbug.au/publications/ldap_tut.html Querying LDAP 
+n? ? LDAP queries are mostly attribute-value predicates: 
+n? ? uid=ahae; o=upenn; c = usa 
+n? ? (|(cn=Andreas Haeberlen)(cn=Boon Thau Loo)
+(cn=Benjamin Pierce)) 
+n? ? objectclass=posixAccount 
+n? ? (!cn=Benjamin Franklin) 
+n? ? How might we process these queries? 
+© 2013 A. Haeberlen, Z. Ives Recap: Directories 
+n? ? An efficient way of finding data, assuming: 
+n? ? Data doesn’t change too often, hence it can be replicated 
+and distributed 
+n? ? Hierarchy is relatively “wide and flat” 
+n? ? Caching is present, helping with repeated queries 
+n? ? Directories generally rely on names at their 
+core 
+n? ? Sometimes we want to search based on 
+other means, e.g., predicates or filters over 
+content… 
+© 2013 A. Haeberlen, Z. Ives Recap: LDAP 
+n? ? A protocol for reading and editing directories 
+over a network 
+n? ? Directory is a tree of entries 
+n? ? Entries consist of a set of attributes 
+n? ? Each entry has a unique identifier (distinguished name) 
+n? ? Directory can be distributed across multiple 
+machines 
+19 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Plan for today 
+n? ? Flat naming 
+n? ? Attribute-based naming; LDAP 
+n? ? Structured naming 
+NEXT 
+n? ? The Domain Name System (DNS) 
+n? ? Attacks on DNS 
+n? ? DNSSEC 
+20 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania DNS namespace 
+... 
+... 
+arpa com org gov mil net edu de fr sg 
+biz name uk 
+info 
+... 
+mit upenn 
+stanford 
+google facebook 
+ebay 
+seas 
+cis wharton 
+... 
+docs groups 
+n? ? DNS has a hierarchical namespace 
+n? ? First level managed by the Internet Corporation for Assigned 
+Names and Numbers (ICANN) 
+n? ? Authority over other levels is delegated 
+n? ? Second level generally managed by registrars 
+n? ? Further levels managed by organizations or individuals 
+n? ? Result: Each domain owns its own names 
+21 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania 
+Top-level 
+domains Top-Level Domains (TLDs) 
+n? ? Several classes of TLDs exist 
+n? ? .com:  commercial 
+n? ? .edu:  educational institution 
+n? ? .gov:  US government 
+n? ? .mil:  US military 
+n? ? .net:  networks and ISPs (now also a number of other things) 
+n? ? .org:  other organizations 
+n? ? 244, 2-letter country suffixes, e.g., .us, .uk, .cz, .tv, … 
+n? ? some variants on this for other institutions, e.g., .eu 
+n? ? a bunch of new suffixes that are not very common,  
+e.g., .biz, .mobi, .name, .pro, … 
+n? ? some internationalized TLDs (e.g., xn--fiqs8s, which is .  ) 
+n? ? Several key TLDs are managed by Verisign 
+© 2013 A. Haeberlen, Z. Ives Finding the root 
+n? ? 13 “root servers” store entries for all top level 
+domains (TLDs) 
+n? ? DNS servers have a hard-coded mapping to 
+root servers so they can “get started” 
+n? ? Question: 
+n? ? Can 13 servers really handle the DNS lookups from the 
+entire planet? 
+ 
+© 2013 A. Haeberlen, Z. Ives Why things had to change 
+n? ? Denial-of-service attacks on DNS 
+n? ? 10/2002, 9 of the root servers were affected  
+(about 1 hour, ICMP flooding) 
+n? ? 02/2007 DDoS 
+n? ? http://www.icann.org/en/announcements/factsheet-dns-
+attack-08mar07.pdf 
+n? ? Result: A change in the way the DNS root 
+servers are operated 
+24 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania New root server locations 
+n? ? Most root servers are distributed via anycast 
+n? ? See http://root-servers.org/ 
+25 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Root servers 
+Root zone 
+Name servers 
+... 
+arpa org gov mil net sg 
+com edu de fr uk 
+biz name 
+info 
+... 
+upenn 
+mit stanford Authoritative 
+google 
+ebay facebook 
+server for 
+upenn.edu 
+cis seas wharton 
+... 
+groups 
+docs 
+n? ? Namespace is divided into zones 
+n? ? TLDs belong to the root zone 
+n? ? Each zone has an authoritative name server 
+n? ? Authoritative server knows, for each name in its zone, which 
+machine corresponds to a given name, or which other name 
+server is responsible  
+26 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania D 
+www.google.com? 
+Name resolution in DNS 
+Root server 
+A
+www.google.com? ?! 
+www.google.com? 
+Server for 'com' 
+B
+D 
+Alice 
+Server for 'google.com' 
+Alice's local 
+C
+DNS server 
+D
+HTTP request 
+n? ? Name lookup can be recursive or iterative 
+n? ? Domain name is resolved step by step, starting with the TLD 
+n? ? Alternative? 
+n? ? Name servers cache results of lookups 
+n? ? Why? 
+27 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania 
+google.com? 
+Ask C! Example lookup (simplified) 
+[ahae@carbon ~]$ dig seas.upenn.edu ANY 
+;; QUESTION SECTION: 
+;seas.upenn.edu.                IN      ANY 
+ 
+;; ANSWER SECTION: 
+seas.upenn.edu.         300     IN      RRSIG   MX 5 3 300 20110219082608 20110120082115 50475 upenn.edu. 
+Qp00em2D2LKySqpV+GncOVPWwT6LJO03cBmWj+w4wvj+1gO+jjzu9pEUSxz7oYvUDziLEzN5PBKjuunwNWOTgAGxBHS06jXTVHb2Oh8PDSwt/
+Dor/CLeXP0yyBjcYhQNhXj5qUQHdvFw/wWkr0qX3wtazcNNAx4jB+GkiZ/D /IY= 
+seas.upenn.edu.         300     IN      MX      10 sympathy.seas.upenn.edu. 
+seas.upenn.edu.         300     IN      MX      10 telepathy.seas.upenn.edu. 
+seas.upenn.edu.         300     IN      MX      10 psychopathy.seas.upenn.edu. 
+seas.upenn.edu.         300     IN      MX      10 empathy.seas.upenn.edu. 
+seas.upenn.edu.         3600    IN      RRSIG   A 5 3 3600 20110213024656 20110114023912 50475 upenn.edu. 
+wuxfZS16kw8xdLIv1C9r+l8F8hwAbOSZRtZqQALNW3C9qsYPfSbUytk5+gEBa87CbISRsv+E7HfEzkPaA6rd9qskl/+NDci+W7/
+iIAP4gf1TyQ5mcNUeMj8q6M2aQuFmFFrfLTdsGzCUZ5sfTNDz2QcObBujVfgA4S2rI83c Wks= 
+seas.upenn.edu.         3600    IN      A       158.130.69.89 
+seas.upenn.edu.         3600    IN      A       158.130.67.216 
+seas.upenn.edu.         86400   IN      RRSIG   TXT 5 3 86400 20110209180334 20110110174016 50475 upenn.edu. 
+ShLh2Qy/mS9VofDk43NJmBVaN6AVyY2VzrFVxB7u2QcfOBzuVw+njWmkyM8DadEqbe7bUg8uT+KGQsMBYMm0lKorpg9C0NnYeUMO7KFtm93b
++KwuoXVKTzd+UZpC0BZ9ObzOMZSaXfDDyM9YasIUu7fwxMKaPI+CpH7NSDbF diA= 
+seas.upenn.edu.         86400   IN      TXT     "v=spf1" 
+seas.upenn.edu.         3600    IN      NSEC    abaqus.seas.upenn.edu. A MX TXT RRSIG NSEC 
+seas.upenn.edu.         3600    IN      RRSIG   NSEC 5 3 3600 20110219082608 20110120082115 50475 upenn.edu. 
+jI9oDqW8lEyvgXo+b1TPhZyJgQG1SiNZgR1JVrkgdAYS0H1Viz8dw4/PB4z3UEGLxxb5FTGozyZS/
+SRnAkFkKUMJxFeU87oAyARoG1Psvdj7fFEN SON9s0lma82aJZcsVtDXTpvzmEfXodLGGO+9od7rMlELyUugGjHPpfKy tUg= 
+[ahae@carbon ~]$ 
+Try it out: http://www.webdnstools.com/dnstools/dns-lookup 
+28 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Excerpt from DNS Root Server Entries 
+; This file is made available by InterNIC registration services under anonymous FTP as  
+; file /domain/named.root  
+;  
+; formerly NS.INTERNIC.NET  
+;  
+.     3600000  IN  NS  A.ROOT-SERVERS.NET.  
+A.ROOT-SERVERS.NET.  3600000   A  98.41.0.4  
+;  
+; formerly NS1.ISI.EDU  
+;  
+.      3600000   NS  B.ROOT-SERVERS.NET. 
+B.ROOT-SERVERS.NET.  3600000   A  128.9.0.107  
+;  
+; formerly C.PSI.NET  
+;  
+.      3600000   NS  C.ROOT-SERVERS.NET. 
+C.ROOT-SERVERS.NET.  3600000   A  192.33.4.12 
+© 2013 A. Haeberlen, Z. Ives Supposing we were to build DNS 
+n? ? How would we start? How is a lookup 
+performed? 
+n? ? Hint: What do you need to specify when you add a client to 
+a network that doesn’t do DHCP? 
+© 2013 A. Haeberlen, Z. Ives DNS in a nutshell 
+n? ? In a typical setup, the network administrator 
+n? ? configures a local DNS server with the address of at least 
+one root server 
+n? ? configures a DHCP (Dynamic Host Configuration Protocol) 
+server with the IP address of the local DNS server 
+n? ? When your machine joins the network, 
+n? ? it broadcasts a packet to find the local DHCP server 
+n? ? the local DHCP server responds with (among other things) 
+an IP address for your machine to use, and the IP address 
+of the local DNS server 
+n? ? Your machine is then ready to send DNS requests to the 
+local DNS server, who can forward them to other servers 
+(e.g., the root servers) if necessary 
+31 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Issues in DNS 
+n? ? We know that everyone wants to be “my-
+domain”.com 
+n? ? How does this mesh with the assumptions inherent in our 
+hierarchical naming system? 
+n? ? What happens if things move frequently? 
+n? ? What happens if we want to provide  
+different behavior to different requestors 
+(e.g., Akamai)? 
+© 2013 A. Haeberlen, Z. Ives How Akamai works 
+1.? Root NS asked for 
+a7.g.akamai.net 
+? .net name server 
+2.? .net name server 
+returns domain 
+delegation (NS) 
+for .akamai.net 
+to Akamai top-level DNS 
+3.? Akamai TL DNS server returns domain delegation 
+for .g.akamai.net to Akamai low-level DNS (TTL ~1 
+hour) 
+n? ? Selected based on proximity to requesting client 
+4.? Akamai low-level DNS server returns IPs of servers 
+available to satisfy the request (TTL secs-mins) 
+33 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania 
+n? ? Selected based on, e.g., server health, server load, network condition... 
+From: J. Dilley, B. Maggs, J. Parikh, H. Prokop, R. Sitaraman, B. Weihl, "Globally Distributed Content Delivery", IEEE Internet Computing Se/Oct 2002 Recap: DNS 
+n? ? Domain Name System 
+n? ? A key component of the Web 
+n? ? Implements a hierarchical namespace; control over parts 
+of the namespace is delegated 
+n? ? Globally distributed across many DNS servers  
+n? ? Plus: Replication via anycast 
+n? ? Can contain many types of records (MX, e

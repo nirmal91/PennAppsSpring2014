@@ -1,0 +1,233 @@
+CIS 455/555: Internet and Web Systems 
+XQuery; Data Integration Basics 
+ 
+March 20, 2013 
+1 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania Announcements 
+n? ? HW2 MS2 is due on Monday 
+n? ? If you think you may need an extension, please double-check 
+how many jokers you have left 
+n? ? Please think about project teams! 
+n? ? One person from each team should send me an email by 
+Friday with the names and SEAS logins of the team members 
+n? ? When recruiting members for your team, please discuss your 
+expectations (work style, schedule, technologies, goals, ...) 
+carefully to ensure that you are a good match 
+n? ? Reading for today: 
+n? ? XQuery tutorial (http://www.w3schools.com/xquery/) 
+2 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania Plan for today 
+NEXT 
+n? ? XQuery 
+n? ? Basics 
+n? ? FLWOR 
+n? ? Examples 
+n? ? Data integration 
+n? ? Basics 
+n? ? Concordance tables 
+3 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania XQuery and its uses 
+n? ? Primarily a query language for getting 
+information out of XML databases 
+n? ? Answer a query over some data source 
+n? ? However, can also be used to define mappings 
+between different XML schemas 
+n? ? Describe relationship between source data and target data 
+n? ? Transform 2 into 6 by Òadd 4Ó operation 
+n? ? Convert from S1 to S2 by applying the query described by 
+view V 
+n? ? We will see this in use later, when we talk about data 
+integration 
+4 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania XQuery basics 
+n? ? Distinctly functional style 
+n? ? A few simple XQueries 
+n? ? "Hello World" 
+n? ? 2+2 
+n? ? current-time() 
+n? ? <employee empid="12345"><name>John Doe</name><job>XML 
+specialist</job><deptno>187</deptno><salary>125000</
+salary></employee> 
+n? ? any XPath 2.0 
+n? ? Queries can access XML documents: 
+n? ? doc('http://www.foo.com/bar.xml') 
+5 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania XQuery examples 
+n? ? More interesting: Expressions with variables 
+<employee empid="{$id}"> 
+ <name>{$name}</name> 
+ {$job} 
+ <deptno>{$deptno}</deptno> 
+ <salary>{$SGMLspecialist+100000}</salary> 
+</employee> 
+n? ? Variables can be bound with 'let' 
+n? ? ... but they cannot be updated! 
+n? ? The following is NOT allowed: let $x := $x+1 
+6 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania http://www.brics.dk/~amoeller/XML/querying/pathexp.html FLWOR expressions 
+'for' creates an ordered 
+list of bindings 
+for $d in document("depts.xml")//deptno  
+let $e := document("emps.xml")//employee[deptno = $d]  
+where count($e) >= 10  
+order by avg($e/salary) descending  
+return  
+'let' creates a 
+   <big-dept>  
+single binding 
+      { $d,  
+        <headcount>{count($e)}</headcount>,  
+        <avgsal>{avg($e/salary)}</avgsal>  
+      }  
+   </big-dept>  
+n? ? The key primitive in XQuery 
+n? ? For-Let-Where-Order-Return (pronounced 'flower') 
+n? ? Generalizes SELECT-FROM-HAVING-WHERE from SQL 
+n? ? Example: The above query produces a list of departments 
+with at least 10 employees, sorted by average salaries 
+7 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania http://www.brics.dk/~amoeller/XML/querying/flwrexp.html List expressions 
+n? ? XQuery expressions manipulate lists of values 
+n? ? Constant lists: (7, 9, <twelve/>) 
+n? ? Integer ranges: i to j 
+n? ? XPath expressions, e.g., all the children of the context node 
+n? ? Concatenation: , 
+n? ? Set operations: union, intersect, except 
+n? ? Functions: count, avg, max, min, sum, distinct-values, ... 
+(and hundreds of other built-in functions + operators) 
+8 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania Conditional & quantified expressions 
+n? ? XQuery supports if-then-else: 
+for $h in document("library.xml")//holding  
+return <holding> {  
+  $h/title,  
+  if ($h/@type = "Journal")  
+    then $h/editor  
+    else $h/author  
+} </holding> 
+n? ? XQuery also supports quantifiers: 
+n? ? some ... in ... satisifes, every ... in ... satisifes 
+n? ? Example: Find the titles of all books that mention sailing and 
+scuba in the same paragraph: 
+for $b in document("bib.xml")//book  
+where some $p in $b//paragraph satisfies  
+  (contains($p,"sailing") AND contains($p,"scuba"))  
+return $b/title 
+9 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania http://www.brics.dk/~amoeller/XML/querying/quantexp.html Example XML file 
+<mydatabase> 
+  <videos> 
+    <video> 
+      <name>Die Hard</name> 
+      <year>1988</year> 
+      <genre>Action</genre> 
+      <runtime>131</runtime> 
+  <actors> 
+      <director>John McTiernan</director>     <actor id="123"> 
+      <actorRef>123</actorRef>       Willis, Bruce  
+    </video>     </actor> 
+    <video>     <actor id="456"> 
+      <name>Black Swan</name> 
+      Portman, Natalie 
+      <year>2010</year>     </actor> 
+      <genre>Drama</genre>     <actor id="789"> 
+      <runtime>108</runtime>       Kunis, Mila 
+      <director>Darren Aronofsky</director>     </actor> 
+      <actorRef>456</actorRef> 
+    ... 
+      <actorRef>789</actorRef> 
+  </actors> 
+    </video> 
+</mydatabase> 
+    ... 
+  </videos> 
+   
+10 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania Simple examples 
+n? ? Return all the video elements in $doc: 
+n? ? for $v in $doc//video return $v 
+Every XPath expression is also a valid XQuery! 
+n? ? $doc//video 
+n? ? Return the titles of all videos released in 1988: 
+n? ? for $v in $doc//video where $v/year = 1988 return $v/title 
+n? ? $doc//video[year=1988]/title 
+n? ? Return the total runtime of all the movies: 
+let $totalDuration := 0 
+n? ? NOT:  
+for $v in //video 
+let $totalDuration := $totalDuration + $v/runtime 
+return $totalDuration 
+n? ? What does this query do? 
+sum(//video/runtime) 
+n? ? How to do it correctly? 
+11 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania Some more complex examples 
+n? ? How can we make a list of all the actors who 
+have played in each genre? 
+for $genre in //genre 
+let $genreVideos := //video[genre = $genre] 
+let $genreActorRefs := $genreVideos/actorRef 
+for $actor in //actor[@id = $genreActorRefs] 
+return concat($genre, ": ", $actor) 
+... 
+n? ? A list of actors for each action video? 
+for $v in //video[genre="action"] 
+return  
+   <actors video="{$v/title}"> 
+      {for $a in //actor[@id = $v/actorRef] 
+         return 
+            <actor> 
+               <firstname>{substring-after($a, ",")}</firstname> 
+               <lastname>{substring-before($a, ",")}</lastname> 
+            </actor> 
+      } 
+   </actors> 
+12 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania XSLT vs XQuery 
+n? ? There is a lot of overlap; for example, 
+n? ? both are based on XPath 
+n? ? both allow the transformation of XML into something else 
+n? ? However, there are also important differences 
+n? ? XSLT has more of a declarative flavor; it has an implicit 
+'processing engine' that does most of the work for you, and 
+it has lots of default behaviors 
+n? ? XQuery, in contrast, is more imperative: You have full 
+control over the algorithm 
+n? ? XSLT is more suitable for transforming entire documents (as 
+the name suggests); XQuery is more for 'zooming into' 
+documents and focusing only on a few subsections 
+13 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania http://www.ibm.com/developerworks/xml/library/x-wxxm34.html Recap: XQuery 
+n? ? XQuery: A query language for XML 
+n? ? Functional language; based on XPath 2.0 
+n? ? Manipulates lists of values 
+n? ? Key primitive: FLWOR expressions 
+n? ? Let bindings (not variables) 
+n? ? Conditionals, quantifiers, ... 
+n? ? Can express joins 
+n? ? Focused on queries, not on transformations 
+n? ? Idea is to return some specific part of an XML document or 
+database 
+n? ? User specifies detailed algorithm (not like XSLT) 
+n? ? However, some overlap with XSLT exists 
+14 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania Plan for today 
+n? ? XQuery 
+n? ? Basics 
+n? ? FLWOR 
+n? ? Examples 
+NEXT 
+n? ? Data integration 
+n? ? Basics 
+n? ? Concordance tables 
+15 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania Scenario: Data integration 
+??? 
+A 
+??? 
+B 
+Everything 
+??? 
+C 
+n? ? We have: Many related databases 
+n? ? Example: Various teams of geneticists each ha

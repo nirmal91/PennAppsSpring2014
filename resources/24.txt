@@ -1,0 +1,589 @@
+CIS 455/555: Internet and Web Systems 
+Special topics 
+ 
+April 17, 2013 
+1 
+A. Haeberlen University of Pennsylvania Announcements 
+nd
+n? ? 2 midterm: Monday (April 22) 4:30pm DRL A1 
+n? ? Please complete the course evaluations! 
+n? ? Please let me know how you liked the class (topics covered, 
+structure, projects, assignments, ...) and especially what 
+aspects could be improved 
+n? ? I already know the workload is very high 
+n? ? Your feedback will benefit next year's CIS455 class! 
+n? ? Project demo slots will be announced soon 
+n? ? Please turn in a snapshot of your code by April 29th 
+n? ? Reading for today: 
+n? ? Arvind Narayanan and Vitaly Shmatikov: "Robust De-
+anonymization of Large Sparse Datasets" (Oakland 2008) 
+n? ? http://www.cs.utexas.edu/~shmat/shmat_oak08netflix.pdf 
+2 
+A. Haeberlen University of Pennsylvania Announcements (continued) 
+n? ? Do we want to allow front-end languages 
+other than Java? 
+n? ? Pro: Easier / more convenient for some of you 
+n? ? Pro: Fewer limits on your creativity 
+n? ? Con: Less 'bragging rights' for you later 
+n? ? Con: Risky when not all team members know the language 
+n? ? Con: Uneven playing field ("tremendous advantage") 
+n? ? Are you participating in Senior Design? 
+n? ? If so, you should attend the poster session today! 
+n? ? Special 'repeat' lecture for seniors tomorrow at 3pm in L307 
+3 
+A. Haeberlen University of Pennsylvania Reminder: Google award 
+n? ? The team with the best search engine will 
+receive an award (sponsored by           ) 
+n? ? Criteria: Architecture/design, speed, reliability, quality of 
+search results, user interface, written final report 
+n? ? Winning team gets four cell phones 
+n? ? Winners will be announced on the course web page 
+4 
+A. Haeberlen University of Pennsylvania Current projects 
+Accountability and evidence 
+n? ? If some nodes in our distributed  
+system (e.g., cloud) have been  
+compromised, how can we tell? 
+n? ? Case study: Detecting novel and 
+unknown cheats in Counterstrike 
+Differential privacy 
+n? ? How can we answer questions about 
+sensitive data without (accidentally) 
+compromising someone's privacy? 
+n? ? Example: Netflix disaster 
+n? ? Goal: Provable privacy guarantees 
+5 
+A. Haeberlen University of Pennsylvania Current projects 
+Network forensics 
+n? ? If you discover that some part of  
+your cloud has been broken into,  
+how can you tell what to clean up? 
+n? ? Approach: Secure provenance 
+Resilient cloud 
+n? ? If part of your cloud service gets 
+compromised, can you limit the 
+damage, and perform automatic  
+recovery? 
+n? ? Approach: Communities of trust 
+6 
+A. Haeberlen University of Pennsylvania For more information 
+n? ? Accountability and evidece 
+n? ? http://accountability.cis.upenn.edu/ 
+ 
+n? ? Differential privacy 
+n? ? http://privacy.cis.upenn.edu/ 
+ 
+n? ? Network forensics 
+n? ? http://snp.cis.upenn.edu/ 
+ 
+n? ? Resilient cloud 
+n? ? http://sound.cis.upenn.edu/ 
+7 
+A. Haeberlen University of Pennsylvania Outline 
+Differential privacy 
+Accountability & evidence 
+Resilient cloud 
+Network forensics 
+8 
+A. Haeberlen University of Pennsylvania Scenario: Multiplayer game 
+I'd like 
+Charlie 
+to play 
+a game 
+Network 
+Bob 
+Alice 
+n? ? Alice decides to play a game of Counterstrike 
+with Bob and Charlie 
+9 
+A. Haeberlen University of Pennsylvania What Alice sees 
+Movie 
+Alice 
+10 
+A. Haeberlen University of Pennsylvania Could Bob be cheating? 
+Ammo 
+Charlie 
+35  36  37 
+Network 
+Bob 
+Alice 
+n? ? In Counterstrike, ammunition is local state 
+n? ? Bob can manipulate counter and prevent it from decrementing 
+n? ? Such cheats (and many others) do exist, and are being used 
+11 
+A. Haeberlen University of Pennsylvania The state of the art 
+n? ? Anti-cheating techniques 
+n? ? VAC2, PunkBuster, ... 
+n? ? Can only find known types of cheats 
+n? ? Privacy concerns 
+n? ? Memory scanning, sending screenshots... 
+n? ? Want to know more? 
+n? ? Hoglund/McGraw: Exploiting online games 
+(Addison-Wesley) 
+12 
+A. Haeberlen University of Pennsylvania This is not (just) about cheating! 
+Software 
+Bob 
+Network 
+Alice 
+n? ? Cheating is a serious problem in itself 
+n? ? Multi-billion-dollar industry 
+ 
+n? ? But there is a more general problem: 
+n? ? Alice relies on software that runs on a third-party machine 
+n? ? This is true of the cloud (and many other types of systems) 
+n? ? How does Alice know if the software running as intended? 
+13 
+A. Haeberlen University of Pennsylvania What do we do in the 'offline' world? 
+n? ? Misbehavior isn't unique to computers 
+n? ? What if you run a company and somebody embezzles money? 
+n? ? What if someone misreports their income on their tax return? 
+n? ? What if a professor spends his grant money on a Ferrari? 
+n? ? ... 
+n? ? In the 'offline world, these aren't huge issues 
+n? ? Why? 
+14 
+A. Haeberlen University of Pennsylvania Learning from the 'offline' world 
+n? ? In the 'offline' world, we rely on accountability 
+Expected 
+Tamper-evident Auditors Incriminating 
+behavior 
+record evidence 
+n? ? Accountability can: 
+n? ? Detect faults 
+n? ? Identify the faulty person/entity 
+n? ? Convince others of the fault (by producing evidence) 
+n? ? Can we apply this approach to distributed systems? 
+15 
+A. Haeberlen © 2009 Andreas Haeberlen Goal: Accountability 
+Software 
+Network Bob 
+Alice 
+n? ? We want Alice to be able to 
+n? ? Detect when the remote machine is faulty 
+n? ? Obtain evidence of the fault that would convince a third party 
+n? ? Challenges: 
+n? ? Alice has no idea how Bob's cheat might work (if he has one) 
+n? ? How to look for something when you don't know what it looks like? 
+n? ? Neither Alice nor Bob may understand how the software works 
+n? ? Binary only - no specification of the correct behavior 
+16 
+A. Haeberlen University of Pennsylvania Accountable 
+Virtual Machine 
+(AVM) 
+Accountable Virtual Machines 
+AVM 
+Virtual 
+Accountable 
+machine 
+Virtual Machine 
+image 
+Monitor (AVMM) 
+AVMM 
+Network 
+Bob 
+Alice 
+n? ? Bob runs Alice's software image in an AVM 
+n? ? AVM maintains a log of network in-/outputs 
+n? ? Alice can check this log with a reference image 
+n? ? Alice can detect a large class of cheats - without having to 
+know how the cheat works! Bob cannot prevent detection! 
+n? ? Conversely, if Bob has not cheated, he can demonstrate this 
+17 
+A. Haeberlen University of Pennsylvania Tamper-evident logging 
+AVM 
+474: SEND(Alice, Firing) 
+473: SEND(Charlie, Got ammo) 
+ 
+472: RECV(Alice, Got medipack) 
+AVMM 
+ 
+471: SEND(Charlie, Moving left) 
+ 
+    Firing 
+Moving right 
+... 
+n? ? Message log is tamper-evident [SOSP'07] 
+n? ? Log is structured as a hash chain 
+n? ? Messages contain signed authenticators 
+n? ? Result: Alice can either... 
+n? ? ... detect that the log has been tampered with, or 
+n? ? ... get a complete log with all the observable messages 
+18 
+A. Haeberlen OSDI (October 4, 2010) Execution logging 
+AVM 
+474: SEND(Alice, Firing) 
+474: SEND(Alice, Firing) 
+ 
+473: Mouse button clicked 
+473: SEND(Charlie, Got ammo) 
+472: SEND(Charlie, Got ammo) 
+ 
+471: RECV(Alice, Got medipack) 
+472: RECV(Alice, Got medipack) 
+AVMM 
+ 
+470: Got network interrupt 
+471: SEND(Charlie, Moving left) 
+ 
+469: SEND(Charlie, Moving left) 
+... 
+n? ? How does Alice know whether the log matches 
+a correct execution of her software image? 
+n? ? Idea: AVMM can specify an execution 
+n? ? AVMM additionally logs all nondeterministic inputs 
+n? ? AVM correct: Can replay inputs to get execution 
+n? ? AVM faulty: Replay inevitably (!) fails 
+19 
+A. Haeberlen OSDI (October 4, 2010) Auditing and replay 
+373: SEND(Alice, Firing) 
+372: SEND(Alice, Firing) 
+371: SEND(Alice, Firing) 371: SEND(Alice, Firing) 
+370: SEND(Alice, Firing) 370: SEND(Alice, Firing) 
+369: SEND(Alice, Firing) 
+369: SEND(Alice, Firing) 
+368: Mouse button clicked 368: Mouse button clicked 
+367: SEND(Alice, Got medipack) 367: SEND(Alice, Got medipack) 
+366: Mouse moved left 
+366: Mouse moved left 
+... 
+Modification 
+Evidence 
+AVMM 
+AVMM 
+Network 
+Bob 
+Alice 
+20 
+A. Haeberlen OSDI (October 4, 2010) 
+AVM 
+AVM But what about my frame rate? 
+Different machines 
+200 
+with different players 
+-11% 
+?158fps 
+150 
+-13% 
+100 
+No fps cap 
+Window mode 
+50 
+800x600 
+Softw. rendering 
+0 
+Bare VMware AVMM 
+VMware AVMM 
+hardware (logging)  
+(no logging) (no crypto) 
+n? ? Frame rate is ~13% lower than on bare hw 
+n? ? 137fps is still a lot! 60--80fps generally recommended 
+n? ? 11% due to logging; additional cost for accountability is small 
+21 
+A. Haeberlen OSDI (October 4, 2010) 
+Average frame rate Summary: Accountability & evidence 
+n? ? Nodes in a distributed system can misbehave 
+n? ? Compromised by attacker, manipulated by operator, ... 
+n? ? Approach: Accountability 
+n? ? Reliably detect when misbehavior occurs 
+n? ? Diagnose the misbehavior (identify which nodes are affected) 
+n? ? Provide irrefutable evidence of the misbehavior 
+n? ? Owner of affected node(s) may deny everything, or may not even be 
+aware that the misbehavior is occurring! 
+n? ? Challenge: Detection and evidence 
+n? ? How to prove that something did (not) happen in a dist.sys.? 
+n? ? ... especially if nodes are telling lies or are actively covering their traces? 
+n? ? Ongoing research - e.g., PeerReview, AVM, ... 
+n? ? Provable detection guarantees, cryptographic evidence 
+22 
+A. Haeberlen University of Pennsylvania Outline 
+Differential privacy 
+Accountability & evidence 
+Resilient cloud 
+Network forensics 
+23 
+A. Haeberlen University of Pennsylvania Opportunity: 'Big Data' 
+Data analysts Data owner 
+Data 
+n? ? Data is accumulating in systems every day 
+n? ? What could we do with all this data? 
+n? ? Medical research, traffic planning, better movie recom-
+mendations, fewer ads, less congested networks, ... 
+n? ? But what about privacy? 
+n? ? Very hard to protect (Netflix!) ? Reluctance to share data 
+n? ? We can either guarantee privacy or work with the data 
+24 
+A. Haeberlen DIMACS workshop (October 26, 2012) Challenge: Privacy 
+A 
+B C 
+n? ? Sharing is difficult due to privacy concerns 
+n? ? "Data is like plutonium - you can't touch it" 
+n? ? Goal: Share a limited amount of information, but 
+still protect customer privacy 
+n? ? Just enough to be useful; not enough to reveal secrets 
+n? ? Model: Adversary learns all shared information 
+n? ? Pessimistic (but fairly safe) assumption 
+n? ? Running example: Database contains network traces; adversary 
+wants to know whether Andreas has cancer or not 
+25 
+A. Haeberlen University of Pennsylvania Anonymization is not enough 
+5-digit 
+County 
+ZIP code 
+0% 
+Year of birth 
+0.2% 
+Year and month of birth 4.2% 
+0.2% 
+Year, month, and day of birth 
+63.3% 14.8% 
+Table 1 from: P. Golle, "Revisiting the Uniqueness of Simple Demographics in the U.S. Population", WPES 2006 
+Results based on the 2000 census 
+n? ? Idea: Let's share anonymized data 
+n? ? Example: "Tell me all the requests sent from your domain to 
+cancer.com today" 
+n? ? Known to be insufficient to protect privacy 
+n? ? Example: Netflix deanonymization [Narayanan/Shmatikov] 
+n? ? Example: AOL search dataset  
+26 
+A. Haeberlen University of Pennsylvania Privacy is hard! 
+27 
+A. Haeberlen DIMACS workshop (October 26, 2012) Example: Netflix prize dataset 
+n? ? In 2006, Netflix released anonymized movie 
+ratings from ~500,000 customers 
+n? ? Goal: Hold a competition for better movie recommendation 
+algorithms 
+n? ? This data was 'de-anonymized' by two 
+researchers from UT Austin 
+n? ? ... by correlating the private/anonymized Netflix ratings with 
+the public ratings from the Internet Movie Database 
+n? ? Result: Privacy breach 
+n? ? User may have rated a lot more movies on Netflix than on 
+IMDb, e.g., ones that reflect on his sexual preferences or 
+religious/political views! 
+28 
+A. Haeberlen University of Pennsylvania Aggregation is not enough 
+n? ? Idea: Let's share only aggregate information 
+n? ? Example: "How many different IPs made requests to 
+cancer.com from this network today?" 
+ 
+n? ? Problem: Outside information 
+n? ? Adversary might already know that 317 persons in the 
+network have cancer, but may not be sure about Andreas 
+n? ? If the answer is 318, he knows that  
+Andreas has cancer 
+ 
+n? ? Idea: Add some noise to the answer 
+n? ? "317 people have cancer, plus or minus 2" 
+n? ? What can the (Bayesian) adversary conclude from this? 
+29 
+A. Haeberlen University of Pennsylvania Differential privacy 
+"How many requests to cancer.com today?" 
+Should I allow 
+my data to be 
+Laplace noise 
+included? 
+Difference 
+X 
+n? ? Idea: Quantify how much more the adversary 
+can learn if some individual X allows his data 
+to be included in the database 
+30 
+A. Haeberlen University of Pennsylvania Privacy budgets 
+n? ? What if the adversary can ask more than one 
+question? 
+n? ? Repeat the same question: Obtain multiple samples from the 
+distribution, increase confidence 
+n? ? Different questions: Can correlate answers 
+n? ? Idea: Assign a 'privacy budget' to each querier 
+n? ? Represents how much privacy the owner of the box is willing 
+to give up (e.g., ?=0.1) 
+n? ? Cost of each query is deducted from the budget 
+n? ? Querier can continue asking until budget is exhausted 
+n? ? Number of questions depends on how private each of them is 
+31 
+A. Haeberlen University of Pennsylvania What is so special about diff. privacy? 
+n? ? We do NOT have to assume anything about: 
+n? ? adversary's outside knowledge 
+n? ? adversary's goals 
+n? ? adversary's inability to learn answers to queries 
+n? ? Nevertheless we can ensure that: 
+n? ? Even if the adversary can ask anything he wants, he can be 
+at most a little more confident that Andreas has cancer than 
+he was before 
+n? ? Extremely strong guarantee! 
+n? ? Important for convincing customers that it is 'okay' to share 
+their data in this way 
+32 
+A. Haeberlen University of Pennsylvania Recap: What we have so far 
+A 
+C 
+B 
+n? ? Goal: Share (some) data while provably 
+protecting privacy 
+n? ? Approach: Differential privacy 
+33 
+A. Haeberlen University of Pennsylvania The importance of automation 
+n? ? What if someone asks the following query: 
+n? ? "If Andreas is in the database and has cancer, return 
+1,000,000; otherwise 0" 
+n? ? How do we know... 
+n? ? whether it is okay to answer this (given our bound ?)? 
+n? ? and, if so, how much noise we need to add? 
+n? ? Analysis can be done manually... 
+n? ? Example: McSherry/Mironov [KDD'09] on Netflix data 
+n? ? ... but this does not scale! 
+n? ? Each database owner would have to hire a 'privacy expert' 
+n? ? Analysis is nontrivial - what if the expert makes a mistake? 
+34 
+A. Haeberlen University of Pennsylvania Sensitivity, and why it matters 
+1) How many people looked at cancer.com today? 
+2) How many requests went to cancer.com today? 
+3) If Andreas is in the database, return 1,000,000; else 0 
+n? ? What is the difference between these queries? 
+n? ? Answer: Their sensitivity 
+n? ? If we add or remove one person's data from the database, 
+how much can the answer change (at most)? 
+n? ? Why does the sensitivity matter for diff.priv.? 
+n? ? The higher the sensitivity, the more noise we need to add 
+n? ? If too high (depending on ?), we can't answer at all 
+35 
+A. Haeberlen University of Pennsylvania Intuition behind the type system 
+f(x) = 7 
+f(x) = x 
+Sensitivity 0 
+Sensitivity 1 
+f(x) = 2*x 
+Sensitivity 2*1 
+f(x) = 2*x + 7 
+Sensitivity 2*1 + 0 
+n? ? Suppose we have a function f(x)=2x+7 
+n? ? What is its sensitivity? 
+n? ? Intuitively 2: changing the input by 1 changes the output by 2 
+36 
+A. Haeberlen University of Pennsylvania A type system for inferring sensitivity 
+If we know that the value of x  
+is used k times in e... 
+?, x : ? ? e : ?' 
+k
+y(x) = 3*x + 4 
+k 
+? ? ?x.e : ? ? ?' 
+...then the function ?x.e is k-sensitive in x  
+n? ? We can use a type system to infer sensitivity 
+ 
+37 
+A. Haeberlen University of Pennsylvania This works for an entire language! 
+n? ? The full set of typing rules can be built into a 
+simple functional programming language 
+n? ? If program typechecks, we have a proof that running it 
+won't compromise privacy 
+38 
+A. Haeberlen University of Pennsylvania Putting everything together 
+query(db:database) { 
+  num = 0; 
+  foreach x?db 
+     if (x is DNS lookup 
+Database of 
+Machine with 
+       for 'bot*.com') 
+traffic statistics 
+language runtime 
+     then num ++; 
+  return num; 
+} 
+17,182 
+Querier 
+17,145 +Noise 
+~100 
+n? ? Queries are written in a special programming language 
+n? ? Runtime ensures that results are noised appropriately 
+n? ? Result is still useful, despite the noise 
+39 
+A. Haeberlen University of Pennsylvania Fuzz protects private information 
+query(db:database) { 
+  foreach x?db 
+     if (x is DNS lookup for 
+       'cancer.com' by Andreas) 
+     then return 1; 
+  return 0; 
+} 
+-47 
+1 
+Adversary 
++Noise 
+~100 
+n? ? What if an adversary asks for private information? 
+n? ? Perhaps a network has been compromised by a hacker 
+n? ? The answer reveals almost nothing! 
+n? ? Information 'drowns' in the noise 
+40 
+A. Haeberlen University of Pennsylvania Review questions 
+41 
+A. Haeberlen University of Pennsylvania You should be able to... 
+n? ? Identify security problems in web systems and 
+apply suitable countermeasures 
+n? ? Example: Devise attacks on a poorly secured servlet 
+n? ? Write XQueries (FLWOR etc) 
+n? ? Compare various consistency models 
+n? ? Example: Eventual/sequential/snapshot consistency 
+n? ? Understand fundamentals of Inform. Retrieval 
+n? ? Example: Compare Boolean model and Vector model 
+n? ? Understand techniques for achieving robust-
+ness to various types of faults, and their costs 
+n? ? Example: How would you build a storage system that handles 
+a) crash faults, b) rational behavior, c) Byzantine faults? 
+42 
+A. Haeberlen University of Pennsylvania Review questions 
+n? ? Compare the architecture of Google and Mercator 
+n? ? What is a Sybil attack, and how can you defend a 
+system against it? 
+n? ? How would you implement a DHT in Pastry? 
+n? ? Be able to provide pseudocode and discuss failure cases 
+n? ? Explain similarities and differences between the 
+semantics of RPCs and local function calls 
+n? ? Can you pass values by reference in a RPC?  
+n? ? How can you achieve exactly-once semantics? 
+n? ? Compare SOAP and REST 
+n? ? Explain PageRank: Intuition? How to compute? 
+43 
+A. Haeberlen University of Pennsylvania Review questions 
+n? ? Compare XQuery and XSLT 
+n? ? Web-specific challenges for Information Retrieval? 
+n? ? Compare Boolean model and Vector model 
+n? ? Compare HITS and PageRank 
+n? ? Implement PageRank in MapReduce 
+n? ? Possible defenses against various SEOs 
+n? ? Explain utility computing model; compare to classical 
+n? ? Compare different consistency models 
+n? ? Be able to do a simple ARIES example 
+n? ? Which faults can you (not) recover from in 2PC? 
+n? ? Example of a fault that is rational but not Byzantine? 
+44 
+A. Haeberlen University of Pennsylvania Review questions 
+n? ? Design or debug a simple incentive scheme 
+n? ? How would you exploit BitTorrent for your own profit? 
+n? ? Explain why we need fault models 
+n? ? How would you implement search suggestions? 
+n? ? How would you implement phrase search? 
+n? ? How can you 'optimize' the PageRank of your site? 
+n? ? Explain what the utility computing model is 
+n? ? 2PC: Explain how to recover from a given fault 
+n? ? 2PL: Explain why it works; how it could go wrong 
+n? ? For each component of ACID... 
+n? ? name one technique that can be used to implement it 
+n? ? provide an example where it goes wrong 
+45 
+A. Haeberlen University of Pennsylvania Review questions 
+n? ? Explain TF-IDF ranking 
+n? ? Explain the idea behind stemming 
+n? ? Write an XQuery (with FLWOR) 
+n? ? Example: Use of a correspondence table 
+n? ? Discuss importance of replication for a new service 
+46 
+A. Haeberlen University of Pennsylvania I hope you liked CIS455/555! 
+ 
+Please don't forget to complete your  
+course evaluations 
+47 
+A. Haeberlen University of Pennsylvania 

@@ -1,0 +1,436 @@
+CIS 455/555: Internet and Web Systems 
+Decentralized systems 
+ 
+February 11, 2013 
+1 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Announcements 
+n? ? HW1 MS2 is due February 20 
+n? ? Try to finish a few days early (testing/debugging...) 
+n? ? Basic Testing Guide is available on the homepage  
+n? ? NOT an exhaustive list of all the features you need to implement! 
+n? ? Some MS1 features will be tested again  
+n? ? Please use the feedback from your MS1 grade report to improve your 
+server (grade reports should be available later this week) 
+n? ? Reading for next time: 
+n? ? Stoica et al., "Chord: A Scalable Peer-to-Peer Lookup Service 
+for Internet Applications", SIGCOMM 2001 
+n? ? http://pdos.csail.mit.edu/papers/chord:sigcomm01/chord_sigcomm.pdf 
+2 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Coming up: HW1 MS2 
+n? ? Please make sure that your web server has all 
+the basic functionality 
+n? ? GET and HEAD; directory listing; If-(un)modified-since 
+n? ? Proper access restrictions (/dir/../../ etc) 
+n? ? Survives stress test (apachebench) 
+ 
+n? ? We will re-test some of these features in MS2 
+n? ? And yes, there will be points 
+n? ? Reason: You will need your web server again 
+later! 
+3 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Some advice on MS2 
+n? ? START NOW! 
+n? ? Some time will be needed for testing and debugging 
+n? ? Some features may be trickier than you think 
+n? ? FIX MS1 PROBLEMS FIRST 
+n? ? MS2 will build on MS1 
+n? ? It's just like building a house: The foundation has to be solid! 
+n? ? TEST EXTENSIVELY 
+n? ? Not just with Firefox; also use apachebench and curl 
+n? ? We'll try to make some testing guidelines available on the 
+course webpage 
+4 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Plan for the next two lectures 
+NEXT 
+n? ? A few words on Java servlets 
+n? ? Decentralization 
+n? ? Partly centralized systems 
+n? ? Example: BitTorrent 
+n? ? Consistent hashing 
+n? ? Distributed hashtables 
+n? ? Fully decentralized systems 
+n? ? KBR; Chord 
+n? ? Pastry 
+n? ? Attacks on KBR 
+5 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Recap: What is a servlet? 
+* 
+Unload 
+Servlet 3 
+* 
+* 
+Servlet 17 
+Load 
+Client 
+Storage 
+Servlet container 
+(browser) 
+n? ? Servlet: A Java class that can respond to HTTP requests 
+n? ? Implements a specific method that is given the request from 
+the client, and that is expected to produce a response 
+n? ? Servlets run in a special web server, the servlet container 
+n? ? Only one instance per servlet; each request is its own thread 
+n? ? Servlet container loads/unloads servlets, routes requests to 
+servlets, handles interaction with client (HTTP protocol), ... 
+6 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania 
+HTTP frontend A simple example 
+47+11=58 
+11 
+47 
+n? ? Running example: A calculator web-app 
+n? ? User enters two integers into a HTML form and submits 
+n? ? Result: GET request to calculate?num1=47&num2=11 
+n? ? Web app adds them and displays the sum 
+http://ds08.seas.upenn.edu:8080/calculator/ 
+7 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania The Calculator servlet 
+package edu.upenn.cis.cis455; 
+ 
+Numbers from the GET 
+import java.io.*; 
+import javax.servlet.*; request become parameters 
+import javax.servlet.http.*; 
+ 
+public class CalculatorServlet extends HttpServlet { 
+ 
+ 
+  public void doGet(HttpServletRequest request, HttpServletResponse response)  
+       throws java.io.IOException {   
+ 
+ 
+    int v1 = Integer.valueOf(request.getParameter("num1")).intValue(); 
+ 
+ 
+    int v2 = Integer.valueOf(request.getParameter("num2")).intValue(); 
+     response.setContentType("text/html"); 
+ 
+     PrintWriter out = response.getWriter(); 
+ 
+    out.println("<html><head><title>Hello</title></head>"); 
+  
+     out.println("<body>"+v1+"+"+v2+"="+(v1+v2)+"</body></html>"); 
+ 
+ 
+  } 
+} 
+n? ? Two easy steps to make a servlet: 
+n? ? Create a subclass of HttpServlet 
+n? ? Overload the doGet() method 
+n? ? Read input from HttpServletRequest , write output to HttpServletResponse 
+n? ? Do not use instance variables to store session state! (why?) 
+8 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania How does this work in MS2? 
+9 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania javax.http.HttpServlet 
+n? ? Abstract parent class for servlets 
+n? ? Methods for handling the HTTP requests: 
+n? ? doDelete() Handles DELETE 
+n? ? doHead() Handles HEAD 
+n? ? doGet() Handles GET 
+n? ? doPost() Handles POST 
+n? ? doPut() Handles PUT 
+n? ? Other methods: 
+n? ? init()  Called when servlet is initialized 
+n? ? destroy() Called when servlet is unloaded 
+n? ? getServletConfig() Init parameters (set in web.xml) 
+n? ? log() Writes a message to a servlet log file 
+n? ? service() Dispatches HTTP requests to doXYZ() 
+10 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania The life cycle of a servlet 
+n? ? Servlet container creates servlet instance 
+n? ? init() method is called once 
+n? ? Can overload to do some initialization 
+n? ? Not called again for further requests 
+n? ? For each request: 
+n? ? Servlet container picks a new thread and calls service() 
+n? ? service() checks which HTTP method the client has used 
+(GET, PUT, POST, ...) and calls appropriate doXYZ method 
+n? ? Servlets normally do not override service() 
+n? ? Container may decide to unload servlet later 
+n? ? In this case, destroy() is called - can do some cleanup 
+n? ? Servlet should not rely on this call, e.g., to write out state!  
+11 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania HttpServletRequest 
+n? ? Passed in as an argument to each doXYZ() 
+n? ? Any data the client uploaded, e.g., as part of a PUT or POST 
+n? ? getContentLength(), getInputStream(), getReader() 
+n? ? If the request came from a HTML form, values in the form: 
+n? ? getParameter() 
+n? ? Information about the client making the request: 
+n? ? getRemoteAddr(), getRemoteHost() 
+n? ? getAuthType(), getRemoteUser() [if HTTP authentication was used] 
+n? ? Whether a secure connection is being used: 
+n? ? isSecure() 
+n? ? Any headers submitted by the client (e.g., HTTP referer) 
+n? ? getHeader("headerName") 
+n? ? Cookies previously set: 
+n? ? getCookies() 
+12 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania HttpServletResponse 
+n? ? Given as argument to doXYZ() 
+n? ? Receives the response from the servlet 
+n? ? Contains output stream for writing the response 
+n? ? getWriter(), getOutputStream() 
+* 
+n? ? Can set the status of the response 
+n? ? setStatus(SC_OK), sendError(500, "Bad file descriptor") 
+n? ? Can be used to set the type of the content returned 
+n? ? setContentType("image/jpeg") 
+n? ? Can be used to redirect client to another page 
+n? ? sendRedirect("http://www.otherserver.com/foo.html") 
+n? ? Can add headers and cookies 
+n? ? addHeader("X-MyHeader", "myValue") 
+n? ? addCookie(new Cookie("myName", "myValue")) 
+n? ? Contains a buffer that can be "committed" in various ways 
+13 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Producing output 
+n? ? Appropriate method depends on whether 
+servlet returns text or binary data 
+n? ? Examples: HTML page (text) vs JPEG image (binary) 
+n? ? Why might you want to dynamically generate an image? 
+ 
+n? ? To produce text: 
+n? ? Call HttpServletResponse.getWriter() 
+n? ? Returns a standard Java PrintWriter  
+n? ? Uses a character encoding 
+* 
+n? ? To produce binary data: 
+n? ? Call HttpServletResponse.getOutputStream() 
+n? ? Returns a ServletOutputStream 
+n? ? Does not encode the data 
+14 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania HttpSession 
+HttpSession session = request.getSession(true); 
+ShoppingCart sc = (ShoppingCart) session.getAttribute("cart"); 
+if (sc == null) { 
+  cart = new ShoppingCart(); 
+  session.setAttribute("cart", cart); 
+} 
+/* perform operation on shopping cart */ 
+n? ? Abstracts away details of session management 
+n? ? Web app developer only sees a key-value store 
+n? ? Behind the scenes, many servers use cookies to implement it 
+but fall back to other methods (such as URL rewriting) when 
+cookies are disabled 
+n? ? State is stored and retrieved via getAttribute()/setAttribute() 
+n? ? Session information automatically expires after some time 
+(configurable via setMaxInactiveInterval) 
+15 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania HttpSession methods 
+n? ? Some other methods: 
+n? ? getId()  
+n? ? Returns unique ID assigned to session 
+n? ? isNew()  
+n? ? true if client does not yet know about session 
+n? ? getCreationTime()  
+n? ? Returns time session was created 
+n? ? getLastAccessedTime()  
+n? ? Returns time of last request associated with session 
+n? ? setMaxInactiveInterval(secs)  
+n? ? Session information is automatically collected if no requests are 
+received for the specified amount of time 
+n? ? invalidate() 
+n? ? Destroys the session and unbinds any objects associated with it 
+16 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Recap: Servlet API 
+n? ? HttpServlet 
+n? ? init(), destroy(); doXYZ() methods 
+n? ? One instance per servlet, one thread per request 
+n? ? Do NOT use instance variables to store session state 
+ 
+n? ? HttpServletRequest 
+n? ? getInputStream()/getReader() to read input 
+n? ? getParameter() to read parameters (form input etc) 
+ 
+n? ? HttpServletResponse 
+n? ? getOutputStream()/getWriter() to produce output 
+n? ? setContentType() to specify type of data returned 
+ 
+17 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Packaging web applications 
+n? ? Web applications may be heterogeneous: 
+n? ? A couple of servlets (e.g., shopping cart, product browser...) 
+n? ? Some static content (greeting page, terms and conditions...) 
+n? ? Data files 
+n? ? ... 
+n? ? Web applications may have dependencies 
+n? ? E.g., needs a mail server, or some other web app must be 
+installed as well 
+n? ? How to manage all this? 
+18 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Directory with servlet classes 
+index.html 
+WAR files 
+WEB-INF/ 
+[ahae@carbon servlets]$ jar tvf myservlet.war  
+   web.xml 
+     0 Mon Nov 01 18:54:16 EDT 2010 META-INF/ 
+   106 Mon Nov 01 18:54:14 EDT 2010 META-INF/MANIFEST.MF 
+   classes/ 
+     0 Mon Nov 01 18:53:02 EDT 2010 WEB-INF/ 
+   lib/ 
+     0 Mon Nov 01 18:27:14 EDT 2010 WEB-INF/classes/ 
+     0 Mon Nov 01 18:27:14 EDT 2010 WEB-INF/classes/edu/ 
+     0 Mon Nov 01 18:27:14 EDT 2010 WEB-INF/classes/edu/upenn/ 
+     0 Mon Nov 01 18:27:14 EDT 2010 WEB-INF/classes/edu/upenn/cis/ 
+     0 Mon Nov 01 18:27:14 EDT 2010 WEB-INF/classes/edu/upenn/cis/mkse212/ 
+  1580 Mon Nov 01 18:54:16 EDT 2010 WEB-INF/classes/edu/upenn/cis/mkse212/CalculatorServlet.class 
+   731 Mon Nov 01 18:53:48 EDT 2010 WEB-INF/web.xml 
+Deployment descriptor 
+   263 Mon Nov 01 18:50:58 EDT 2010 index.html 
+Static content 
+[ahae@carbon servlets]$ 
+n? ? Solution: Web application archive (WAR) 
+n? ? Basically a JAR file with a specific structure 
+n? ? Contains a directory called 'WEB-INF' with the classes 
+n? ? WEB-INF/lib may contain JAR files (libraries) to put into the class path 
+n? ? WEB-INF also contains the deployment descriptor (a file 
+called 'web.xml') that describes the structure of the app 
+n? ? May contain additional files, e.g., static web content 
+19 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania The deployment descriptor 
+Description of the web app  
+(will be shown in container console) 
+<?xml version="1.0" encoding="UTF-8"?> 
+<!DOCTYPE web-app 
+  PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.2//EN" 
+  "http://java.sun.com/j2ee/dtds/web-app_2_2.dtd"> 
+<web-app> 
+  <display-name>Test servlet for CIS455</display-name> 
+  <servlet> 
+    <servlet-name>CalculatorServlet</servlet-name> 
+    <servlet-class>edu.upenn.cis.cis455.CalculatorServlet</servlet-class> 
+  </servlet> 
+  <servlet-mapping> 
+    <servlet-name>CalculatorServlet</servlet-name> 
+    <url-pattern>calculate/*</url-pattern> Servlet class 
+  </servlet-mapping> 
+URL pattern 
+  <servlet-mapping> 
+    <servlet-name>default</servlet-name> 
+    <url-pattern>*.html</url-pattern> 
+Use of default 
+  </servlet-mapping> 
+servlet 
+</web-app> 
+n? ? Tells container which servlets handle which URLs 
+n? ? Can specify an URL pattern 
+n? ? 'default' servlet can be used to serve static content 
+* 
+20 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Initialization parameters 
+<?xml version="1.0" encoding="UTF-8"?> 
+<!DOCTYPE web-app 
+  PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.2//EN" 
+  "http://java.sun.com/j2ee/dtds/web-app_2_2.dtd"> 
+<web-app> 
+  <display-name>Test servlet for CIS455</display-name> 
+  <servlet> 
+    <servlet-name>CalculatorServlet</servlet-name> 
+    <servlet-class>edu.upenn.cis.cis455.CalculatorServlet</servlet-class> 
+    <init-param> 
+      <param-name>maxValue</param-name><param-value>37</param-value> 
+    </init-param> 
+  </servlet> 
+  <servlet-mapping> 
+    <servlet-name>CalculatorServlet</servlet-name> 
+    <url-pattern>calculate/*</url-pattern> 
+  </servlet-mapping> 
+</web-app> 
+n? ? What if the servlet needs parameters? 
+n? ? Put parameters into the deployment descriptor 
+n? ? init() calls getServletConfig() to obtain ServletConfig object 
+n? ? Then invokes getInitParameter() to read the parameters 
+21 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Building WAR files with ant 
+<project name="myservlet" default="war" basedir="./"> 
+  <target name="init"> 
+    <mkdir dir="WEB-INF/classes"/> 
+  </target> 
+  <target name="compile" depends="init"> 
+    <javac srcdir="src" destdir="WEB-INF/classes" includes="*.java"  
+     debug="true" includeantruntime="false" classpath="servlet-api.jar"/> 
+  </target> 
+  <target name="war" depends="compile"> 
+    <jar destfile="myservlet.war"> 
+Makes the  
+      <fileset dir="." includes="WEB-INF/classes/**/*.class"/> 
+structure required 
+      <fileset dir="." includes="WEB-INF/*.xml"/> 
+      <fileset dir="." includes="*.html"/> 
+for WAR files 
+    </jar> 
+  </target> 
+  <target name="clean"> 
+    <delete dir="WEB-INF/classes"/> 
+    <delete file="myservlet.jar"/> 
+  </target> 
+</project> 
+n? ? Example script: See above 
+n? ? Alternative: Use Eclipse's Web Tools Platform 
+22 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Apache Tomcat 
+n? ? An implementation of a servlet container 
+n? ? Started as the reference implementation of Java Servlet and 
+Java Server Pages at Sun 
+n? ? Donated by Sun to Apache Foundation in 1999 
+n? ? Originally part of the Jakarta 'umbrella' project, which 
+contains Apache's open-source Java solutions 
+n? ? Became its own top-level Apache project in 2005 
+n? ? Can also serve static content 
+n? ? Suitable as a stand-alone test container for web apps 
+n? ? Latest version is Tomcat 7.0  
+n? ? Supports Java Servlets API 3.0, Java Server Pages 2.2 
+n? ? Needs Java 1.6 
+23 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Installing Tomcat 
+n? ? Windows installer available 
+n? ? http://tomcat.apache.org/download-70.cgi 
+n? ? Runs as a service 
+n? ? Taskbar interface for starting and stopping the service 
+24 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Tomcat web interface 
+List of 
+Button for 
+installed servlets 
+removing 
+a servlet 
+Uploads and deploys 
+a new WAR file  
+n? ? Web interface for configuration 
+n? ? Open http://localhost:8080/manager/html with your browse 
+25 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania The road ahead 
+n? ? Remember our goal: 
+n? ? Understand large web systems 
+like Google, Facebook, ... 
+n? ? So far, we have seen: 
+n? ? "Frontend" technology 
+n? ? Data representation, indexing 
+n? ? Focus was on a single machine 
+n? ? Coming up next: 
+n? ? How to build large services  
+with lots of machines 
+n? ? Main challenges: Scalability, 
+robustness 
+26 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania 
+Salil S. (F0t0Synth), http://www.flickr.com/photos/ss2001/4531189792/ Plan for the next two lectures 
+n? ? A few words on Java servlets 
+NEXT 
+n? ? Decentralization 
+n? ? Partly centralized systems 
+n? ? Example: BitTorrent 
+n? ? Consistent hashing 
+n? ? Distributed hashtables 
+n? ? Fully decentralized systems 
+n? ? KBR; Chord 
+n? ? Pastry 
+n? ? Attacks on KBR 
+27 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania How do we distribute a B+ tree? 
+n? ? We need to host the root  
+at one machine and  
+distribute the rest 
+n? ? Implications for sca

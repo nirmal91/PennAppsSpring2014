@@ -1,0 +1,229 @@
+CIS 455/555: Internet and Web Systems 
+Crawling and Publish/Subscribe 
+ 
+February 18, 2013 
+1 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Announcements 
+n? ? HW1 MS2 is due on Wednesday 
+n? ? Please test your solution carefully 
+n? ? Testing guide is available on the assignments page 
+n? ? Reading for next time: 
+n? ? Ghemawat et al.: "The Google File System" 
+2 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Reminder: Academic integrity 
+n? ? You may not use any code from the web 
+n? ? All of the code you submit must have been 
+written by you personally 
+n? ? Only exception: Code we have given you (e.g., TestHarness, 
+code on the slides, ...) 
+n? ? You may not collaborate with others on any 
+of the homework assignments 
+n? ? Only exception: Final project (done in teams of four) 
+n? ? Review Penn's Code of Academic Integrity: 
+n? ? http://www.upenn.edu/academicintegrity/ai_codeofacademicintegrity.html 
+n? ? Violations will be referred to OSC 
+n? ? http://www.upenn.edu/academicintegrity/ai_violations.html 
+3 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania ???? 
+Piazza questions per day 
+HW1MS1 
+HW1MS2 
+HW0 due 
+due 
+due 
+Please start early! 
+4 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Plan for today 
+NEXT 
+n? ? Basic crawling 
+n? ? Mercator 
+n? ? Publish/subscribe 
+n? ? XFilter 
+5 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Motivation 
+n? ? Suppose you want to build a search engine 
+n? ? Need a large corpus of web pages 
+n? ? How can we find these pages? 
+n? ? Idea: crawl the web 
+n? ? What else can you crawl? 
+n? ? For example, social network 
+6 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Crawling: The basic process 
+n? ? What state do we need? 
+n? ? Q := Queue of URLs to visit 
+n? ? P := Set of pages already crawled 
+n? ? Basic process: 
+1.? Initialize Q with a set of seed URLs 
+2.? Pick the first URL from Q and download the corresponding page 
+3.? Extract all URLs from the page (<base href> tag, anchor links, CSS, DTDs, 
+scripts, optionally image links) 
+4.? Append to Q any URLs that a) meet our criteria, and b) are not already in P 
+5.? If Q is not empty, repeat from step 2 
+n? ? Can one machine crawl the entire web? 
+n? ? Of course not! Need to distribute crawling across many machines. 
+7 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Crawling visualized 
+"Frontier" 
+Pages currently 
+being crawled 
+URLs that will 
+eventually be 
+crawled 
+Seeds 
+Unseen web 
+URLs already 
+crawled 
+URLs that do not 
+fit our criteria 
+(too deep, etc) 
+The Web 
+8 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Crawling complications 
+n? ? What order to traverse in? 
+n? ? Polite to do BFS - why? 
+n? ? Malicious pages 
+n? ? Spam pages / SEO 
+Need to be 
+n? ? Spider traps (incl. dynamically generated ones) robust! 
+n? ? General messiness 
+n? ? Cycles, site mirrors, duplicate pages, aliases 
+n? ? Varying latency and bandwidth to remote servers 
+n? ? Broken HTML, broken servers, ... 
+n? ? Web masters' stipulations 
+n? ? How deep to crawl? How often to crawl? 
+n? ? Continuous crawling; freshness 
+9 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania SEO: "White-hat" version 
+n? ? There are several ways you can make your 
+web page easier to crawl and index: 
+n? ? Choose a good title 
+n? ? Use <meta> tags, e.g., description 
+n? ? Use meaningful URLs with actual words 
+n? ? BAD: http://xyz.com/BQF/17823/bbq 
+n? ? GOOD: http://xyz.com/cars/ferrari/458-spider.html 
+n? ? Provide an XML Sitemap 
+n? ? Use mostly text for navigation (not flash, JavaScript, ...) 
+n? ? Descriptive file names, anchor texts, ALT tags 
+n? ? More information from search engines, e.g.: 
+n? ? http://www.google.com/webmasters/docs/search-engine-
+optimization-starter-guide.pdf 
+n? ? www.microsoft.com/web/seo 
+10 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania SEO: "Black-hat" version 
+n? ? Tries to trick the search engine into ranking 
+pages higher than it normally would: 
+n? ? Shadow domains 
+n? ? Doorway pages 
+n? ? Keyword stuffing 
+n? ? Hidden or invisible text 
+n? ? Link farms 
+n? ? Page hijacking 
+n? ? Blog/comment/wiki spam 
+n? ? Cloaking 
+n? ? ... 
+11 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Normalization; eliminating duplicates 
+n? ? Some of the extracted URLs are relative URLs 
+n? ? Example: /~ahae/papers/ from www.cis.upenn.edu 
+n? ? Normalize it: http://www.cis.upenn.edu/~ahae/papers 
+n? ? Duplication is widespread on the web 
+n? ? If the fetched page is already in the index, do not process it 
+n? ? Can verify using document fingerprint (hash) or shingles 
+12 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Crawler etiquette 
+n? ? Explicit politeness 
+n? ? Look for meta tags; for example, ignore pages that have 
+<META NAME="ROBOTS” CONTENT="NOINDEX"> 
+n? ? Implement the robot exclusion protocol; for example, look 
+for, and respect, robots.txt 
+n? ? Implicit politeness  
+n? ? Even if no explicit specifications are present, do not hit the 
+same web site too often 
+13 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Robots.txt 
+n? ? What should be in robots.txt? 
+n? ? See http://www.robotstxt.org/wc/robots.html 
+n? ? To exclude all robots from a server: 
+     User-agent: * 
+      Disallow: / 
+n? ? To exclude one robot from two directories: 
+     User-agent: BobsCrawler 
+User-agent: *  
+     Disallow: /news/ 
+Disallow: /_mm/  
+      Disallow: /tmp/ 
+Disallow: /_notes/  
+Disallow: /_baks/  
+Disallow: /MMWIP/ 
+  
+User-agent: googlebot  
+Disallow: *.csi  
+ 
+User-agent: *  
+Crawl-delay: 5 
+http://www.cis.upenn.edu/robots.txt 
+14 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Recap: Crawling 
+n? ? How does the basic process work? 
+n? ? What are some of the main challenges? 
+n? ? Duplicate elimination 
+n? ? Politeness 
+n? ? Malicious pages / spider traps 
+n? ? Normalization 
+n? ? Scalability 
+15 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Plan for today 
+n? ? Basic crawling 
+NEXT 
+n? ? Mercator 
+n? ? Publish/subscribe 
+n? ? XFilter 
+16 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Mercator: A scalable web crawler 
+n? ? Written entirely in Java 
+n? ? Expands a “URL frontier” 
+n? ? Avoids re-crawling same URLs 
+n? ? Also considers whether a document has been 
+seen before 
+n? ? Same content, different URL [when might this occur?] 
+n? ? Every document has signature/checksum info computed as 
+it’s crawled 
+n? ? Despite the name, it does not actually scale 
+to a large number of nodes 
+n? ? But it would not be too difficult to parallelize 
+17 
+© 2013 A. Haeberlen, Z. Ives Univer H se ity y  dof on  P  a en nd n s N yl av jor ank: ia  Mercator, a scalable, extensible web crawler (WWW'99) Mercator architecture 
+1.? Dequeue frontier URL 5.? Extract hyperlinks 
+2.? Fetch document 6.? Filter unwanted links 
+3.? Record into 7.? Check if URL repeated 
+RewindInputStream (RIS) (compare its hash) 
+4.? Check against fingerprints to 8.? Enqueue URL 
+verify it’s new 
+18 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania 
+Source: Mercator paper Mercator’s polite frontier queues 
+n? ? Tries to go beyond breadth-first approach 
+n? ? Goal is to have only one crawler thread per server 
+n? ? What does this mean for the load caused by Mercator? 
+n? ? Distributed URL frontier queue: 
+n? ? One subqueue per worker thread 
+n? ? The worker thread is determined by hashing the hostname 
+of the URL 
+n? ? Thus, only one outstanding request per web server 
+19 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Mercator’s HTTP fetcher 
+n? ? First, needs to ensure robots.txt is followed 
+n? ? Caches the contents of robots.txt for various web sites as it 
+crawls them 
+n? ? Designed to be extensible to other protocols 
+n? ? Had to write own HTTP requestor in Java – 
+their Java version didn’t have timeouts 
+n? ? Today, can use setSoTimeout() 
+n? ? Could use Java non-blocking I/O: 
+n? ? http://www.owlmountain.com/tutorials/NonBlockingIo.htm 
+n? ? But they use multiple threads and synchronous I/O 
+n? ? Multi-threaded DNS resolver 
+20 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Other caveats 
+n? ? Infinitely long URL names (good way to get a 
+buf

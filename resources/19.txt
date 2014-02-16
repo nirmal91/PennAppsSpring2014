@@ -1,0 +1,605 @@
+CIS 455/555: Internet and Web Systems 
+The Cloud; Amazon Web Services 
+ 
+April 1, 2013 
+1 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Announcements 
+n? ? HW3 is due on Friday 
+n? ? Please test your solutions carefully before submitting! 
+n? ? Second midterm: April 22nd 
+n? ? 4:30-6:00pm 
+n? ? Location: DRL A1 (not here in Moore 216!) 
+n? ? Reading for today: 
+n? ? Armbrust et al.: A View of Cloud Computing (http://
+dl.acm.org/citation.cfm?doid=1721654.1721672) 
+ 
+2 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Plan for today 
+NEXT 
+n? ? A few words about the final project 
+n? ? Cloud computing 
+n? ? Utility computing model 
+n? ? Amazon Web Services 
+n? ? Brief overview of EC2 
+n? ? Brief overview of EBS 
+3 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania The Final Project 
+n? ? Goals: 
+n? ? Build a P2P web indexer/crawler  
+n? ? Evaluate the performance your crawler on EC2 
+n? ? Builds on, and integrates, your solutions from 
+the homework assignments 
+n? ? Milestones: 
+n? ? April 10: Project plan due 
+n? ? April 29: Code due 
+n? ? April 29 - May 7: Project demos 
+n? ? May 7: Final report due 
+4 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Details: Final Project 
+n? ? Four basic components: 
+n? ? Crawler: Mercator-style distributed crawler, built over Pastry 
+n? ? Indexer / TF-IDF retrieval engine with a distributed store 
+n? ? PageRank engine, based on MapReduce 
+n? ? Search engine / user interface 
+n? ? (and lots of opportunities for extra credit) 
+n? ? Plus evaluation 
+n? ? For crawling and query processing 
+n? ? Examples: How does the throughput depend on the number 
+of nodes in the system? What does the processing time 
+depend on? Which components take the most time? etc. 
+n? ? Evaluation should be on Amazon EC2; AWS credit codes will 
+be sent out today (through AWS In Education program) 
+5 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Project plan and final report 
+n? ? Project plan (due April 11): 
+n? ? A two-page PDF document 
+n? ? Introduction: Project goals, high-level approach 
+n? ? Project architecture: Which components? How do they 
+interact? What are the interfaces? Etc. 
+n? ? Division of labor: Who is responsible for which parts 
+n? ? Milestones: What you plan to complete by when 
+n? ? Final report (due May 7): 
+n? ? A six-page PDF document 
+n? ? All of the above (possibly revised and/or expanded) plus 
+nontrivial implementation details, evaluation, conclusion 
+n? ? The quality of the report will have a substantial impact on 
+your grade! 
+6 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania A few words on the project 
+n? ? Five-person teams need to do extra work 
+n? ? For example, some of the extra-credit tasks 
+n? ? Please contact me with a concrete proposal 
+n? ? The team project is worth 33% of your grade 
+n? ? This can make a huge difference 
+n? ? There are lots of opportunities for extra credit 
+n? ? You can also propose your own additional features 
+n? ? Some advice: 
+n? ? Get the basic features working first 
+n? ? !!! Start early !!! 
+n? ? Evaluation and final report are both important; you should 
+leave enough time at the end to do them well 
+7 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Major challenge: Integration 
+n? ? The components must fit together for the 
+overall system to work well 
+n? ? Good interfaces are essential 
+n? ? Test early!! - even if some of the functionality is still missing 
+n? ? Regular project meetings help - talk to your teammates!! 
+n? ? Think about which component(s) are likely to be 'central' and 
+start working on these very early 
+n? ? Experience tells that, if you only integrate at the end, you 
+may have to rewrite a substantial amount of code 
+n? ? The components must work on EC2 
+n? ? EC2 is different from the VM and speclab! 
+n? ? May have implications for performance 
+n? ? Try to develop on EC2 early, to avoid surprises later on 
+8 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania A recipe for disaster 
+n? ? Submit a vague project plan without a clear 
+division of labor and/or vague interfaces 
+n? ? Result: Missing components, duplicated functionality, pieces 
+don't fit together at the end 
+n? ? Do not motivate your teammates, or keep 
+track of their progress 
+n? ? Result: You end up having to do most of the work 
+n? ? Do not define milestones 
+n? ? Result: Most of the time is spent on one component; other 
+components are hastily cobbled together at the last minute 
+n? ? Develop components separately and test only 
+on workstations; do integration at the end 
+n? ? Result: Major debugging effort; lots of code is rewritten 
+9 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania A recipe for disaster (continued) 
+Guarantees 
+n? ? Do nothing until end of April 
+diaster! 
+n? ? Result 1: Most of the features not completed due to lack of 
+time; other features untested and buggy 
+n? ? Result 2: Massive time crunch at the end (second midterm, 
+exams & projects in other classes will all be due around the 
+same time!!!) 
+n? ? Do not test your solution 
+n? ? Result: Evaluation becomes a nightmare; system doesn't 
+run on EC2 and/or crashes during the project demo 
+n? ? Ignore the report, and write it only at the 
+last minute 
+n? ? Result: Grade is lower than expected, even if you have 
+produced a beautiful implementation 
+10 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania A recipe for disaster (continued) 
+n? ? Don't crawl until the very end 
+n? ? Result 1: Small corpus with not enough data to return good 
+search results 
+n? ? Result 2: Scalability problems not discovered early (search 
+takes minutes) & too late to do anything about it 
+n? ? Don't make the crawler restartable 
+n? ? Small bug ? Need to throw away the entire corpus! 
+n? ? Assume ranking function is trivial 
+n? ? Do not reserve any time for tweaking it; do not read IR 
+book and other materials to discover good approaches; do 
+not build in diagnostics 
+n? ? Result: Visually appealing, technically sophisticated search 
+engine - but doesn't return useful results!! 
+11 
+ 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Plan for today 
+n? ? A few words about the final project 
+NEXT 
+n? ? Cloud computing 
+n? ? Utility computing model 
+n? ? Amazon Web Services 
+n? ? Brief overview of EC2 
+n? ? Brief overview of EBS 
+12 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Utility computing: Power plant analogy 
+Steam engine at Stott Park Bobbin Mill 
+Waterwheel at the Neuhausen ob Eck Open-Air Museum 
+n? ? It used to be that everyone had their own 
+power source 
+n? ? Challenges are similar to the cluster: Needs large up-front 
+investment, expertise to operate, difficult to scale up/down... 
+13 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Scaling the power plant 
+n? ? Then people started to build large, centralized 
+power plants with very large capacity... 
+14 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Metered usage model 
+Metering 
+Power source Network Customer 
+device 
+n? ? Power plants are connected to customers by 
+a network 
+n? ? Usage is metered, and everyone (basically) 
+pays only for what they actually use 
+15 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Why is this a good thing? 
+Electricity Computing 
+n? ? Economies of scale 
+n? ? Cheaper to run one big power  
+n? ? Cheaper to run one big data  
+plant than many small ones 
+center than many small ones 
+n? ? Statistical multiplexing 
+n? ? High utilization! 
+n? ? High utilization! 
+n? ? No up-front commitment 
+n? ? No investment in generator; 
+n? ? No investment in data center; 
+pay-as-you-go model 
+pay-as-you-go model 
+n? ? Scalability 
+n? ? Thousands of kilowatts 
+n? ? Thousands of computers 
+available on demand; add 
+available on demand; add 
+more within seconds 
+more within seconds 
+16 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania What is cloud computing? 
+The interesting thing about Cloud Computing is that we've  
+redefined Cloud Computing to include everything that we  
+already do.... I don't understand what we would do differently  
+in the light of Cloud Computing other than change the  
+wording of some of our ads. 
+                                                   Larry Ellison, quoted in the Wall Street Journal, September 26, 2008 
+A lot of people are jumping on the [cloud] bandwagon, but 
+I have not heard two people say the same thing about it. 
+There are multiple definitions out there of "the cloud". 
+                                                            Andy Isherwood, quoted in ZDnet News, December 11, 2008 
+17 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania So what is it, really? 
+n? ? According to NIST: 
+Cloud computing is a model for enabling convenient,  
+on-demand network access to a shared pool of configurable  
+computing resources (e.g., networks, servers, storage,  
+applications, and services) that can be rapidly provisioned  
+and released with minimal management effort or  
+service provider interaction.  
+n? ? Essential characteristics: 
+n? ? On-demand self service 
+n? ? Broad network access 
+n? ? Resource pooling 
+n? ? Rapid elasticity 
+n? ? Measured service 
+18 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania History: The early days 
+n? ? Cloud computing: A new term for a concept 
+that has been around since the 1960s 
+n? ? Who invented it? 
+n? ? No agreement. Some candidates: 
+n? ? John McCarthy (Stanford professor and inventor of Lisp; 
+proposed the 'service bureau' model in 1961) 
+n? ? J.C.R. Licklider (contributed key ideas to ARPANET; published 
+a memo on the "Intergalactic Computer Network" in 1963) 
+n? ? Douglas Parkhill (published a book on "The Challenge of the 
+Computer Utility" in 1966) 
+19 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania History: Becoming a cloud provider 
+Technology Cost in medium DC Cost in large DC Ratio 
+(~1,000 servers) (~50,000 servers) 
+Network $95 per Mbit/sec/month $13 per Mbit/sec/month 7.1 
+Storage $2.20 per GByte/month $0.40 per GByte/month 5.7 
+Administration ~140 servers/admin >1,000 servers/admin 7.1 
+n? ? Early 2000s: Phenomenal growth of web 
+services 
+n? ? Many large Internet companies deploy huge data centers, 
+develop scalable software infrastructure to run them 
+n? ? Due to economies of scale, these companies were now  
+able to run computation very cheaply 
+n? ? What else can we do with this? 
+20 
+ 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania History: The pioneers 
+n? ? Jul 2002: Amazon Web Services launched 
+n? ? Third-party sites can search and display products from 
+Amazon's web site, add items to Amazon shopping carts 
+n? ? Available through XML and SOAP 
+n? ? Mar 2006: Amazon S3 launched 
+n? ? Innovative 'pay-per-use' pricing model, which is now the 
+standard in cloud computing 
+n? ? Cheaper than many small/medium storage solutions: $0.15/
+GB/month of storage, $0.20/GB/month for traffic 
+n? ? Amazon no longer a pure retailer, entering technology space 
+n? ? Aug 2006: EC2 launched 
+n? ? Core computing infrastructure becomes available 
+21 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania History: Wide-spread adoption  
+n? ? Apr 2008: Google App Engine launched 
+n? ? Same building blocks Google uses for its own applications: 
+Bigtable and GFS for storage, automatic scaling and load 
+balancing, ... 
+n? ? Nov 2009: Windows Azure Beta launched 
+n? ? Becomes generally available in 21 countries in Feb 2010 
+ 
+22 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Plan for today 
+n? ? A few words about the final project 
+n? ? Cloud computing 
+n? ? Utility computing model 
+NEXT 
+n? ? Amazon Web Services 
+n? ? Brief overview of EC2 
+n? ? Brief overview of EBS 
+23 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Insert your favorite 
+cloud here 
+Why Amazon AWS and not             ? 
+n? ? Amazon is only one of several cloud providers 
+n? ? Others include Microsoft Azure, Google App Engine, ... 
+n? ? But there is no common standard (yet) 
+n? ? App Engine is PaaS and supports Java/JVM or Python 
+n? ? Azure is PaaS and supports .NET/CLR 
+n? ? AWS is PaaS/IaaS and supports IA-32 virtual machines 
+n? ? So I had to pick one specific provider 
+n? ? Amazon AWS is going to be used for the rest of this class 
+n? ? Full disclosure: Amazon's only involvement is providing free 
+EC2 access for this class 
+24 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania What is Amazon AWS? 
+n? ? Amazon Web Services (AWS) provides a 
+number of different services, including: 
+n? ? Amazon Elastic Compute Cloud (EC2) 
+Used for the 
+Virtual machines for running custom software 
+project 
+n? ? Amazon Simple Storage Service (S3) 
+Simple key-value store, accessible as a web service 
+n? ? Amazon SimpleDB 
+Simple distributed database 
+n? ? Amazon Mechanical Turk (MTurk) 
+A 'marketplace for work' 
+n? ? Amazon CloudFront 
+Content delivery network 
+n? ? ... 
+25 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Setting up an AWS account 
+aws.amazon.com 
+n? ? Sign up for an account on aws.amazon.com 
+n? ? You need to choose an username and a password 
+n? ? These are for the management interface only 
+n? ? Your programs will use other credentials (RSA keypairs, 
+access keys, ...) to interact with AWS 
+26 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Command-line tools 
+AWS credentials 
+SOAP APIs 
+AWS web site and 
+management console 
+Sign-in credentials X.509 certificates 
+REST APIs 
+Connecting to an 
+Access keys 
+EC2 key pairs 
+instance (e.g., via ssh) 
+n? ? Why so many different types of credentials? 
+27 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania The AWS management console 
+n? ? Used to control many AWS services: 
+n? ? For example, start/stop EC2 instances, create S3 buckets... 
+28 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Plan for today 
+n? ? A few words about the final project 
+n? ? Cloud computing 
+n? ? Utility computing model 
+n? ? Amazon Web Services 
+NEXT 
+n? ? Brief overview of EC2 
+n? ? Brief overview of EBS 
+29 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania What is Amazon EC2? 
+1.7 GB memory 
+1 virtual core 
+(1 CU each) 
+160GB storage 
+'moderate' I/O 
+68.4 GB memory 
+8 virtual cores 
+(3.25 CU each) 
+1690 GB storage 
+'high' I/O 
+n? ? Infrastructure-as-a-Service (IaaS) 
+n? ? You can rent various types of virtual machines by the hour 
+n? ? In your VMs, you can run your own (Linux/Windows) programs 
+n? ? Examples: Web server, search engine, movie renderer, ... 
+30 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania 
+http://aws.amazon.com/ec2/pricing (4/1/2013) Demo 
+n? ? Logging into AWS Management Console 
+n? ? Launching an instance 
+n? ? Contacting the instance via ssh 
+n? ? Terminating an instance 
+n? ? Have a look at the AWS Getting Started guide 
+n? ? http://www.cis.upenn.edu/~cis455/handouts/Getting-Started-with-AWS.pdf 
+31 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Avoiding costly mistakes 
+n? ? When you stop working with EC2, be sure to 
+check whether you still have resources allocated 
+n? ? If you forget about a running Small instance and don't discover 
+it for one week, this will cost you $10! 
+Amazon will charge you for allocated resources, even 
+if you are not using them. If your $100 credit code 
+runs out, your credit card will be charged! 
+32 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Oh no - where has my data gone? 
+n? ? EC2 instances do not have persistent storage 
+n? ? Data survives stops & reboots, but not termination 
+If you store data on the virtual hard disk of your instance 
+and the instance fails or you terminate it, 
+your data WILL be lost!  
+n? ? So where should I put persistent data? 
+n? ? Elastic Block Store (EBS) - in a few slides 
+n? ? Ideally, use an AMI with an EBS root (Amzon's default AMI 
+has this property) 
+33 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Amazon Machine Images 
+n? ? When I launch an instance, what software 
+will be installed on it? 
+n? ? Software is taken from an Amazon Machine Image (AMI) 
+n? ? Selected when you launch an instance 
+n? ? Essentially a file system that contains the operating system, 
+applications, and potentially other data 
+n? ? Lives in S3 
+n? ? How do I get an AMI? 
+n? ? Amazon provides several generic ones, e.g., Amazon Linux, 
+Fedora Core, Windows Server, ... 
+n? ? You could make your own (NOT required for the project) 
+n? ? You can even run your own custom kernel, with some restrictions 
+34 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Security Groups 
+Evil 
+attacker 
+Legitimate 
+user (you or 
+your customers) 
+Instance 
+n? ? Basically, a set of firewall rules 
+n? ? Can be applied to groups of EC2 instances 
+n? ? Each rule specifies a protocol, port numbers, etc... 
+n? ? Only traffic matching one of the rules is allowed through 
+n? ? Sometimes need to explicitly open ports  
+35 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Regions and Availability Zones 
+n? ? Where exactly does my instance run? 
+n? ? No easy way to find out - Amazon does not say 
+n? ? Instances can be assigned to regions 
+n? ? Currently 9 available: US East (Northern Virginia), US West 
+(Northern California), US West (Oregon), EU (Ireland), Asia/
+Pacific (Singapore), Asia/Pacific (Tokyo), South America (Sao 
+Paulo), Australia (Sydney) GovCloud 
+n? ? Important, e.g., for reducing latency to customers 
+n? ? Instances can be assigned to availability zones 
+n? ? Purpose: Avoid correlated fault 
+n? ? Several availability zones within each region 
+36 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Network pricing 
+n? ? AWS does charge for network traffic 
+n? ? Price depends on source and destination of traffic 
+n? ? Free within most AWS svcs in same region (e.g., EC2, S3) 
+n? ? If private IP is used 
+n? ? Remember: ISPs are typically charged for upstream traffic 
+37 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania 
+http://aws.amazon.com/ec2/pricing/ (4/1/2013) Instance types 
+Source: http://aws.amazon.com/ 
+ec2/reserved-instances/ 
+n? ? So far: On-demand instances 
+n? ? Also available: Reserved instances (L/M/H) 
+n? ? One-time reservation fee to purchase for 1 or 3 years 
+n? ? Usage still billed by the hour, but at a considerable discount 
+n? ? Also available: Spot instances 
+n? ? Spot market: Can bid for available capacity 
+n? ? Instance continues until terminated or price rises above bid 
+38 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Service Level Agreement 
+4.38h downtime 
+per year allowed 
+http://aws.amazon.com/ec2-sla/ (10/23/2008 version; excerpt) 
+39 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Recap: EC2 
+n? ? What EC2 is: 
+n? ? IaaS service - you can rent virtual machines 
+n? ? Various types: Very small to very powerful 
+n? ? How to use EC2: 
+n? ? Ephemeral state - local data is lost when instance terminates 
+n? ? AMIs - used to initialize an instance (OS, applications, ...) 
+n? ? Security groups - "firewalls" for your instances 
+n? ? Regions and availability zones 
+ 
+40 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Plan for today 
+n? ? A few words about the final project 
+n? ? Cloud computing 
+n? ? Utility computing model 
+n? ? Amazon Web Services 
+n? ? Brief overview of EC2 
+NEXT 
+n? ? Brief overview of EBS 
+41 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania What is Elastic Block Store (EBS)? 
+EBS storage 
+Instance 
+n? ? Persistent storage 
+n? ? Unlike the local instance store, data stored in EBS is not lost 
+when an instance fails or is terminated 
+n? ? Should I use the instance store or EBS? 
+n? ? Typically, instance store is used for temporary data 
+42 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Volumes 
+n? ? EBS storage is allocated in volumes 
+n? ? A volume is a 'virtual disk' (size: 1GB - 1TB) 
+n? ? Basically, a raw block device 
+n? ? Can be attached to an instance (but only one at a time) 
+n? ? A single instance can access multiple volumes 
+n? ? Placed in specific availability zones 
+n? ? Why is this useful? 
+n? ? Be sure to place it near instances (otherwise can't attach) 
+n? ? Replicated across multiple servers 
+n? ? Data is not lost if a single server fails 
+n? ? Amazon: Annual failure rate is 0.1-0.5% for a 20GB volume 
+43 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania 
+ EC2 instances with EBS roots 
+n? ? EC2 instances can have an EBS volume as 
+their root device ("EBS boot") 
+n? ? Result: Instance data persists independently from the 
+lifetime of the instance 
+n? ? You can stop and restart the instance, similar to suspending 
+and resuming a laptop 
+n? ? You won't be charged for the instance while it is stopped (only for EBS) 
+n? ? Caution: Instance may get a new IP address when it is resumed! 
+n? ? You can enable termination protection for the instance 
+n? ? Blocks attempts to terminate the instance (e.g., by accident) until 
+termination protection is disabled again 
+n? ? Alternative: Use instance store as the root 
+n? ? You can still store temporary data on it, but it will disappear 
+when you terminate the instance 
+n? ? You can still create and mount EBS volumes explicitly 
+44 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania 
+ 
+ Time 
+Snapshots 
+n? ? You can create a snapshot of a volume 
+n? ? Copy of data in the volume at the time snapshot was made 
+n? ? Only the first snapshot makes a full copy; subsequent 
+snapshots are incremental 
+n? ? What are snapshots good for? 
+n? ? Sharing data with others 
+n? ? DBpedia snapshot ID is "snap-882a8ae3" 
+n? ? Access control list (specific account numbers) or public access 
+n? ? Instantiate new volumes 
+n? ? Point-in-time backups 
+45 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Pricing 
+n? ? You pay for... 
+n? ? Storage space: $0.10 per allocated GB per month 
+n? ? I/O requests: $0.10 per million I/O requests 
+n? ? S3 operations (GET/PUT) 
+n? ? Charge is only for actual storage used 
+n? ? Empty space does not count 
+46 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Creating an EBS volume 
+Create volume 
+Needs to be in same 
+availability zone as 
+your instance! 
+DBpedia 
+snapshot ID 
+47 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Mounting an EBS volume 
+n? ? Step 1: Attach the volume 
+[ahae@oxygen ~]$ ec2-attach-volume -d /dev/sda2 -i i-9bd6eef1 vol-cca68ea5 
+ATTACHMENT      vol-cca68ea5    i-9bd6eef1      /dev/sda2       attaching 
+[ahae@oxygen ~]$ 
+n? ? Step 2: Mount the volume in the instance 
+[ahae@oxygen ~]$ ssh ec2-user@ec2-184-73-95-155.compute-1.amazonaws.com 
+Last login: Thu Sep 23 03:44:05 2010 from oxygen.seas.upenn.edu 
+ 
+       __|  __|_  )  Amazon Linux AMI 
+       _|  (     /     Beta 
+      ___|\___|___| 
+ 
+See /etc/image-release-notes for latest release notes. :-) 
+[ec2-user@domU-12-31-39-0A-8C-D3 ~]$ sudo mount /dev/sda2 /mnt/ 
+[ec2-user@domU-12-31-39-0A-8C-D3 ~]$ ls /mnt/ 
+dbpedia_3.5.1.owl  dbpedia_3.5.1.owl.bz2  en  other_languages 
+[ec2-user@domU-12-31-39-0A-8C-D3 ~]$ 
+48 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Detaching an EBS volume 
+n? ? Step 1: Unmount the volume in the instance 
+[ec2-user@domU-12-31-39-0A-8C-D3 ~]$ sudo umount /mnt/ 
+ 
+[ec2-user@domU-12-31-39-0A-8C-D3 ~]$ exit 
+[ahae@oxygen ~]$  
+n? ? Step 2: Detach the volume 
+[ahae@oxygen ~]$ ec2-detach-volume vol-cca68ea5 
+ATTACHMENT      vol-cca68ea5    i-9bd6eef1      /dev/sda2       detaching 
+[ahae@oxygen ~]$ 
+49 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Recap: Elastic Block Store (EBS) 
+n? ? What EB2 is: 
+n? ? Basically a virtual hard disk; can be attached to EC2 instances 
+n? ? Persistent - state survives termination of EC2 instance 
+n? ? How to use EBS: 
+n? ? Allocate volume - empty or initialized with a snapshot 
+n? ? Attach it to EC2 instance and mount it there 
+n? ? Can create snapshots for data sharing, backup 
+50 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Method Time 
+Internet (20Mbps) 45 days 
+FedEx 1 day 
+AWS Import/Export 
+Time to transfer 10TB [AF10] 
+n? ? Import/export large amounts of data to/from 
+S3 buckets via physical storage device 
+n? ? Mail an actual hard disk to Amazon (power adapter, cables!) 
+n? ? Signature file for authentication 
+n? ? Discussion: Is this the Right Way to be shipping data, or 
+should we rather be using a network? 
+51 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Mechanical Turk (MTurk) 
+n? ? A crowdsourcing marketplace 
+n? ? Requesters post small jobs (HIT - Human Intelligence Task), 
+offer small rewards ($0.01-$0.10) 
+52 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylv

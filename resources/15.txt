@@ -1,0 +1,240 @@
+CIS 455/555: Internet and Web Systems 
+Pastry; Message Queueing 
+ 
+March 13, 2013 
+1 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania Plan for today 
+NEXT 
+n? ? A few words about the team project 
+n? ? Pastry 
+n? ? Differences to Chord 
+n? ? API basics 
+n? ? Message Queueing 
+n? ? Remote Procedure Calls 
+n? ? Abstraction 
+n? ? Mechanism 
+n? ? Stub-code generation 
+2 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania The team project 
+n? ? Task: Build a P2P-based search engine 
+n? ? Should consist of four components: 
+n? ? Crawler, based on your crawler (HW2) and Pastry (HW3) 
+n? ? Indexer, based on Pastry (HW3) and BerkeleyDB 
+n? ? PageRank, based on MapReduce 
+n? ? Search engine and user interface 
+n? ? Draft specs are available on the course web page 
+n? ? Deploy & evaluate on Amazon EC2 
+n? ? Need to evaluate performance and write final report 
+n? ? Amazon has donated credit codes for this assignment 
+n? ? Will send out credit codes soon 
+3 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania Some of last year's projects 
+4 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania Logistics 
+n? ? Rough timeline (preliminary): 
+n? ? Late March: Begin project planning 
+n? ? Early April: Initial project plan due 
+n? ? April 29: Official code submission deadline 
+n? ? April 30-May 3: Project demos 
+n? ? May 7: Final report due (hard deadline!) 
+n? ? Todo: Form project groups 
+n? ? Each team should have 4 members 
+n? ? 5-member group requires approval & needs to do some 
+extra credit tasks 
+n? ? One person from each group should send me a list of 
+group members by Friday 
+n? ? I may have to split or merge some groups 
+5 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania The Google award 
+n? ? The team with the best search engine will 
+receive an award (sponsored by           ) 
+n? ? Criteria: Architecture/design, speed, reliability, quality of 
+search results, user interface, written final report 
+n? ? Winning team gets four Android cell phones 
+n? ? Winners will be announced on the course web page 
+6 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania Some 'lessons learned' from last year 
+n? ? The most common mistakes were: 
+n? ? Started too late; tried to do everything at the last minute 
+n? ? You need to leave enough time at the end to a) crawl a sufficiently 
+large corpus, and b) tweak the ranking function to get good results 
+n? ? Underestimated amount of integration work 
+n? ? Suggestion: Define clean interfaces, build dummy components for 
+testing, exchange code early and throughout the project 
+n? ? Performance issues 
+n? ? Do NOT use Pastry to transfer large amounts of data; use it for small, 
+infrequent coordination messages! 
+n? ? Underestimated EC2 deployment 
+n? ? Try your code on EC2 as early as possible 
+n? ? Unbalanced team 
+n? ? You need to pick your teammates wisely, make sure everyone pulls 
+their weight, keep everyone motivated, ... 
+7 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania Announcements 
+n? ? HW2 MS2 is due on March 25th 
+n? ? Try to finish by Friday! 
+n? ? You can attend office hours / lab sessions 
+n? ? You'll have time for testing, and to fix unforeseen problems 
+n? ? Why not get started today? 
+n? ? Second midterm is on April 22nd at 4:30pm 
+n? ? Likely location: DRL A1 
+n? ? Reading for today: 
+n? ? A. Rowstron, P. Druschel: "Pastry: Scalable, distributed object 
+location and routing for large-scale peer-to-peer systems" 
+n? ? http://www.freepastry.org/PAST/pastry.pdf 
+8 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania Plan for today 
+n? ? A few words about the team project 
+NEXT 
+n? ? Web services (continued) 
+n? ? Pastry 
+n? ? Differences to Chord 
+n? ? API basics 
+n? ? Message Queueing 
+9 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania The Facebook API 
+n? ? What you can do: 
+n? ? Read data from profiles and pages 
+n? ? Navigate the graph (e.g., via friends lists) 
+n? ? Issue queries (for posts, people, pages, ...) 
+n? ? Add or modify data (e.g., create new posts) 
+n? ? Get real-time updates, issue batch requests, ... 
+n? ? How you can access it: 
+n? ? Graph API 
+n? ? FQL 
+n? ? Legacy REST API 
+10 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania "Object": Unordered 
+collection of  
+key-value pairs 
+JSON 
+{  
+  "firstName": "John",  
+  "lastName": "Smith",  
+  "age": 25,  
+  "address": {  
+    "streetAddress": "21 2nd Street",  
+    "city": "New York",  
+    "state": "NY",  
+Array (ordered  
+    "postalCode": 10021  
+sequence of  
+  },  
+values; can be  
+  "phoneNumber": [  
+different types) 
+    { "type": "home", "number": "212 555-1234" },  
+    { "type": "fax", "number": "646 555-4567" }  
+  ]  
+} 
+n? ? Another standard for data interchange 
+n? ? "JavaScript Object Notation"; MIME type application/json 
+n? ? Basically legal JavaScript code; can be parsed with eval() 
+n? ? Caution: Security! 
+n? ? Often used in AJAX-style applications 
+n? ? Data types: Numbers, strings, booleans, arrays, "objects" 
+11 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania { 
+  "id": "1074724712",  
+  "age_range": { 
+The Graph API 
+    "min": 21 
+  },  
+  "locale": "en_US",  
+  "location": { 
+    "id": "101881036520836",  
+    "name": "Philadelphia, Pennsylvania" 
+  } 
+} 
+n? ? Requests are mapped directly to HTTP: 
+n? ? https://graph.facebook.com/(identifier)?fields=(fieldList) 
+n? ? Response is in JSON 
+12 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania The Graph API 
+n? ? Uses several HTTP methods: 
+n? ? GET for reading 
+n? ? POST for adding or modifying 
+n? ? DELETE for removing 
+n? ? IDs can be numeric or names 
+n? ? /1074724712 or /andreas.haeberlen 
+n? ? Pages also have IDs 
+n? ? Authorization is via 'access tokens' 
+n? ? Opaque string; encodes specific permissions  
+(access user location, but not interests, etc.) 
+n? ? Has an expiration date, so may need to be refreshed 
+13 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania Other API options 
+n? ? Facebook Query Language (FQL) 
+n? ? SQL-style queries over the data provided via the Graph API 
+n? ? Example: SELECT name FROM user WHERE uid=me() 
+n? ? Supports 'multi-queries' (JSON-encoded dictionary of queries) 
+n? ? 72 different tables are available for querying 
+n? ? Legacy REST API 
+n? ? See description of REST in the previous lecture 
+n? ? In the process of being deprecated 
+n? ? Large number of methods available 
+n? ? Examples: friends.get, comments.add, status.set, video.upload, ... 
+14 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania Plan for today 
+n? ? A few words about the team project 
+NEXT 
+n? ? Pastry 
+n? ? Differences to Chord 
+n? ? API basics 
+n? ? Message Queueing 
+15 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania Remember Chord? 
+k10 
+k120 
+N10 
+Node ID k112 
+k11 
+N100 
+Circular 
+k30 
+key 
+k99 
+N32 
+space 
+Object key 
+k33 
+k40 
+N80 
+k52 
+k70 
+k65 
+N60 
+n? ? Large circular key space; objects and nodes have keys 
+n? ? Key-based routing: route(message, key) 
+16 
+© 2013 A. Haeberlen , Z. Ives From Chord to Pastry 
+n? ? What we saw was the basic data algorithms 
+for the Chord system 
+n? ? Pastry is a slightly different: 
+n? ? It uses a slightly different mapping mechanism (closest 
+neighbor, not successor) 
+n? ? It has some extra features (leaf set, proximity-aware routing) 
+n? ? It allows for replication of data and finds the closest replica 
+n? ? It’s written in Java, not C 
+n? ? … And you’ll be using it for HW3 and the final project! 
+17 
+© 2013 A. Haeberlen , Z. Ives FreePastry 
+n? ? An open-source Java implementation of Pastry 
+n? ? Main web page:  
+http://www.freepastry.org/ 
+n? ? Trac-Wiki: 
+https://trac.freepastry.org/ 
+n? ? Tutorial: 
+https://trac.freepastry.org/wiki/FreePastryTutorial 
+n? ? Frequently Asked Questions: 
+https://trac.freepastry.org/wiki/FreePastryFAQ 
+n? ? Discussion group archives: 
+https://mailman.rice.edu/pipermail/freepastry-discussion-l/ 
+n? ? Publications (if you're interested): 
+http://www.freepastry.org/pubs.htm 
+18 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania Pastry API Basics 
+n? ? Keys/Node-IDs implement rice.p2p.commonapi.Id 
+160
+n? ? Typical key space is 0..2 -1 (SHA-1) 
+n? ? Generated by fa

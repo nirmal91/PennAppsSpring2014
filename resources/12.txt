@@ -1,0 +1,272 @@
+CIS 455/555: Internet and Web Systems 
+MapReduce 
+ 
+February 25, 2013 
+1 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania Announcements 
+n? ? Midterm exam February 27 
+n? ? Open-book, open-notes, closed-Google 
+n? ? Covers all the material up to, and including, today's lecture 
+n? ? HW2 is now available 
+n? ? Deadlines March 15th (MS1) and March 25th (MS2) 
+n? ? HW3 will probably become available before MS2 is due 
+n? ? Reading: 
+n? ? GFS and MapReduce papers (see links on the web page) 
+2 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania PLEASE 
+START 
+EARLY!!! 
+3 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania Plan 
+n? ? Google File System 
+n? ? Comparison to NFS 
+n? ? Key assumptions 
+n? ? Architecture and operation 
+NEXT 
+n? ? Introduction to MapReduce 
+n? ? Motivation 
+n? ? Programming model and data flow 
+n? ? Some implementation details 
+n? ? Example tasks 
+n? ? Hadoop and HDFS 
+n? ? Strengths and weaknesses 
+4 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania Analogy: National census 
+n? ? Suppose we have  
+10,000 employees,  
+whose job is to collate  
+census forms and  
+to determine how  
+many people live in  
+each city 
+n? ? How would you  
+organize this task? 
+5 
+© 2013 A. Haeberlen , Z. Ives 
+http://www.census.gov/2010census/pdf/2010_Questionnaire_Info.pdf National census "data flow" 
+6 
+© 2013 A. Haeberlen , Z. Ives Making things more complicated 
+n? ? Suppose people take vacations, get sick, work 
+at different rates 
+n? ? Suppose some forms are incorrectly filled out 
+and require corrections or need to be thrown 
+away 
+n? ? What if the supervisor gets sick? 
+n? ? How big should the stacks be? 
+n? ? How do we monitor progress?  
+n? ? ... 
+7 
+© 2013 A. Haeberlen , Z. Ives A bit of introspection 
+n? ? What is the main challenge? 
+n? ? Are the individual tasks complicated?  
+n? ? If not, what makes this so challenging? 
+n? ? How resilient is our solution? 
+n? ? How well does it balance work across 
+employees? 
+n? ? What factors affect this? 
+ 
+n? ? How general is the set of techniques? 
+8 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania I don't want to deal with all this!!! 
+n? ? Wouldn't it be nice if there were some system 
+that took care of all these details for you? 
+n? ? Ideally, you'd just tell the system what needs 
+to be done 
+n? ? That's the MapReduce framework. 
+9 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania Census data flow 
+CountStack 
+blue: 4k 
+Filter+Stack 
+Worker 
+Worker 
+CountStack 
+green: 4k 
+Worker 
+Filter+Stack 
+Worker 
+CountStack 
+cyan: 3k 
+Worker 
+Filter+Stack 
+Worker 
+CountStack 
+gray: 1k 
+Worker 
+Filter+Stack 
+CountStack 
+Worker 
+orange: 4k 
+Worker 
+10 
+© 2013 A. Haeberlen , Z. Ives Abstracting once more 
+n? ? There are two kinds of workers: 
+n? ? Those that take input data items and produce output items 
+for the “stacks” 
+n? ? Those that take the stacks and aggregate the results to 
+produce outputs on a per-stack basis 
+n? ? We’ll call these: 
+n? ? map:  takes (item_key, value), produces one or more 
+(stack_key, value’) pairs 
+n? ? reduce:  takes (stack_key, {set of value’}), produces one or 
+more output results – typically (stack_key, agg_value) 
+We will refer to this key 
+as the reduce key 
+11 
+© 2013 A. Haeberlen , Z. Ives Why MapReduce? 
+n? ? Scenario: 
+n? ? You have a huge amount of data, e.g., all the Google 
+searches of the last three years 
+n? ? You would like to perform a computation on the data, e.g., 
+find out which search terms were the most popular 
+n? ? How would you do it? 
+n? ? Analogy to the census example: 
+n? ? The computation isn't necessarily difficult, but parallelizing 
+and distributing it, as well as handling faults, is challenging 
+n? ? Idea: A programming language! 
+n? ? Write a simple program to express the (simple) computation, 
+and let the language runtime do all the hard work 
+12 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania Plan 
+n? ? Google File System 
+n? ? Comparison to NFS 
+n? ? Key assumptions 
+n? ? Architecture and operation 
+n? ? Introduction to MapReduce 
+n? ? Motivation 
+NEXT 
+n? ? Programming model and data flow 
+n? ? Some implementation details 
+n? ? Example tasks 
+n? ? Hadoop and HDFS 
+n? ? Strengths and weaknesses 
+13 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania What is MapReduce? 
+n? ? A famous distributed programming model 
+n? ? In many circles, considered the key building block for 
+much of Google’s data analysis 
+n? ? A programming language built on it:  Sawzall, 
+http://labs.google.com/papers/sawzall.html 
+n? ? … Sawzall has become one of the most widely used programming languages at 
+Google.  … [O]n one dedicated Workqueue cluster with 1500 Xeon CPUs, there were 
+32,580 Sawzall jobs launched, using an average of 220 machines each. While running 
+those jobs, 18,636 failures occurred (application failure, network outage, system crash, 
+etc.) that triggered rerunning some portion of the job. The jobs read a total of 
+15 12
+3.2x10 bytes of data (2.8PB) and wrote 9.9x10 bytes (9.3TB). 
+n? ? Other similar languages:  Yahoo’s Pig Latin and Pig; Microsoft’s 
+Dryad 
+n? ? Cloned in open source: Hadoop, 
+http://hadoop.apache.org/core/ 
+ 
+14 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania The MapReduce programming model 
+n? ? Simple distributed functional programming primitives 
+n? ? Modeled after Lisp primitives: 
+n? ? map (apply function to all items in a collection) and  
+n? ? reduce (apply function to set of items with a common key) 
+n? ? We start with: 
+n? ? A user-defined function to be applied to all data, 
+map: (key,value) à? (key, value) 
+n? ? Another user-specified operation  
+reduce: (key, {set of values}) à? result 
+n? ? A set of n nodes, each with data 
+n? ? All nodes run map on all of their data, producing new 
+data with keys 
+n? ? This data is collected by key, then shuffled, and finally reduced 
+n? ? Dataflow is through temp files on GFS 
+15 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania Simple example: Word count 
+map(String key, String value) { reduce(String key, Iterator values) { 
+  // key: document name, line no    
+  // key: a word 
+  // value: contents of line  
+  // values: a list of counts 
+    
+  int result = 0; 
+  for each word w in value: 
+  
+    emit(w, "1")   for each v in values: 
+}  
+    result += ParseInt(v); 
+ 
+  emit(key, result) 
+} 
+n? ? Goal: Given a set of documents, count how 
+often each word occurs 
+n? ? Input: Key-value pairs (document:lineNumber, text) 
+n? ? Output: Key-value pairs (word, #occurrences) 
+Key design 
+n? ? What should be the intermediate key-value pairs? 
+question! 
+ 
+16 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania Simple example: Word count 
+Key range the node  
+is responsible for 
+(apple, 3) 
+(apple, 1) (apple (apple , 1)  , { (apple 1, 1, 1} , 1)  ) 
+(an, 2) 
+Reducer 
+Mapper 
+(an, {1, 1}) 
+(an, 1)  (an, 1) 
+(because, 1) 
+(1-2) (A-G) 
+(1, the apple) 
+(be (be caus caus e, { e, 1)  1}) 
+(green, 1) 
+(green, {1}) 
+(green, 1) 
+(2, is an apple) 
+(is, 2) 
+(is (is , 1)  , {(is 1, 1} , 1)  ) Reducer 
+Mapper 
+(3, not an orange) 
+(not, 2) 
+(H-N) 
+(3-4) 
+(not (n , ot 1) , (  { n1 ot , ,1  1 }) )  
+(4, because the) 
+(5, orange) 
+(orange, 1) (orange, 1) (orange, 1) 
+(orange, {1, 1, 1}) (orange, 3) 
+Mapper Reducer 
+(the, {1, 1, 1}) 
+(the, 1) (the, 1) (the, 1) (the, 3) 
+(6, unlike the apple) 
+(5-6) (O-U) 
+(unlike, {1}) (unlike, 1) 
+(unlike, 1) 
+(7, is orange) 
+(8, not green) 
+Mapper Reducer 
+(7-8) (V-Z) 
+The reducers  
+2 
+1 Each mapper  The mappers 3 Each KV-pair output 4 The reducers  5 
+process their 
+receives some  process the  by the mapper is sent sort their input  
+input one group 
+of the KV-pairs  KV-pairs  to the reducer that is by key  
+at a time 
+as input one by one responsible for it and group it 
+17 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania In practice, mappers and 
+reducers usually run on 
+the same set of machines! 
+MapReduce dataflow 
+Intermediate  
+(key,value) pairs 
+Reducer 
+Mapper 
+Mapper Reducer 
+Mapper Reducer 
+Mapper Reducer 
+What is meant by a 'dataflow'? 
+"The Shuffle" 
+What makes this so scalable? 
+18 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania 
+Input data 
+O

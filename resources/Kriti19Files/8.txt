@@ -1,0 +1,114 @@
+ 
+ 
+ 
+Spring 2013 
+ 
+ 
+Assignment 0: Using VMware Player 
+ 
+Due January 18, 2013 
+ 
+1		Background	
+We will be offering a standardized development system for CIS455/555 that is based on a virtual machine 
+image. This image contains a small Linux installation, the Eclipse IDE, and all the tools you will need for 
+the homework assignments. Having such a standardized system has several advantages: 
+ 
+1. You do not have to worry about incompatibilities between the software we will be using and 
+other software that may be installed on your machine; 
+2. If something goes wrong, you have a 'safe' configuration to go back to - just reinstall the virtual 
+machine image; 
+3. The virtual machine image will be the 'gold standard' for grading; thus, if your solution works in 
+the VM image, you can be sure that it will also work on the graders' machines. 
+ 
+The virtual machine image works with VMware Player, which has been installed on the Linux machines 
+in M100A, M204 (Ketterer Lab), M207, and Towne-M70. If you prefer using your own computer, 
+VMware Player is available for free at http://www.vmware.com/products/player/ (Windows and Linux 
+versions; non-commercial use only). If you are a Mac user, try VirtualBox (http://www.virtualbox.org/). 
+ 
+Of course, you are free to use a different development system (e.g., a different operating system, your 
+favorite editor or IDE, ...). However, we will only grade solutions based on their performance in the 
+virtual machine image, and we can only offer limited support if you decide to use your own setup. 
+2		Installing	the	VM	image	
+Your first task is to install the VM image for this assignment. The following step-by-step guide assumes 
+that you are in the Moore M100A lab: 
+ 
+1. Download the VM image from http://www.cis.upenn.edu/~cis455/handouts/vm.zip. If you don't 
+have enough space in your SEAS account, use the cis455-vm link in your account (see below) 
+2. Unpack the .zip file; this should produce a folder called cis455 
+3. Start VMware Player (if you are using the Linux in the lab, press Alt+F2 to open the 'Run' dialog 
+and enter vmplayer; you can also open a terminal window and run vmplayer from there) 
+4. Click 'Open a Virtual Machine'. In the dialog box that appears, open the cis455 folder, select 
+the CIS455 machine image, and click 'Open'. 
+5. Click 'Play virtual machine'. If you are asked whether the VM was moved or copied, say 'moved'. 
+6. The Linux in the VM image should boot now. Wait until the login dialog appears.  
+7. Click on 'CIS455' to log in. The password is vm. 
+CIS 455/555: Internet and Web Systems 
+You should now have a running VM. A few tips regarding the virtual machine:  
+ 
+? If you run out of storage space while unpacking vm.zip, try downloading vm.zip to a 
+temporary directory (e.g., /tmp), and then unpack it to your home directory from there. (Do not 
+unpack the VM image to /tmp, since files in this directory are deleted regularly!) 
+? If you are using an old version of VMware Player, you may get an error message about an invalid 
+configuration file. If you see this message, try upgrading to the newest version. 
+? CETS has allocated some extra space for CIS455/555 students; you should have a symbolic link 
+called cis455-vm in your home directory that points to this space. If the VM image doesn't fit 
+into your normal SEAS account, please store it in this space. 
+? Always shut down the VM properly before closing VMware Player (by clicking on the 'CIS455' 
+the upper right corner and selecting 'Power Off'). If you do not do this, the VM image can become 
+corrupted, just like your operating system can become corrupted if you switch off your computer 
+before shutting it down properly. 
+? If the screen size of your VM is tiny, try resizing it or putting it into full-screen mode. 
+? Note that the mouse pointer has to be over the VM window; otherwise your inputs will not be 
+accepted. If at any point your mouse or keyboard are 'captured' by the VM (i.e., you can no longer 
+move the mouse outside of the VM window or switch to other applications), press the 'Ctrl' and 
+'Alt' keys simultaneously. This should also help you to get out of 'fullscreen mode'. 
+? The data you store inside the VM is persistent (i.e., will survive reboots), and we will be using a 
+version control system; nevertheless, we strongly recommend that you make occasional backups, 
+e.g., by copying your data to eniac.seas.upenn.edu using the scp command. 
+? The password for the cis455 user is vm. You shouldn't normally need to become root, but if 
+this ever becomes necessary, you can use sudo with the same password. 
+? If you would like to use a text editor other than Eclipse, please use apt-get to install it. For 
+instance, to install gedit, run sudo apt-get install gedit in a terminal window. 
+? If the VM runs slowly on your machine, try increasing its memory size to 1.5GB (under Virtual 
+Machine / Virtual Machine Settings..., or under "Edit virtual machine settings"). 
+? If the virtual disk (the .vmdk file(s) in the cis455 folder) is getting too big, try deleting some 
+files inside the VM and then 'compacting' it (under Virtual Machine Settings... / Hard Disk (SCSI) 
+/ Utilities / Compact). This should free up some space on the host machine. 
+3		The	HelloWorld	application	[10	points]	
+Your third task in this assignment is to write a simple Java program that writes your full name and your 
+SEAS login name to System.out when it is invoked (for example, my own solution writes "*** 
+Author: Andreas Haeberlen (ahae)"). The class that contains your main method should be 
+called HelloWorld, and it should be a member of the package edu.upenn.cis455.hw0.  
+ 
+This is not rocket science. We know. The goal is to familiarize yourself with the VM, and to try out the 
+homework submission process, which is described below. In the following, we will assume that you have 
+already received an email with your login information for the svn server, and that your VM can 
+successfully connect to the network. If you are not sure about the network connection, double-click on the 
+"Firefox" icon on the VM's desktop; this should open the CIS455/555 web page. 
+ 
+To get started, open Eclipse, select the "File..." menu, and click on "Import...". Find the "SVN" tab, select 
+"Checkout Projects from SVN", and hit "Next >". In the dialog box that opens now, select "Create a new 
+repository location" and hit "Next >"; then enter the URL  
+ 
+              svn://ds01.seas.upenn.edu:10455/yourSEASlogin 
+ 
+but replace yourSEASlogin with your actual SEAS login name. Then hit "Next >". 
+You should now be prompted for a username and password (if not, check your network connection!). The 
+dialog box will suggest cis455 as the username, but you should not accept it; rather, replace it with your 
+SEAS login name, and enter the password from your welcome email (check the box to allow the 
+password to be saved). You should now see the "Select Folder" dialog, which should show the URL you 
+just typed, and below it a folder called "HW0". Select the "HW0" folder and click "Finish". The HW0 
+project should now be checked out, and it should appear in Eclipse's Package Explorer.  
+ 
+Find the HelloWorld.java file, and add the necessary code to write your full name and SEAS login. 
+Please use the exact format above (Example: "*** Author: Andreas Haeberlen (ahae)"). 
+Also, open the README file and complete all the fields. Finally, check all your changes back into the 
+repository. To do this, right-click on the "HW0" project in the Package Explorer, select "Team..." and 
+then "Commit". You should be prompted for a comment. Enter a short description of your changes  
+(Example: "Implemented Hello World") and then hit "OK". Your changes should now be checked in. 
+ 
+For later assignments, we strongly recommend that you regularly check in your changes, at least once a 
+day and/or whenevery you've implemented a major new feature. That way, when something suddenly 
+stops working, you can use svn's diff feature to find the changes you've made since the last checkin. Also, 
+when you create additional files, e.g., for new Java classes, please don't forget to add them to the 
+repository

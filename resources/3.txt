@@ -1,0 +1,715 @@
+CIS 455/555: Internet and Web Systems 
+Server Architectures and Web Servers 
+ 
+January 16, 2013 
+1 
+A. Haeberlen University of Pennsylvania Announcements 
+n? ? Have you registered on Piazza? 
+n? ? http://www.piazza.com/ 
+n? ? Homework 0 is due on Friday (10:00pm EST) 
+n? ? Did the VM image work well for you? 
+n? ? Homework 1 will be available soon 
+n? ? No class next week 
+n? ? MLK day on Monday, Andreas in Italy on Wednesday (POPL) 
+n? ? Please use the time to work on HW1MS1! 
+n? ? Reading: 
+n? ? Krishnamurthy/Rexford Chapter 4 ("Web servers") 
+n? ? Tanenbaum Chapter 3.1 ("Threads") 
+2 
+A. Haeberlen University of Pennsylvania Homework assignments 
+PLEASE 
+START 
+EARLY!!! 
+3 
+A. Haeberlen University of Pennsylvania Plan for today 
+n? ? Brief discussion of the Lampson paper 
+n? ? The client/server model 
+n? ? An example service: Web/HTTP 
+n? ? Servers with threads 
+NEXT 
+n? ? Consistency issues with shared resources 
+n? ? Event-driven servers 
+n? ? State, and where to keep it 
+n? ? Extensible servers 
+n? ? Multi-tier services and replication 
+ 
+4 
+A. Haeberlen University of Pennsylvania Why do we need synchronization? 
+void transferMoney(customer A, customer B, int amount)  
+{ 
+  showMessage("Transferring "+amount+" to "+B); 
+  int balanceA = getBalance(A); 
+  int balanceB = getBalance(B); 
+  setBalance(B, balanceB + amount); 
+  setBalance(A, balanceA - amount); 
+  showMessage("Your new balance: "+(balanceA-amount)); 
+} 
+n? ? Now that we have more than one thread,  
+life gets more complicated 
+n? ? Key issue: Shared resources, e.g., variables that can be 
+accessed by more than one thread 
+n? ? Simple example: Accounting system in a bank 
+n? ? Maintains the current balance of each customer's account 
+n? ? Customers can transfer money to other customers 
+5 
+A. Haeberlen University of Pennsylvania Why do we need synchronization? 
+$100 
+$500 
+Alice 
+Bob 
+1) A=Balance(Alice) 
+1) B=Balance(Bob) 
+2) B=Balance(Bob) 
+2) A=Balance(Alice) 
+3) SetBalance(Alice,A+500) 
+3) SetBalance(Bob,B+100) 
+4) SetBalance(Bob,B-500) 
+4) SetBalance(Alice,A-100) 
+n? ? What can happen if this code runs concurrently? 
+2 
+1 3 4 
+Time 
+2 3 4 
+1 
+$200 $700 $700 $100 
+$200 
+Alice's balance: 
+Bob's balance: $900 
+$800 $900 $300 $300 
+6 
+A. Haeberlen University of Pennsylvania Problem : Race condition 
+void transferMoney(customer A, customer B, int amount)  
+{ 
+  showMessage("Transferring "+amount+" to "+B); 
+Alice's and Bob's 
+  int balanceA = getBalance(A); 
+threads of execution 
+  int balanceB = getBalance(B); 
+  setBalance(B, balanceB + amount); 
+  setBalance(A, balanceA - amount); 
+  showMessage("Your new balance: "+(balanceA-amount)); 
+} 
+n? ? What happened? 
+n? ? Race condition: Result of the computation depends on the 
+exact timing of the two threads of execution, i.e., the order 
+in which the instructions are executed 
+n? ? Reason: Concurrent updates to the same state 
+7 
+A. Haeberlen University of Pennsylvania How common is this? 
+n? ? Depends on how much interaction there is 
+between server processes/requests 
+n? ? Let's consider: 
+n? ? google.com 
+n? ? amazon.com 
+n? ? twitter.com 
+n? ? ebay.com 
+n? ? battle.net 
+8 
+A. Haeberlen University of Pennsylvania Goal: Consistency 
+n? ? What should have happened? 
+n? ? Intuition: It shouldn't make a difference whether the 
+requests are executed concurrently or not 
+n? ? How can we formalize this? 
+n? ? Need a consistency model that specifies how the system 
+should behave in the presence of concurrency 
+9 
+A. Haeberlen University of Pennsylvania Sequential consistency 
+Actual 
+Core #1: 
+T2 T4 T5 
+execution 
+Core #2: T1 T3 
+T6 
+Time 
+Hypothetical 
+execution 
+Single core: 
+T1 T2 T3 T6 T4 T5 
+Time 
+Same start 
+Same  
+state 
+result 
+n? ? Sequential consistency: 
+n? ? The result of any execution is the same as if the operations 
+of all the cores had been executed in some sequential order, 
+and the operations of each individual processor appear in 
+this sequence in the order specified by the program 
+n? ? How do we build systems that achieve this? 
+10 
+A. Haeberlen University of Pennsylvania Mutual exclusion 
+void transferMoney(customer A, customer B, int amount)  
+{ 
+  showMessage("Transferring "+amount+" to "+B); 
+  int balanceA = getBalance(A); 
+  int balanceB = getBalance(B); 
+Critical section 
+  setBalance(B, balanceB + amount); 
+  setBalance(A, balanceA - amount); 
+  showMessage("Your new balance: "+(balanceA-amount)); 
+} 
+n? ? How can we achieve better consistency? 
+n? ? Key insight: Code has a critical section where accesses from 
+other cores to the same resources will cause problems 
+n? ? Approach: Mutual exclusion 
+n? ? Enforce restriction that only one core can execute the critical 
+section at any given time 
+n? ? What does this mean for scalability? 
+11 
+A. Haeberlen University of Pennsylvania Locking 
+void transferMoney(customer A, customer B, int amount)  
+{ 
+  showMessage("Transferring "+amount+" to "+B); 
+  int balanceA = getBalance(A); 
+  int balanceB = getBalance(B); 
+Critical section 
+  setBalance(B, balanceB + amount); 
+  setBalance(A, balanceA - amount); 
+  showMessage("Your new balance: "+(balanceA-amount)); 
+} 
+n? ? Idea: Implement locks 
+n? ? If LOCK(X) is called and X is not locked, lock X and continue 
+n? ? If LOCK(X) is called and X is locked, wait until X is unlocked 
+n? ? If UNLOCK(X) is called and X is locked, unlock X 
+n? ? How many locks, and where do we put them? 
+n? ? Option #1: One lock around the critical section 
+n? ? Option #2: One lock per variable (A's and B's balance) 
+n? ? Pros and cons? Other options? 
+12 
+A. Haeberlen University of Pennsylvania Refresher: Monitors in Java 
+n? ? For shared resources, use synchronized to 
+gain a monitor on the object to be 'locked' 
+n? ? synchronized methods lock the entire object 
+n? ? synchronized(obj){É} blocks lock their argument 
+n? ? Implicit condition variables 
+n? ? Call wait() to block a thread while in the monitor 
+n? ? Call notify() or notifyAll() to unblock waiting threads 
+13 
+A. Haeberlen University of Pennsylvania Locking helps! 
+$100 
+$500 
+Alice 
+Bob 
+1) LOCK(Alice) 
+1) LOCK(Bob) 
+2) LOCK(Bob) 
+2) LOCK(Alice) 
+3) B=Balance(Bob) 
+3) A=Balance(Alice) 
+4) A=Balance(Alice) 
+4) B=Balance(Bob) 
+5) SetBalance(Bob,B+100) 
+5) SetBalance(Alice,A+500) 
+6) SetBalance(Alice,A-100) 
+6) SetBalance(Bob,B-500) 
+7) UNLOCK(Alice) 
+7) UNLOCK(Bob) 
+8) UNLOCK(Bob) 
+8) UNLOCK(Alice) 
+2 3 4 6 7 8 
+1 5 
+blocked Time 
+1 1 2 2 7 8 
+3 4 5 6 
+$600 
+$200 $100 $600 
+$200 
+Alice's balance: 
+Bob's balance: $400 
+$900 
+$800 $900 $900 
+14 
+A. Haeberlen University of Pennsylvania Problem : Deadlock 
+$100 
+$500 
+Alice 
+Bob 
+1) LOCK(Alice) 
+1) LOCK(Bob) 
+2) LOCK(Bob) 
+2) LOCK(Alice) 
+3) B=Balance(Bob) 
+3) A=Balance(Alice) 
+4) A=Balance(Alice) 
+4) B=Balance(Bob) 
+5) SetBalance(Bob,B+100) 
+5) SetBalance(Alice,A+500) 
+6) SetBalance(Alice,A-100) 
+6) SetBalance(Bob,B-500) 
+7) UNLOCK(Alice) 
+7) UNLOCK(Bob) 
+8) UNLOCK(Bob) 
+8) UNLOCK(Alice) 
+2 
+1 
+blocked (waiting for lock on Alice) 
+blocked (waiting for lock on Bob) Time 
+2 
+1 
+n? ? Neither processor can make progress! 
+15 
+A. Haeberlen University of Pennsylvania The dining philosophers problem 
+Philosophers 
+Philosopher: 
+ 
+repeat 
+  think 
+  pick up left fork 
+  pick up right fork 
+  eat 
+  put down forks 
+forever 
+16 
+A. Haeberlen University of Pennsylvania What to do about deadlocks 
+n? ? Many possible solutions, including: 
+n? ? Lock manager: Hire a waiter and require that philosophers 
+must ask the waiter before picking up any forks 
+n? ? Consequences for scalability? 
+ 
+n? ? Resource hierarchy: Number forks 1-5 and require that each 
+philosopher pick up the fork with the lower number first 
+n? ? Problem? 
+ 
+n? ? Chandy/Misra solution: 
+n? ? Forks can either be dirty or clean; initially all forks are dirty 
+n? ? After the philosopher has eaten, all his forks are dirty 
+n? ? When a philosopher needs a fork he can't get, he asks his neighbor 
+n? ? If a philosopher is asked for a dirty fork, he cleans it and gives it up 
+n? ? If a philosopher is asked for a clean fork, he keeps it 
+17 
+A. Haeberlen University of Pennsylvania Other issues with shared resources 
+n? ? Livelock: Each thread begins a series of 
+actions, discovers it cannot continue because 
+actions by other threads have interfered, and 
+begins again, endlessly 
+n? ? Example: Two people meeting in a narrow corridor  
+ 
+n? ? Starvation: Several threads are competing for 
+resources and, due to adverse scheduling, one 
+of them never gets what it needs to continue 
+n? ? Example: 'Low-priority' patient in a waiting room when the 
+doctors are always busy with 'high-priority' emergencies 
+18 
+A. Haeberlen Recap: Shared resources 
+n? ? When multiple concurrent threads share 
+resources, we can get into trouble 
+n? ? Inconsistencies, race conditions, ... 
+n? ? We can avoid trouble in serveral ways 
+n? ? Example: Explicit locking; monitors (Java 'synchronized' 
+blocks, wait()/notify()/notifyAll()) 
+n? ? But we have to be very careful 
+n? ? Deadlock, livelock, starvation, ... 
+19 
+A. Haeberlen University of Pennsylvania What does this mean for HW1? 
+n? ? Concurrency brings substantial complexity! 
+n? ? Suggestion: Implement in multiple stages (e.g., start with 
+the single-threaded code from the last lecture, then add 
+support for multiple pages, then add the thread pool, ...) 
+n? ? Avoid rewriting everything all the time - need to have an 
+architecture before you start 
+n? ? Which classes will there be when you're done? How will they interact? 
+n? ? What features will you need to implement, and where will they go? 
+n? ? Do read the entire assignment and the entire spec first! 
+n? ? Test early and often - e.g., by writing "dummies" of some 
+classes first, and then replacing them with working ones 
+n? ? Start as soon as the assignment comes out! 
+n? ? It's ok to finish early - but a strange concurrency bug on the 
+day of the deadline could mean trouble! 
+20 
+A. Haeberlen University of Pennsylvania Plan for today 
+n? ? Brief discussion of the Lampson paper 
+n? ? The client/server model 
+n? ? An example service: Web/HTTP 
+n? ? Servers with threads 
+n? ? Consistency issues with shared resources 
+NEXT 
+n? ? Event-driven servers 
+n? ? State, and where to keep it 
+n? ? Extensible servers 
+n? ? Multi-tier services and replication 
+ 
+21 
+A. Haeberlen University of Pennsylvania Event-driven programming 
+n? ? Basically, a programmer-specified way of 
+breaking up tasks 
+n? ? You've probably seen it if you've done GUI programming 
+n? ? But it is also used to multitask 
+n? ? Based on an event queue and event handlers 
+n? ? Each task is broken into a series of events 
+n? ? Each event has a handler that does some work and 
+potentially enqueues another event 
+n? ? "Local state" is generally kept in the event 
+n? ? What are the events that would occur in a web server? 
+22 
+A. Haeberlen University of Pennsylvania Example: Event-based web server 
+handleNewConnection(e) { startReading(e.connection); } 
+handleRequestRead(e) {  
+  if (e.request == "GET <document>") { 
+    issueFilesystemRead(document); 
+Event handlers 
+  } else { 
+(must not 
+    issueWrite(e.connection, "HTTP/1.1 400 Bad req"); 
+block) 
+  }  
+} 
+/* other handlers go here */ 
+ 
+Who puts events 
+main() { 
+into the queue? 
+  EventQueue q; 
+  while (true) { 
+    e = q.getNextEvent(); 
+    case e of { 
+Dispatch 
+      NewConnection: handleNewConnection(e); 
+loop 
+      RequestArrived: handleRequestRead(e); 
+(distributes 
+      FileReadCompleted: handleFileRead(e); 
+events to 
+      AllDataWritten: handleDataWritten(e); 
+    } handlers) 
+  } 
+} 
+23 
+A. Haeberlen University of Pennsylvania Source: SEDA paper (Welsh et al., SOSP 2001) 
+Threads vs events 
+n? ? No throughput degradation under load 
+n? ? Peak throughput is higher 
+24 
+A. Haeberlen University of Pennsylvania Continuations 
+n? ? What if, in response to some event, we must 
+perform a blocking system call? 
+n? ? Example: Request arrives; now we need to read the file from 
+disk (blocking read() call) and send it back to the client 
+n? ? What would happen if we called read() in the event handler? 
+n? ? Solution: Write two event handlers: 
+n? ? Handler A parses the request and issues a non-blocking read  
+(using a special system call) 
+n? ? Handler B is called when the read completes and sends data to client 
+n? ? What if handler A has some state that handler 
+B needs to know? 
+n? ? Must be saved explicitly in a continuation 
+ 
+25 
+A. Haeberlen University of Pennsylvania Continuations: Example 
+class AppWithThreads { 
+  void readRequest(char *filename) { 
+    FILE *file = fopen(filename, "r"); 
+    int blocksTotal = getNumberOfBlocks(file); 
+    byte *buffer = (byte*) malloc(blocksTotal * blockSize); 
+    for (int i=0; i<blocksTotal; i++) 
+      blockingRead(file, &buffer[i*blockSize], blockSize); 
+    /* do something with the file that has been read */ 
+  } 
+OK to block here 
+} 
+(other threads 
+can continue) 
+n? ? With threads, you can write linear code 
+n? ? If an operation blocks the current thread, the kernel can 
+(transparently) save its state, switch to another thread, and 
+later resume the thread when the operation completes 
+n? ? What can be done when events are used? 
+ 
+26 
+A. Haeberlen University of Pennsylvania Continuations continued 
+class EventDrivenApp { 
+  struct { 
+    FILE *file; 
+    byte *buffer; 
+    int blocksRead, blocksTotal; 
+  } continuation; 
+ 
+  void handleNewReadRequest(char *filename) { 
+    continuation.file = fopen(filename, "r"); 
+    continuation.blocksTotal = getNumberOfBlocks(continuation.file); 
+    continuation.buffer = (byte*) malloc(continuation.blocksTotal * blockSize); 
+    continuation.blocksRead = 0; 
+    issueNonblockingRead(continuation.file, continuation.buffer, blockSize); 
+  } 
+ 
+  void handleBlockReadComplete() { 
+    continuation.blocksRead ++;     
+    if (continuation.blocksRead < continuation.blocksTotal) 
+      issueNonblockingRead(continuation.file,  
+     continuation.buffer + continuation.blocksRead*blockSize, blockSize); 
+    else 
+      /* do something with the file that has been read */ 
+  } 
+} 
+27 
+A. Haeberlen University of Pennsylvania Shared resources in event handlers 
+n? ? Generally donÕt need true synchronized 
+blocks or the equivalent here 
+n? ? We control when each event handler gives up a resource, 
+hence we control interleaving of requests and their 
+modification to shared resource 
+n? ? Exception to the rule? 
+n? ? But still may need to maintain flags or other 
+information for situations when a resource is 
+used across events 
+28 
+A. Haeberlen Other ideas 
+n? ? Cooperative scheduling 
+n? ? ÒNon-preemptive multitaskingÓ: Threads execute for a while, 
+save state, and explicitly yield 
+n? ? Examples of where used: Old Mac OS, Windows 2.x 
+n? ? Why is it bad? 
+n? ? Staged events (SEDA Ð Welsh, UCB) 
+n? ? Tasks are broken into explicit sub-components with different 
+triggering events 
+n? ? Better for cache behavior, etc. 
+n? ? Scales to thousands of tasks 
+29 
+A. Haeberlen Concurrency and debugging 
+n? ? A critical issue:  how do we debug  
+concurrent programs? 
+n? ? Consider: 
+n? ? Printlns (be sure to tag with thread/context info) 
+n? ? Logs (see Apache log4j) 
+n? ? Selective breakpoints (remember to do 'binary search') 
+n? ? Are threads or events easier to debug? 
+n? ? Pros and cons? 
+n? ? ThereÕs no free lunch! 
+30 
+A. Haeberlen Recap: Event-driven programming 
+n? ? A different way of structuring servers 
+n? ? Tasks are broken up into small events 
+n? ? Key elements: Event queue, event handlers, dispatch loop 
+n? ? Usually a single thread per core 
+n? ? Tradeoffs different from multithreaded servers 
+n? ? Less need for synchronization (only one running thread!) 
+n? ? Higher performance; less degradation under load 
+n? ? Can be more difficult to program (e.g., continuations) 
+31 
+A. Haeberlen University of Pennsylvania Plan for today 
+n? ? Brief discussion of the Lampson paper 
+n? ? The client/server model 
+n? ? An example service: Web/HTTP 
+n? ? Servers with threads 
+n? ? Consistency issues with shared resources 
+n? ? Event-driven servers 
+NEXT 
+n? ? State, and where to keep it 
+n? ? Extensible servers 
+n? ? Multi-tier services and replication 
+ 
+32 
+A. Haeberlen University of Pennsylvania Shared, persistent state 
+n? ? Generally, a database back-end is a good option 
+n? ? Recovery and reliability features 
+n? ? Transaction support 
+n? ? Simple query interface 
+ 
+n? ? Often the database is on a different server from 
+the executing code 
+AJAX map 
+n? ? This is what Enterprise  
+Client-side 
+JavaBeans are designed  
+Controller 
+JavaScript 
+to support: distributed  
+transactions 
+XML view 
+View 
+n? ? ÒModel-view-controllerÓ  
+pattern is the most common 
+Database 
+Model 
+A. Haeberlen Interfacing with a database 
+n? ? A very common operation: 
+n? ? Read some data from a database, output in a web form 
+n? ? e.g., postings on Slashdot, items for a product catalog, etc. 
+n? ? Three problems, abstracted away by ODBC/
+ADO/JDBC: 
+n? ? Impedance mismatch from relational DBs to objects in Java 
+n? ? Standard API for different databases 
+n? ? Physical implementation for each DB 
+34 
+A. Haeberlen Authentication and Authorization 
+n? ? Authentication: Who is making the request? 
+n? ? At minimum, user ID and password Ð authenticates requestor 
+n? ? Client may wish to authenticate the server, too! 
+n? ? SSL (weÕll discuss this more later) 
+n? ? Part of SSL: certificate from trusted server, validating machine 
+n? ? Also: public key for encrypting clientÕs transmissions 
+ 
+n? ? Authorization: Are they allowed to make the request? 
+n? ? Determine what user can access 
+n? ? For files, applications:  typically, access control list 
+n? ? If data from database, may also have view-based security 
+n? ? WeÕll talk more about these later in the semester 
+35 
+A. Haeberlen Session state 
+n? ? What if clients make multiple related requests? 
+n? ? Example: Open file, read data, read more data, close file 
+n? ? Need to remember some state between requests, e.g., which 
+file was opened, or how much data has already been read 
+n? ? Who should keep this state: Client, server, or both? 
+n? ? If it is kept on the client, how does the server access it? 
+n? ? If it is on the server, how does the client reference it? 
+ 
+n? ? If there is no state, or the client keeps all of it, 
+we can build a stateless server  
+n? ? Server can forget everything about completed requests 
+n? ? Pros and cons of such a design? 
+36 
+A. Haeberlen University of Pennsylvania ... 
+HTTP cookies 
+GET /index.html HTTP/1.1 
+HTTP/1.1 200 OK 
+Content-Type: text/html 
+Set-Cookie: sessionid=12345 
+... contents of the page ... 
+Client 
+Server 
+GET /index.html HTTP/1.1 
+(browser) 
+Cookie: sessionid=12345 
+n? ? What is a cookie? 
+n? ? A set of key-value pairs that a web site can store in your 
+browser (example: 'sessionid=12345') 
+n? ? Created with a Set-Cookie header in the HTTP response 
+n? ? Browser sends the cookie in all subsequent requests to the 
+same web site until it expires 
+37 
+A. Haeberlen University of Pennsylvania A few more words on cookies 
+... 
+Set-Cookie: sessionid=12345;  
+            expires=Thu, 02-Feb-2012 23:59:59 GMT;  
+            path=/;  
+            domain=.cis.upenn.edu 
+... 
+n? ? Each cookie can have several attributes: 
+n? ? An expiration date 
+n? ? If not specified, defaults to end of current session  
+n? ? A domain and a path 
+n? ? Browser only sends the cookies whose path 
+and domain match the requested page 
+n? ? Why this restriction? 
+38 
+A. Haeberlen University of Pennsylvania What are cookies being used for? 
+n? ? Many useful things: 
+n? ? Convenient session management (compare: URL rewriting) 
+n? ? Remembering user preferences on web sites 
+n? ? Storing contents of shopping carts etc. 
+n? ? Some problematic things: 
+n? ? Storing sensitive information (e.g., passwords) 
+n? ? Tracking users across sessions & across different web sites 
+to gather information about them 
+39 
+A. Haeberlen University of Pennsylvania The DoubleClick cookie 
+For the Google Display Network, we serve ads based on the content of the site you view. 
+For example, if you visit a gardening site, ads on that site may be related to gardening. 
+In addition, we may serve ads based on your interests. As you browse websites that 
+have partnered with us or Google sites using the DoubleClick cookie, such as YouTube, 
+Google may place the DoubleClick cookie in your browser to understand the types of 
+pages visited or content that you viewed. Based on this information, Google associates 
+your browser with relevant interest categories and uses these categories to show 
+interest-based ads. For example, if you frequently visit travel websites, Google may show 
+more ads related to travel. Google can also use the types of pages that you have visited 
+or content that you have viewed to infer your gender and the age category you belong 
+to. For example, If the sites that you visit have a majority of female visitors (based on 
+aggregated survey data on site visitation), we may associate your cookie with the female 
+demographic category. 
+(Source: http://www.google.com/privacy_ads.html) 
+n? ? Used by the Google Display Network 
+n? ? DoubleClick used to be its own company, but was acquired 
+by Google in 2008 (for $3.1 billion) 
+n? ? Tracks users across different visited sites 
+n? ? Associates browser with 'relevant interest categories' 
+40 
+A. Haeberlen University of Pennsylvania Cookie management in the browser 
+n? ? Firefox: Tools/Options/Privacy/Show Cookies 
+n? ? Explorer: Tools/Internet Options/General/Browsing history/ 
+Settings/View Files 
+41 
+A. Haeberlen University of Pennsylvania The Evercookie 
+n? ? Arms race: 
+n? ? Advertisers want to track users 
+n? ? Privacy-conscious users do not want to be tracked 
+n? ? What if users simply delete cookies? 
+n? ? Most browsers offer convenient dialogs and/or plugins 
+n? ? But: Cookies are not the only way to store data in browsers 
+n? ? Proof of concept: The 'evercookie' 
+n? ? Stores cookie in eight separate ways: HTTP cookies, Flash 
+cookies, force-cached PNGs, web history (!), HTML5 session 
+storage, HTML5 local storage, HTML5 global storage, HTML5 
+database storage 
+n? ? If any of the eight survives, it recreates the others 
+http://www.schneier.com/blog/archives/2010/09/evercookies.html 
+42 
+A. Haeberlen University of Pennsylvania Eavesdropping with Firesheep 
+n? ? What if someone can listen in on our traffic? 
+n? ? Firesheep: Captures WiFi packets and extracts session 
+cookies, e.g., for Facebook and Twitter 
+n? ? Can be used to 'hijack' sessions (illegal!!!) 
+n? ? Why does this work? How could it be prevented? 
+43 
+A. Haeberlen University of Pennsylvania Recap: State, and where to keep it 
+n? ? Persistent state 
+n? ? Usually kept in a database on the server side (locally or on a 
+separate machine) 
+n? ? JDBC/ODBC are standard software interfaces for accessing 
+databases independent of programming languages, OSes, etc. 
+n? ? Session state 
+n? ? Could be kept on the client, the server, or both 
+n? ? HTTP cookies are a common way (but not the only way) to 
+keep session state on the client 
+n? ? Cookies are used for many other things, e.g., tracking 
+44 
+A. Haeberlen University of Pennsylvania Plan for today 
+n? ? Brief discussion of the Lampson paper 
+n? ? The client/server model 
+n? ? An example service: Web/HTTP 
+n? ? Servers with threads 
+n? ? Consistency issues with shared resources 
+n? ? Event-driven servers 
+n? ? State, and where to keep it 
+NEXT 
+n? ? Extensible servers 
+n? ? Multi-tier services and replication 
+ 
+45 
+A. Haeberlen University of Pennsylvania Forms 
+<html> 
+  <head><title>Web search</title></head> 
+  <body> 
+    <center><h1>Web search</h1> 
+    <form action="search.html" method="post"> 
+      <input type="text" size="40" name="term"><br> 
+      <input type="submit" value="Search"> 
+      <input type="button" value="I'm Feeling Lucky"> CIS455 
+    </form></center> 
+  </body> 
+</html> 
+n? ? What happens when we hit 'Search'? 
+46 
+A. Haeberlen University of Pennsylvania Dynamic content 
+n? ? How can we make content dynamic? 
+n? ? Web server needs to return different web pages, depending 
+on how the user interacts with the web application 
+n? ? Idea #1: Build web app into the web server 
+n? ? Why is this not a good idea? 
+n? ? Idea #2: Loadable modules  
+n? ? Is this a good idea?  
+n? ? Pros and cons? 
+47 
+A. Haeberlen University of Pennsylvania CGI 
+x=2 
+y=3 
+Perl 
+GET /add.cgi?x=2&y=3 
+script 
+<html> 
+... 5 ... 
+200 OK ... <html>...5...</html> 
+</html> 
+Client 
+Web server 
+(browser) 
+n? ? Common G

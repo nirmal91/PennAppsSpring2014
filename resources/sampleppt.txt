@@ -1,0 +1,644 @@
+CIS 455/555: Internet and Web Systems
+*
+University of Pennsylvania
+Introduction
+
+January 9, 2013
+University of Pennsylvania
+Welcome!
+My name: Andreas Haeberlen
+
+Faculty member at CIS
+Affiliated with the NETS program (formerly MKSE)
+
+Research interests:
+Large-scale distributed systems
+... such as cloud computing platforms!
+Security and privacy
+Interaction between social and technical networks
+See also: http://www.cis.upenn.edu/~ahae/
+*
+University of Pennsylvania
+University of Pennsylvania
+What this course is about
+*
+University of Pennsylvania
+University of Pennsylvania
+Wait a minute...
+What is actually going on behind the curtains?
+How is the machine responsible for 'www.google.com' found?
+What systems and protocols are involved in getting the page from California to my laptop?
+How do services like Google or Facebook scale to millions of requests every day? 
+How come they are almost always available?
+How would you program a system of this scale?
+How does Google download 'the entire web'? What kind of system can hold that much data?
+How do you answer a search in 0.13 seconds, and find the most relevant pages among 91,000,000 candidates?
+Why do the best results always seem to be on the first page?
+How did Google know I meant the city center in Philadelphia?
+...
+*
+University of Pennsylvania
+University of Pennsylvania
+Why should I care?
+Understand what's underneath the Web
+How does it work? What are its strengths? Its shortcomings?
+Technologies: Interdomain routing, DNS, HTTP, XML, ...
+
+Understand the underlying principles
+How do you build something that scales so well, is so robust, etc.?
+Lots of clever algorithms, e.g., scalable storage, consensus, ...
+
+Be able to use the right approach when designing new protocols and web systems
+How would you go about building the next Facebook/Google/...?
+Need to scale, be efficient, avoid failures, prevent intrusions, ... 
+*
+University of Pennsylvania
+University of Pennsylvania
+Why should I care? (continued)
+Gain practical experience with web technologies
+Often, the best way to understand something is to build it yourself
+In this course, you will learn how to build a cloud-based mini-Google
+
+Understand the impact on society
+Net neutrality, filter bubble, personalization, the death of privacy, ...
+Need to understand the current state of the technology!
+
+Anticipate what's possible in the future
+*
+University of Pennsylvania
+University of Pennsylvania
+Main themes
+CIS455 focuses on services like Google, Akamai, iTunes, Facebook, eBay, ...
+Main goals:
+Understand the technology (DNS, HTTP, TCP/IP, cookies, ...)
+Underlying principles (consistency models, scalable algortihms, ...)
+Basics of system design / how to make the right choices
+Case studies of concrete systems (Google, AWS, BitTorrent, ...)
+How to handle massive amounts of data
+Find it, gather it, encode it, store it, process it, integrate it, keep it consistent, extract useful answers from it, rank it, deliver it quickly, prevent its loss, ...
+Technical skills (using cloud platform, programming a data center)
+Hands-on experience with a concrete system (web search)
+Working in teams, evaluating your solution, ...
+Understanding risks, e.g., security/privacy, and countermeasures
+This is not a course on building web sites!
+*
+University of Pennsylvania
+University of Pennsylvania
+Relationship to other courses at Penn
+CIS 330/550 (databases)
+455/555 focuses on data with respect to interoperability
+
+CIS 350/573 (software engineering)
+Focus is on building software products 
+
+CIS 505 (software systems)
+Less project-oriented than CIS 555
+CIS 555 covers web services + cloud in more detail
+
+MKSE 212 (scalable/cloud computing)
+Introductory course; broader than CIS455 but less deep
+Some overlap with CIS455, but focus is more on the cloud
+*
+University of Pennsylvania
+University of Pennsylvania
+Topics
+Servers + Internet protocols
+Concurrency, threads vs events, communication, state/sessions
+Web protocols, cookies, forms, authentication, servlets
+Assignment: Multithreaded web server + servlet engine
+Search
+Examples: LDAP, DNS, P2P systems, ...
+Data structures: Inverted index, lists, B+ tree, ...
+XML
+Data formats, marshalling, RPC, various encodings
+DTDs, XML Schema, DOM, XPath, XSLT
+Crawling
+Crawler etiquette, XFilter, FSMs
+Assignment: Topic-specific web crawler + XPath engine
+
+*
+University of Pennsylvania
+University of Pennsylvania
+Topics (continued)
+Decentralized systems
+Consistent hashing, overlays, DHTs, key-based routing, join
+Chord, Pastry; finger tables, successor lists, replication
+Assignment: P2P Caching system
+Scalable programming models
+Distributed file systems: NFS, Google file system
+MapReduce; Hadoop; comparison to message passing
+Integration
+Web services: REST, SOAP, WSDL, UDDI, ...
+Schema mapping
+Information retrieval
+Basic concepts; vector model
+*
+University of Pennsylvania
+University of Pennsylvania
+Topics (continued)
+Web search
+HITS, PageRank; Google architecture; Mercator
+Transactions
+ACID, concurrency control, consistency models, 2PL, 2PC, ...
+Security / privacy
+Various types of attacks; some basic crypto
+Kerberos; SSL
+
+Final team project: P2P web crawler + search engine
+*
+University of Pennsylvania
+University of Pennsylvania
+Plan the next two lectures
+Introduction
+Course logistics
+Let's get started...
+*
+University of Pennsylvania
+University of Pennsylvania
+*
+Course staff
+				
+Name	Andreas Haeberlen	Dhruv Arya	Santhosh Kumar Balakrishnan	Ping Fu
+Role	Instructor	TA	TA	TA
+Email	ahae@cis	adhruv@seas	bsanth@seas	fuping@seas
+				
+Name	Saurabh Garg	Chetan Singh	Anand Subramanian	
+Role	TA	TA	TA	
+Email	saurabhg@seas	chetans@seas	anandsub@seas	
+University of Pennsylvania
+Course discussion group
+We will be using                for discussions related to  this course
+Examples: Questions about homework assignments
+The TAs and I will read the posts and respond to questions
+
+Piazza will also be used for
+Announcements, e.g., cancelled classes (if necessary)
+Supplemental materials, e.g., links to relevant papers or articles
+Corrections and clarifications, e.g., bugs in the homework handouts
+Please check the group frequently!
+
+Please sign up at
+https://piazza.com/upenn/spring2013/cis455555
+*
+University of Pennsylvania
+TODO
+University of Pennsylvania
+Textbook
+Tanenbaum/van Steen: Distributed  Systems: Principles and Paradigms  (2nd edition)
+We'll read from the book ~50% of the time
+
+Frequent supplementary handouts
+Excerpts from several books; many recent research papers
+
+First one (please read by Wednesday):
+B. Lampson, "Hints for Computer Systems Design", SOSP 1983 
+http://research.microsoft.com/en-us/um/people/blampson/33-hints/Acrobat.pdf
+*
+University of Pennsylvania
+TODO: Read
+University of Pennsylvania
+Prerequisites and workload
+You will need:
+Ability to code in Java (substantial implementation project!)
+Good debugging skills -- this will be the biggest time sink!
+Ability to work in a team with classmates (towards the end)
+Willingness to learn how to read API documentation
+Some exposure to threads / concurrent programming
+
+
+Expected workload:
+Three programming-based homework assignments (estimate)
+Substantial term project with experimental evaluation + report
+Two mid-term exams
+
+
+Warning: This course should be considered 1.5 CU!
+Typical feedback: "The course was hard, but we learned a lot"
+*
+University of Pennsylvania
+University of Pennsylvania
+Expected payoff
+Your payoff:
+Lots of practical development and debugging experience
+Good working knowledge of fundamentals behind scalable/web systems
+A working "academic clone of Google" hosted on Amazon EC2!
+*
+University of Pennsylvania
+University of Pennsylvania
+The Google award
+The team with the best search engine will receive an award (sponsored by             )
+Likely award: Four Android cell phones
+Winners will be announced on the course web page
+*
+University of Pennsylvania
+University of Pennsylvania
+Last year's winners
+Team "Hitchhiker"
+Dhruv Arya, Shantosh Kumar Balakrishnan, Saurabh Garg, and Chetan Singh
+All four are serving as TAs this year!
+*
+University of Pennsylvania
+University of Pennsylvania
+The CIS455/555 Virtual Machine
+We will provide a VM image with the necessary software
+Use with VMware Player/VirtualBox
+Safe to experiment with
+Standardized environment makes it easier to get help from TAs
+
+Homework 0: Install VM, write 'Hello World'
+Opportunity to familiarize yourself with this environment
+Gives us a chance to iron out technical problems before HW1
+Handout will be available on the course webpage soon
+http://www.cis.upenn.edu/~cis455/
+*
+University of Pennsylvania
+University of Pennsylvania
+Policies: Waiting list
+There is a waiting list for this course
+Reason: Limited room capacity (82)
+I've asked about bigger classrooms, but they're all taken
+
+If you're on the waiting list, I cannot guarantee that you will get a spot
+But we will enroll you if spots become available, i.e., if someone else drops the course
+
+If you have questions about the waiting list, please contact Mike Felker
+*
+University of Pennsylvania
+University of Pennsylvania
+Policies: Collaboration
+All assignments must be done individually
+Only exception is the final project (teams of four allowed)
+All the code you submit has to be your own
+Only exception: Code we have provided or explicitly authorized
+NO code you have found on the web. NO sharing with others.
+Penn's Code of Academic Integrity applies 
+No cheating, plagiarism, fabrication, multiple submissions, gaining an unfair advantage, or facilitating (!) academic dishonesty
+It's not worth it!! Penalties can be severe: http://www.upenn.edu/academicintegrity/ai_violations.html  
+Zero tolerance policy to ensure fairness
+We will use various tools to actively look for cheating
+These tools work: We have caught several cases in the past
+University of Pennsylvania
+Policies: Collaboration
+*
+University of Pennsylvania
+University of Pennsylvania
+Policies: Collaboration
+Can we work on assignments together?
+Can I discuss the assignment with  others (in general terms)?
+Can I use code I copied from the web?
+Can I ask questions about the  assignments on Piazza?
+I just happened to leave my svn  password on my table, and XYZ just happened to find it. Will I be penalized for this?
+Can I come to the lab with my friends and work on the assignments with them?
+*
+University of Pennsylvania
+University of Pennsylvania
+Policies: Extensions
+Everyone gets three 'joker days'
+Each joker automatically extends any  homework deadline by 1 day
+Cannot be used for the final project / final report
+No questions asked
+We will provide a web interface for redeeming jokers
+I am planning to award some extra jokers in class
+
+Absolutely no extensions without jokers
+20% penalty for each late day without a joker
+
+Some recommendations:
+Please start the homeworks early!!!
+Save your jokers for unforeseen events
+Interview calls, deadlines in other courses, tricky bugs in your code, ...
+
+
+*
+University of Pennsylvania
+University of Pennsylvania
+Policies: Slides
+I will make the slides available after the lecture
+On the course web page: http://www.cis.upenn.edu/~cis455/
+
+However, not everything will be on the slides
+Sometimes the slides will just contain a question for us to discuss
+I'd encourage you to take some notes
+
+*
+University of Pennsylvania
+University of Pennsylvania
+Disclaimer
+This remains a "bleeding edge" course
+We are looking at some of today's hottest topics
+This means that we'll be using some immature technology
+Not everything has been tested and validated ahead of time; we'll do the best we can to smooth over the bugs
+
+Focus is on hands-on experience
+Substantial implementation project; goal is a level of comfort in managing large, complex software development with 3rd party code
+As in the real world: learning APIs, dealing with inadequate tools, working with incomplete and/or ambiguous specifications (RFCs etc.)! 
+Most of you will find this a struggle!  
+You’ll spend many hours debugging!
+
+We hope it will be a fun course, though…
+… and an interesting one!
+*
+University of Pennsylvania
+University of Pennsylvania
+Any questions?
+*
+University of Pennsylvania
+University of Pennsylvania
+Plan the next two lectures
+Introduction
+Course logistics
+Let's get started...
+*
+University of Pennsylvania
+University of Pennsylvania
+What exactly is the Internet?
+Tens of thousands of interconnected networks
+Examples: AT&T, Comcast, Level 3, Penn, Verizon, ...
+Provides global connectivity
+*
+University of Pennsylvania
+Many access networks
+"Backbone" of some large networks
+My laptop (at Penn)
+Google's servers (far, far away)
+University of Pennsylvania
+The Internet is built in layers
+IPv4, IPv6 Unicast, (multicast)
+TCP (session-based)
+UDP (sessionless)
+WiFi, UMTS, ZigBee, Ethernet, WiMax, ...
+Lightweight streaming, etc.
+SSH, FTP, HTTP, IM, P2P, …
+Web Services,  distrib. transactions, …
+Link
+IP
+Transport
+Session
+Middleware
+Your Application
+…
+…
+University of Pennsylvania
+What exactly is the Web?
+A collection of documents and other resources that are interconnected (via URLs)
+Implemented by HTTP servers that publish HTML, XML, and a few other content types, plus a huge number of web clients
+Builds on a number of Internet protocols: DNS, TCP, IP, ...  (other Internet services exist and use other protocols)
+Web services and custom applications sometimes use HTTP in ways it was not designed for
+
+
+*
+University of Pennsylvania
+University of Pennsylvania
+*
+What is an Internet system?
+Not just a web server or web application…
+An application built over the Internet, whose functionality is distributed across multiple machines
+Typically, at least in a client-server or server-to-server fashion, but may have many more participants
+Typically, data and/or code must be exchanged in distributed fashion for the functioning of the application
+Often, the data must be partitioned, replicated, translated, etc. (“shards” in Google-speak)
+Often, there is heterogeneity, e.g., code runs in multiple different environments, is written in different languages, etc.
+Often, there are concerns about handling failures, firewalls, attacks, …
+University of Pennsylvania
+Example: Web search
+Index Servers
+Crawlers
+Search Interface  Servers
+queries
+HTML forms; results
+query
+results
+Content
+keywords + locations
+client
+client
+client
+Uses a model of  document/word  similarity to  rank matches
+Web pages
+Many different components working together!
+University of Pennsylvania
+Data centers
+*
+University of Pennsylvania
+Google data center in The Dalles, Oregon
+Data centers (size of a  football field)
+Cooling plant
+University of Pennsylvania
+Example: Social networking site
+Recommender
+Users &
+entities
+User Page Servers
+clicks
+pages &  notifications
+suggestions
+common properties, 
+usage logs, …
+client
+client
+client
+updates, posts
+Examples: Facebook, LinkedIn, Twitter, ...
+University of Pennsylvania
+Example: Information integration
+XML sources
+Mediator
+System
+queries
+results in 
+"mediated schema"
+client
+client
+client
+Relational
+sources
+HTML sources
+XQuery + XPath  
+over XML
+XML
+SQL
+ODBC results
+HTTP    POST
+HTML
+Maps all data into a single format and virtual schema
+University of Pennsylvania
+Example: SETI@home
+Problem  Partitioning
+client
+client
+client
+Breaks computation into many parts and distributes them to the clients
+Data  Aggregation
+New sub- problems
+Computed subresults
+University of Pennsylvania
+*
+Example: P2P File Sharing
+client
+client
+client
+client
+request
+request
+request
+data
+data
+data
+Processes name-based requests for data; each node can make requests, forward requests, return data
+University of Pennsylvania
+What are the hard problems?
+Some of the biggest challenges are:
+Scalability
+Availability / reliability
+Consistency
+Interoperability
+Location and resource discovery
+
+Disclaimer: Most of the hard problems are not solved
+Many cannot be solved perfectly
+
+Often there is not any single 'best' solution
+Typically there is a tradeoff; for example, we can't have consistency, availability, and partition tolerance together
+We need to find the right compromise for each specific problem
+"Is A or B better?" - Typical answer: "It depends!"
+University of Pennsylvania
+*
+Scalability
+Question: How can we build services that can support a large number of clients and/or requests?
+Example: Serve >2 billion videos per day (YouTube), serve >1.2 billion queries per day on more than 27 billion items (Google)
+University of Pennsylvania
+*
+Scalability
+Key idea: Distribute work!
+Challenges: Coordination, load balancing, efficiency
+Parts of the solution:
+Client-server, multi-tier, P2P architectures
+Restricted programming models, e.g., MapReduce
+Data partitioning, replication, remote procedure calls, …
+University of Pennsylvania
+*
+Availability / reliability
+Question: How do we ensure the system is "up" when we want it to be, and doing the "right" thing?
+Things break all the time, and in creative ways
+But: When was the last time you saw Google down?
+
+Key ideas:
+Replication and redundancy; security measures against attacks; ability to undo/redo
+Challenges:
+Keeping things consistent
+Performance vs. security
+Acknowledgments
+Parts of the solution:
+Data partitioning, replication, …
+Logging, transactions, …
+Redundant hardware, multiple sites, …
+Quorum and consensus algorithms
+University of Pennsylvania
+Consistency
+What can happen if this code runs concurrently?
+*
+University of Pennsylvania
+1) B=Balance(Bob)
+2) A=Balance(Alice)
+3) SetBalance(Bob,B+100)
+4) SetBalance(Alice,A-100)
+1) A=Balance(Alice)
+2) B=Balance(Bob)
+3) SetBalance(Alice,A+500)
+4) SetBalance(Bob,B-500)
+Alice
+Bob
+$100
+$500
+Time
+Alice's balance: Bob's balance:
+1
+2
+$200
+$800
+1
+2
+3
+4
+4
+3
+$200
+$900
+$700
+$900
+$700
+$300
+$100
+$300
+University of Pennsylvania
+*
+Consistency / consensus
+Question: Replication, distribution, and failures make it difficult to keep a unified, consistent view of the world – what can we do about this? 
+Key ideas:
+Locking, concurrency control, and invalidation schemes
+Clock synchronization
+Challenges:
+Locking has huge performance overhead
+Network partitions, disconnected operation
+Parts of the solution:
+Optimistic concurrency control, 2-phase locking
+Distributed clock sync
+Conflict resolvers
+University of Pennsylvania
+*
+Interoperability
+Question: How do we coordinate the efforts of components that have different data formats and/or source languages, and are on different machines?
+
+Key idea: Standardization!
+Challenges:
+Everything has a different semantics!
+Parts of the solution:
+Standard data formats:  XML, XML schemas
+“Schema mediation” and data translation
+Remote procedure calls:  CORBA, XML-RPC, …
+University of Pennsylvania
+*
+Location & Resource Discovery
+Question: How do you find what you're looking for?
+
+Naming, declarative queries over standard schemas, advertisements...
+Challenges:
+Naming has implicit semantics
+What do you do when you don’t know what to call something?
+Parts of the solution:
+Directory systems – DNS, LDAP, etc.
+Resource discovery and advertising protocols
+Overlay networks, sharding schemes
+Standardized schemas
+University of Pennsylvania
+*
+Our first focus: Single machines ('servers')
+How do you handle large numbers of concurrent users?
+Processes
+Threads
+Events
+Hybrids (e.g., thread pools)
+Staged architectures
+
+Next week, we'll look under the covers of  an HTTP server
+Key ideas in building scalable systems
+Principles of HTTP and web servers
+Management of concurrent sessions
+University of Pennsylvania
+To do: For next time
+Please read:
+B. Lampson, "Hints for Computer Systems Design", ACM SOSP 1983 (available from http://research.microsoft.com/ en-us/um/people/blampson/33-hints/Acrobat.pdf)
+Tanenbaum Chapter 3.1
+If necessary: Review Tanenbaum “Modern OS,” Ch. 2.3 or a similar OS book on interprocess communication
+
+Please sign up for the Piazza discussion group!
+https://piazza.com/upenn/spring2013/cis455555
+*
+University of Pennsylvania
+University of Pennsylvania
+Stay tuned
+Next time you will learn:  How to build a web server
+*
+University of Pennsylvania
+http://www.flickr.com/photos/10909957@N03/3135455311/
+University of Pennsylvania
+

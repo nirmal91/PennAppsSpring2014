@@ -1,0 +1,494 @@
+CIS 455/555: Internet and Web Systems 
+XML (continued) 
+ 
+February 6, 2013 
+1 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Announcements 
+n? ? HW1 MS1 is due TODAY 
+n? ? Reminder: No late submissions accepted without an extension; 
+no extensions for avoidable scheduling problems 
+n? ? Submission is via turnin; the project name is 'hw1ms1' 
+n? ? Please test your solution before submitting! 
+n? ? Reading: 
+n? ? XSLT tutorial 
+http://www.w3schools.com/xsl/ 
+2 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Common problems with last year's MS1 
+n? ? Works only with Firefox 
+n? ? Very common problem in heterogeneous systems; different programs 
+behave slightly differently. 
+n? ? Solution: Test with more than one program (Firefox + curl) 
+n? ? Handles only a small number of requests, or at a slow rate 
+n? ? Very common problem with concurrent programming; weird race condition 
+or bug is only triggered under heavy load 
+n? ? Solution: Run a stress test (apachebench); debug 
+n? ? Required features overlooked 
+n? ? "The server should close an idle connection after some timeout period"; 
+"Handling Requests with If-Modified-Since" 
+n? ? Solution: Read specification really carefully! 
+n? ? Non-standard behavior 
+n? ? Misspelled headers; HTTP/1.1200 OK; directory listing formatted incorrectly 
+n? ? Solution: See what other web servers do (e.g., our department server) 
+n? ? Does not build / terminates immediately / connections refused 
+n? ? Not acceptable! You HAVE to test your solution before submitting. 
+3 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Plan for today 
+n? ? Data interchange 
+n? ? Extensible Markup Language (XML) 
+n? ? DTDs and XML Schema; DOM 
+n? ? Document Type Definitions (DTDs) 
+NEXT 
+n? ? XML Schema 
+n? ? Document Object Model (DOM) 
+n? ? XPath 
+n? ? Query examples 
+n? ? Axes 
+n? ? XSLT 
+4 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Recap: DTDs 
+n? ? Why do we need them? 
+n? ? What do they check? 
+n? ? What are their limitations? 
+5 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania XML Schema: DTDs rethought 
+n? ? Features: 
+n? ? XML Syntax 
+n? ? Better way of defining keys using XPaths 
+n? ? Subtyping 
+n? ? Namespaces 
+n? ? ... and, of course, built-in datatypes 
+6 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Example XML Schema 
+<?xml version="1.0" encoding="utf-8"?> 
+<xs:schema elementFormDefault="qualified"  
+ xmlns:xs="http://www.w3.org/2001/XMLSchema">  
+  <xs:element name="Address">  
+    <xs:complexType>  
+Elements can have 
+Structured type 
+      <xs:sequence>  
+minOccurs, maxOccurs 
+Root of every 
+        <xs:element name="Recipient" type="xs:string" />  
+XML Schema 
+        <xs:element name="Street" type="xs:string" />  
+        <xs:element name="Town" type="xs:string" />  
+        <xs:element name="County" type="xs:string" minOccurs="0" />  
+        <xs:element name="PostCode" type="xs:string" />  
+        <xs:element name="POBox" type="xs:boolean" />  
+        <xs:element name="Since" type="xs:date" />  
+        <xs:element name="Country">  
+Actual data types 
+          <xs:simpleType>  
+            <xs:restriction base="xs:string">  
+              <xs:enumeration value="FR" />  
+              <xs:enumeration value="DE" />  
+              <xs:enumeration value="UK" />  
+              <xs:enumeration value="US" />  
+            </xs:restriction>  
+          </xs:simpleType>  
+        </xs:element>  
+      </xs:sequence>  
+    </xs:complexType>  
+  </xs:element>  
+</xs:schema> 
+7 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania 
+http://en.wikipedia.org/wiki/XML_Schema_%28W3C%29 Basic constructs of Schema 
+n? ? Separation of elements (and attributes) from 
+types: 
+n? ? complexType is a structured type, which can have 
+sequences or choices 
+n? ? Sequence: Elements in the sequence must be present, in that order 
+n? ? Choice: Only one of the elements must be present  
+n? ? element and attribute have name and type; elements may 
+also have minOccurs and maxOccurs 
+n? ? Subtyping, most commonly using 
+<complexContent> 
+  <extension base="prevType"> 
+   ... 
+  </...> 
+ 
+8 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Some more examples 
+<xs:element name="employee" type="fullpersoninfo"/> 
+ 
+<xs:complexType name="personinfo"> 
+  <xs:sequence> 
+    <xs:element name="firstname" type="xs:string"/> 
+    <xs:element name="lastname" type="xs:string"/> 
+  </xs:sequence> 
+</xs:complexType> 
+ 
+<xs:complexType name="fullpersoninfo"> 
+  <xs:complexContent> 
+Adds three elements 
+    <xs:extension base="personinfo"> 
+to 'personinfo' 
+      <xs:sequence> 
+        <xs:element name="address" type="xs:string"/> 
+        <xs:element name="city" type="xs:string"/> 
+        <xs:element name="country" type="xs:string"/> 
+      </xs:sequence> 
+    </xs:extension> 
+  </xs:complexContent> 
+</xs:complexType> 
+<xs:element name="person"> 
+<xs:element name="pets"> 
+  <xs:complexType> 
+  <xs:complexType> 
+    <xs:choice> 
+    <xs:sequence minOccurs="0" maxOccurs="unbounded"> 
+      <xs:element name="employee" type="employee"/> 
+      <xs:element name="dog" type="xs:string"/> 
+      <xs:element name="member" type="member"/> 
+      <xs:element name="cat" type="xs:string"/> 
+    </xs:choice> 
+    </xs:sequence> 
+  </xs:complexType> 
+  </xs:complexType> 
+</xs:element>  
+</xs:element> 
+9 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania 
+http://www.w3schools.com/schema/ Designing an XML schema or DTD 
+n? ? Often we are given an existing DTD or schema 
+n? ? Example: HTML DTD 
+n? ? If not, we need to design one 
+n? ? What would be a good approach? 
+n? ? Idea: Orient the XML tree around the 'central' objects in the  
+application of interest 
+n? ? We've already discussed this in the context of mapping data 
+structures to XML; XML schema can specify such a mapping 
+10 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Manipulating XML documents 
+n? ? Typical tasks: 
+n? ? Restructure a XML document 
+n? ? Add/remove/modify elements 
+n? ? Example: Dynamically changing a document in response to inputs 
+n? ? Retrieve certain elements that satisfy some constraint 
+n? ? Examples: All books, all addresses in New Hampshire 
+n? ? How do we do this in a program? 
+n? ? Need an interface that allows programs and scripts to 
+dynamically access and update the content, structure, and 
+style of documents 
+n? ? Solution: The Document Object Model (DOM) 
+11 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania The Document Object Model 
+root attribute 
+Root 
+element 
+p-i 
+dblp 
+?xml 
+text 
+mastersthesis 
+article 
+XML document 
+mdate mdate 
+key 
+key 
+author title year school 
+2002… 
+editor title journal volume year ee ee 
+2002… 
+1992 
+XML 
+1997 
+ms/Brown92 The… 
+tr/dec/… 
+parser 
+PRPL… 
+Digital… 
+db/labs/dec 
+Univ…. 
+Kurt P…. Paul R.  
+SRC… 
+http://www. 
+n? ? Document components represented by objects 
+n? ? Objects have methods like getFirstChild(), getNextSibling()... 
+  ? can be used to traverse the tree 
+n? ? Can also modify the tree, and thus alter the XML, via 
+insertAfter(), etc. 
+12 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Isn't there an easier way? 
+n? ? What if we want to find all the author nodes, 
+or all the title nodes that contain 'scalable'? 
+n? ? Coding this manually can be quite cumbersome - need to 
+traverse the entire tree, keep track of conditions, ... 
+n? ? Alternative: A query language 
+n? ? Idea: Declaratively describe the nodes we're interested in, 
+and let a query engine do all the hard work 
+n? ? This can be done with XPath 
+13 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Recap: DTDs, XML Schema, DOM 
+n? ? Document Type Definitions (DTDs) 
+n? ? An EBNF grammar that defines the structure of an XML doc. 
+n? ? Special support for IDs and references 
+n? ? Several limitations, e.g., no proper data types, no subtypes 
+n? ? XML Schema 
+n? ? More expressive than DTDs; itself an XML document 
+n? ? 'Real' data types, subtyping, ... 
+n? ? Document Object Model (DOM) 
+n? ? An interface for accessing/changing XML data from programs 
+n? ? Document components are represented by a tree of objects 
+14 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Problem: Presentation 
+<?xml version="1.0" encoding="ISO-8859-1"?> 
+<course name="cis455"> 
+  <lectures> 
+  </lectures> 
+  <grades> 
+    <student> 
+      <name>Benjamin Franklin</name> 
+      <pennid>0001</pennid> 
+      <grade>A+</grade> 
+    </student> 
+    <student> 
+      <name>George Washington</name> 
+      <pennid>0003</pennid> 
+      <grade>C-</grade> 
+    </student> 
+  </grades> 
+</course> 
+n? ? What does this look like in the browser? 
+http://www.cis.upenn.edu/~cis455/demo/example1.xml 
+15 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Solution: XSLT 
+<?xml version="1.0" encoding="ISO-8859-1"?> 
+<?xml-stylesheet type="text/xsl" href="grades.xsl"?> 
+<course name="cis455"> 
+  <lectures> 
+  ... 
+  </lectures> 
+  <grades> 
+    <student> 
+      <name>Benjamin Franklin</name> 
+      <pennid>0001</pennid> 
+      <grade>A+</grade> 
+    </student> 
+    <student> 
+      <name>George Washington</name> 
+      <pennid>0003</pennid> 
+      <grade>C-</grade> 
+    </student> 
+  </grades> 
+</course> 
+n? ? Let's add a style sheet (analogous to CSS) 
+http://www.cis.upenn.edu/~cis455/demo/example2.xml 
+16 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Solution: XSLT 
+<?xml version="1.0" encoding="ISO-8859-1"?> 
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"> 
+ 
+<xsl:template match="/course"> 
+  <html> 
+  <body> 
+  <h2>CIS455/555 grades</h2> 
+    <table border="1"> 
+      <tr bgcolor="#9acd32"> 
+        <th>Student</th> 
+        <th>PennID</th> 
+        <th>Grade</th> 
+      </tr> 
+      <xsl:for-each select="grades/student"> 
+      <tr> 
+        <td><xsl:value-of select="name"/></td> 
+        <td align="right"><xsl:value-of select="pennid"/></td> 
+        <td align="center"><xsl:value-of select="grade"/></td> 
+      </tr> 
+      </xsl:for-each> 
+    </table> 
+  </body> 
+  </html> 
+</xsl:template> 
+</xsl:stylesheet> 
+17 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Plan for today 
+n? ? Data interchange 
+n? ? Extensible Markup Language (XML) 
+n? ? DTDs and XML Schema; DOM 
+n? ? Document Type Definitions (DTDs) 
+n? ? XML Schema 
+n? ? Document Object Model (DOM) 
+NEXT 
+n? ? XPath 
+n? ? Query examples 
+n? ? Axes 
+n? ? XSLT 
+18 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania XPaths 
+n? ? What is an XPath? 
+n? ? In its simplest form, like a path in a file system: 
+/mypath/subpath/*/morepath 
+n? ? The XPath returns a node set, representing the XML nodes 
+(and their subtrees) at the end of the path 
+n? ? XPaths can have node tests at the end, returning only 
+specific node types, e.g., text(), processing-instruction(), 
+comment(), element(), attribute() 
+n? ? XPath is fundamentally an ordered language: it can query in 
+an order-aware fashion, and it returns nodes in order 
+19 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Sample XML for our XPath examples 
+<?xml version="1.0" encoding="ISO-8859-1" ?>  
+<dblp> 
+  <mastersthesis mdate="2002-01-03" key="ms/Brown92"> 
+    <author>Kurt P. Brown</author>  
+    <title>PRPL: A Database Workload Specification Language</title>  
+    <year>1992</year>  
+    <school>Univ. of Wisconsin-Madison</school>  
+  </mastersthesis> 
+  <article mdate="2002-01-03" key="tr/dec/SRC1997-018"> 
+    <editor>Paul R. McJones</editor>  
+    <title>The 1995 SQL Reunion</title>  
+    <journal>Digital System Research Center Report</journal>  
+    <volume>SRC1997-018</volume>  
+    <year>1997</year>  
+    <ee>db/labs/dec/SRC1997-018.html</ee>  
+    <ee>http://www.mcjones.org/System_R/SQL_Reunion_95/</ee>  
+  </article> 
+Side note: DBLP provides bibliographic information on major 
+computer science journals and proceedings 
+20 
+© 2013 A. Haeberlen, Z. Ives attribute 
+root 
+Visualization 
+element 
+p-i 
+Root 
+text 
+dblp 
+?xml 
+mastersthesis 
+article 
+mdate mdate 
+key 
+key 
+2002… author title year school 
+editor title journal volume year ee ee 
+2002… 
+1992 
+1997 
+ms/Brown92 The… 
+tr/dec/… 
+PRPL… 
+Digital… 
+db/labs/dec 
+Univ…. 
+Paul R.  
+Kurt P…. 
+SRC… 
+http://www. 
+Which XPath query returns this element? 
+21 
+© 2013 A. Haeberlen, Z. Ives Some XPath query examples 
+n? ? XPath queries can be relative or absolute 
+n? ? /dblp/mastersthesis/title  Absolute (starts with a /) 
+n? ? Wildcards can be used 
+n? ? /dblp/*/editor    All editors 
+n? ?      All ee's with =2 ancestors 
+/*/*/ee 
+n? ? Special syntax for selecting all elements 
+n? ? //title     All title elements 
+n? ? //article     /volume All 'volume' parts of articles 
+n? ? Attributes are specified with @ 
+n? ? //@id     All 'id' attributes 
+n? ? //Journa     l[@issn] All journals with ISSN attr 
+22 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania 
+ More XPath query examples 
+n? ? Square brackets to further specify elements 
+n? ? /article/journal[1]    First journal child of article 
+n? ? /article/journal[last()]  Last journal child of article 
+n? ? Predicates can filter the nodes that are returned 
+n? ? //journal[@issn='123']  All journals with this issn 
+n? ? count() counts selected elements 
+n? ? //*[count(ee)=2]    All elements w/2 ee children 
+n? ?      All elements w/3 children 
+//*[count(*)=3] 
+n? ? Other functions available 
+n? ? //*[contains(name(),'ACM')] All elem. w/name cont. ACM 
+n? ? //*[strin     g-length(name())>3] Elements w/name >3 char. 
+23 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Context nodes and relative paths 
+n? ? XPath has a notion of a context node 
+n? ? Analogous to current working directory under Unix 
+n? ? XPath is evaluated relative to that specific node; defaults to 
+the document root 
+n? ? '.' represents the context node 
+n? ? '..' represents the parent node 
+n? ? We can express relative paths: 
+foo/bar/../.. gets us back to the context node 
+n? ? Example: Suppose we are at the 'author' child of the 
+mastersthesis node, and we want to query the title 
+24 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania More complex traversals with axes 
+n? ? So far, we have seen XPath queries that go 
+down the tree (and up one step) 
+All ancestors (parent,  
+n? ? But we can go up, left, right, etc. 
+grandparent, ...)  
+n? ? This is expressed with so-called axes 
+of the current node 
+n? ? self::path-step 
+n? ? child::path-step    parent::path-step 
+n? ? descendant::path-step  ancestor::path-step 
+n? ? descendant-or-self::path-step ancestor-or-self::path-step 
+n? ? preceding-sibling::path-step  following-sibling::path-
+step 
+n? ? preceding::path-step  following::path-step 
+n? ? The XPaths we've seen so far were in 'abbreviated form': 
+Everything after the 
+n? ? /AAA/BBB is equivalent of /child::AAA/child::BBB 
+closing tag of the 
+current node 
+25 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Users of XPath 
+n? ? XML Schema uses simple XPaths in defining keys and 
+uniqueness constraints 
+n? ? XLink and XPointer, hyperlinks for XML 
+n? ? XQuery – useful for restructuring an XML document 
+or combining multiple documents 
+n? ? XSLT – useful for converting from XML to other 
+representations (e.g., HTML, PDF, SVG) 
+n? ? Coming up next 
+ 
+26 
+© 2013 A. Haeberlen, Z. Ives Recap: XPath 
+n? ? A query language for XML 
+n? ? Queries select a set of nodes 
+n? ? Some selection criteria: Type of node, attributes, position in 
+the tree (relative or absolute), number of children, ... 
+n? ? Can traverse the tree in all directions: up, down, left, right 
+n? ? A building block in many other technologies, e.g., XSLT 
+27 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Plan for today 
+n? ? Data interchange 
+n? ? Extensible Markup Language (XML) 
+n? ? DTDs and XML Schema; DOM 
+n? ? XPath 
+n? ? Query examples 
+n? ? Axes 
+NEXT 
+n? ? XSLT 
+n? ? Templates 
+n? ? Processing model 
+n? ? Common operations 
+28 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Extensible Stylesheet Language Transformations (XSLT) 
+XSLT 
+stylesheet 
+XML document 
+(Schema B) 
+PDF document 
+XML document 
+(Schema A) 
+XSLT processor 
+HTML document 
+n? ? What if we have an XML document, but want... 
+n? ? ... an XML document in a different schema? 
+n? ? ... an HTML document for displaying? 
+n? ? ... a PDF, postscript, or PNG with the same content? 
+n? ? Solution: XSLT 
+29 
+© 2013 A. Haeberlen, Z. 

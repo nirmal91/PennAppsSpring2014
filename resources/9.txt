@@ -1,0 +1,310 @@
+CIS 455/555: Internet and Web Systems 
+Key-Based Routing and DHTs 
+ 
+February 13, 2013 
+1 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Announcements 
+n? ? HW1 MS2 is due next Wednesday 
+n? ? Try to finish everything by the end of this week 
+n? ? This will give you some extra time in case things go wrong, your initial 
+design doesn't work out, you encounter tricky bugs, etc. 
+n? ? You can still attend the office hours on Mon/Tue/Wed if necessary 
+n? ? Please test your solution carefully 
+n? ? Testing guide is available on the assignments page 
+ 
+n? ? Reading for next time (important): 
+n? ? XFilter paper (Altinel/Franklin) 
+n? ? Mercator paper (Heydon/Najork) 
+2 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Plan for the next two lectures 
+n? ? Decentralization 
+n? ? Partly centralized systems 
+n? ? Example: BitTorrent 
+n? ? Consistent hashing 
+n? ? Distributed hashtables 
+NEXT 
+n? ? Fully decentralized systems 
+n? ? KBR; Chord 
+n? ? Attacks on KBR 
+ 
+3 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Goal: Distributed storage system 
+n? ? Your task: Build a system that stores data 
+n? ? Two operations:  
+n? ? PUT(name, data)  
+"Key-value 
+store" 
+n? ? GET(name) ? data 
+X 
+n? ? What would be a very simple solution? 
+n? ? PUT just stores the data on an arbitrary node, e.g., the node 
+on which it is invoked 
+n? ? GET floods the system with the query and downloads the 
+data from any node that responds 
+n? ? Would this be a good solution? 
+n? ? Some problems: Load imbalance; no guarantee that data will 
+be found even if it exists; wasteful / doesn't scale 
+4 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Towards a better solution: Hashing 
+0 
+40 
+82 
+1 
+19 
+x mod 4 
+2 82 
+Overflow 
+40 
+6 
+3 6 
+Values 19 
+Hash function 
+n? ? Recall how hash tables work (on a single machine): 
+n? ? Data items are mapped to a number of hash buckets, using 
+a hash function 
+n? ? Function should have a uniform distribution of values 
+n? ? Example: To map numbers to b buckets with numbers 
+0,...,b-1, we can use H(x)=x mod b 
+n? ? What if two values have the same hash? 
+n? ? Collision; need to have 'overflow buckets' and chain 
+© 2013 A. Haeberlen, Z. Ives Distributed hashtables (DHTs) 
+n? ? Idea: Simple distribution – allocate some 
+number of hash buckets to each machine 
+n? ? Can give this information to every client, or provide a 
+central directory 
+n? ? Can evenly or unevenly distribute buckets 
+n? ? Lookup is very straightforward 
+n? ? What do we do about data skew? 
+n? ? Some ranges of values may occur very frequently 
+n? ? Can use dynamic hashing techniques 
+n? ? Can use better hash function, e.g., SHA-1 (160-bit key) 
+n? ? With such a large key space, collisions are virtually 
+impossible 
+6 
+© 2013 A. Haeberlen, Z. Ives Problem: Dynamic membership 
+n? ? What if the set of servers holding the hash 
+buckets is dynamic? 
+n? ? Servers can join or leave (e.g., because of failures) 
+n? ? What has to happen? 
+n? ? Problem #1: If servers leave unexpectedly, data may be lost 
+n? ? Need to create replicas on multiple servers when data is first stored 
+n? ? Need to compensate for lost replicas when servers fail or leave 
+n? ? Problem #2: The number of buckets changes!  
+n? ? Need to reorganize the hash table 
+n? ? How much work is required to do this? 
+7 
+© 2013 A. Haeberlen, Z. Ives Example: Classical hashing 
+0 1 2 3 
+File i ? 
+Server (i mod 4) 
+"key space" 
+19 
+87 
+8 34 18 
+52 17 65 
+(e.g., hash of 
+71 35 
+58 
+file contents) 42 
+36 84 41 
+26 
+4 
+0 1 2 3 
+File i ? 
+Server (i mod 5) 
+35 84 34 
+65 
+52 8 18 
+36 41 17 
+19 
+26 71 
+42 58 
+87 
+n? ? What happens when a new server joins? 
+n? ? Most of the files have to be moved to a new server!! 
+8 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Consistent hashing 
+n? ? Intuition: Build a distributed hash table where 
+the number of buckets stays constant, even if 
+the number of machines changes 
+n? ? Requires a mapping from hash entries to nodes 
+n? ? Don’t need to re-hash everything if node joins/leaves 
+n? ? Only the mapping (and allocation of buckets) needs to 
+change when the number of nodes changes 
+n? ? This is the basis of many structured P2P 
+systems, e.g., CAN, Pastry, Chord 
+n? ? For this course, you will use Pastry 
+n? ? But Chord is simpler to understand, so we’ll look at it first 
+9 
+© 2013 A. Haeberlen, Z. Ives Intuition: Consistent hashing 
+"Server ID" 
+37 
+20 67 93 
+File i ? 
+Server whose ID 
+"key space" 
+follows i 
+8 84 
+17 26 34 41 42 71 
+87 
+52 58 
+18 19 
+35 36 
+65 
+37 51 67 93 
+20 
+File i ? 
+Server whose ID 
+follows i 
+8 71 84 
+17 26 34 41 42 52 58 
+87 
+65 
+18 19 
+35 36 
+n? ? What happens now when a new server joins? 
+n? ? Only a few files have to be moved! 
+10 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania How to implement PUT and GET 
+n? ? We need a way to contact the node who is 
+currently responsible for a given key 
+n? ? Key-based routing: ROUTE(key, message) 
+n? ? Can be used to implement a distributed hashtable (how?) 
+n? ? How can we implement ROUTE? 
+n? ? Idea #1: Central directory 
+n? ? Problem: Directory becomes a bottleneck; prone to failures 
+n? ? Idea #2: Flooding 
+n? ? Problem: Wasteful; doesn't scale 
+n? ? Can we do better? 
+11 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Recap: DHTs and consistent hashing 
+n? ? Distributed hashtable 
+n? ? Hash buckets are distributed across multiple machines 
+n? ? Implements PUT(key, value) and GET(key) 
+n? ? Consistent hashing 
+n? ? A way to assign hash buckets to nodes such that changes in 
+membership do not require a large number of reassignments 
+n? ? Key-based routing 
+n? ? ROUTE(key, msg): sends a message to the node that is 
+currently responsible for a given key 
+n? ? Can be used to implement a distributed hashtable 
+12 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Plan for the next two lectures 
+n? ? Decentralization 
+n? ? Partly centralized systems 
+n? ? Example: BitTorrent 
+n? ? Consistent hashing 
+n? ? Distributed hashtables 
+NEXT 
+n? ? Fully decentralized systems 
+n? ? KBR; Chord 
+n? ? Attacks on KBR 
+ 
+13 
+© 2013 A. Haeberlen, Z. Ives University of Pennsylvania Circular key space 
+160
+0 
+2 -1 1 
+2 
+n? ? We’re going to use a very large 
+key space 
+n? ? SHA-1 hash: 20 bytes, or 160 bits 
+n? ? We will arrange it into a ring (i.e., the keys 
+160
+wrap around from 2 -1 back to 0) 
+n? ? Keys are assigned to both nodes and objects 
+n? ? Example: The key of object "abacus" might be 
+n? ? SHA1("abacus")=c0a20267f9f1e4469f8eb7bf45704218293412db 
+n? ? Example: The key (node ID) of a node with IP 158.130.53.72 
+might be 
+n? ? SHA1("158.130.53.72")=51f2414dd789175924d8caac7a455eb9219a9e35 
+14 
+© 2013 A. Haeberlen, Z. Ives DHTs with Chord 
+k10 
+k120 
+N10 
+Node ID k112 
+k11 
+N100 
+Circular 
+k30 
+key 
+k99 
+N32 
+space 
+Object key 
+k33 
+k40 
+N80 
+k52 
+k70 
+k65 
+N60 
+n? ? Chord hashes each key to its successor 
+n? ? That is, the node whose node ID follows the key 
+15 
+© 2013 A. Haeberlen, Z. Ives Basic routing: Linear time 
+N5 
+ ROUTE(55, GET(55)) 
+N10 
+N110 
+N20 
+N99 
+Object 
+N32 
+55 
+N40 
+N80 
+N60 
+n? ? Idea: Each node has a pointer to its successor 
+n? ? Can find keys by following pointers to the key's predecessor 
+n? ? Ensures correctness (if pointers are correct) but inefficient 
+16 
+© 2013 A. Haeberlen, Z. Ives Finger table allows O(log N) lookups 
+? 
+? 
+What happens when 
+the fingers are not 
+1/8 
+100% correct? 
+1/16 
+1/32 
+1/64 
+1/128 
+N80 
+n? ? Idea: Each node knows some 'shortcuts' 
+i-1
+n? ? "Finger table": Node n has pointers to successor(n+2 ) 
+n? ? Result: Any key can be found in O(log N) hops whp 
+n? ? Needed for efficiency, not for correctness 
+17 
+© 2013 A. Haeberlen, Z. Ives O(log N) lookups visualized 
+N5 
+N99 
+n? ? First 'hop' is usually the longest 
+18 
+© 2013 A. Haeberlen, Z. Ives Node joins 
+n? ? Suppose a new node 
+N120 
+wants to join 
+N5 
+n? ? Needs to know at least one 
+N10 
+existing node - how? 
+N110 
+N20 
+n? ? What would need to 
+N99 
+happen to maintain 
+N32 
+connectivity? 
+N40 
+N80 
+n? ? What data needs to be 
+shipped around? 
+N60 
+n? ? Some keys (+data) from the 
+new node's successor 
+n? ? Pointers / finger table updates 
+19 
+© 2013 A. Haeberlen, Z. Ive

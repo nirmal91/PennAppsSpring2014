@@ -1,0 +1,637 @@
+CIS 455/555: Internet and Web Systems 
+HITS and PageRank; Google 
+ 
+March 27, 2013 
+1 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania Announcements 
+n? ? HW3 handout will be available later today 
+ 
+ 
+n? ? Reading for next time: 
+n? ? (see web page) 
+2 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania Web search before 1998 
+n? ? Based on information retrieval 
+n? ? Boolean / vector model, etc. 
+n? ? Based purely on 'on-page' factors, i.e., the text of the page 
+n? ? Results were not very good 
+n? ? Web doesn't have an editor to control quality 
+n? ? Web contains deliberately misleading information (?SEO) 
+n? ? Great variety in types of information: Phone books, catalogs, 
+technical reports, slide shows, ... 
+n? ? Many languages, partial descriptions, jargon, ... 
+n? ? How to improve the results? 
+3 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania Plan for today 
+NEXT 
+n? ? HITS 
+n? ? Hubs and authorities 
+n? ? PageRank 
+n? ? Iterative computation 
+n? ? Random-surfer model 
+n? ? Refinements: Sinks and Hogs 
+n? ? Google 
+n? ? How Google worked in 1998 
+n? ? Google over the years 
+n? ? SEOs 
+ 
+4 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania Goal: Find authoritative pages 
+n? ? Many queries are relatively broad 
+n? ? "cats", "harvard", "iphone", ... 
+n? ? Consequence: Abundance of results 
+n? ? There may be thousands or even millions of pages that 
+contain the search term, incl. personal homepages, rants, ... 
+n? ? IR-type ranking isn't enough; still way too much for a  
+human user to digest 
+n? ? Need to further refine the ranking! 
+n? ? Idea: Look for the most authoritative pages 
+n? ? But how do we tell which pages these are? 
+n? ? Problem: No endogenous measure of authoritativeness 
+? Hard to tell just by looking at the page. 
+n? ? Need some 'off-page' factors 
+5 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania Idea: Use the link structure 
+n? ? Hyperlinks encode a considerable amount of 
+human judgment 
+n? ? What does it mean when a web page links 
+another web page? 
+n? ? Intra-domain links: Often created primarily for navigation 
+n? ? Inter-domain links: Confer some measure of authority 
+n? ? So, can we simply boost the rank of pages 
+with lots of inbound links? 
+6 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania Relevance ≠ Popularity! 
+Team 
+“A-Team”  
+page 
+Sports 
+Yahoo Wikipedia 
+Cheesy 
+Mr. T’s 
+Hollywood 
+Directory 
+TV 
+page 
+“Series to 
+Shows 
+Recycle” page 
+page 
+7 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania Hubs and authorities 
+A B 
+Hub 
+Authority 
+n? ? Idea: Give more weight to links from hub 
+pages that point to lots of other authorities 
+n? ? Mutually reinforcing relationship: 
+n? ? A good hub is one that points to many good authorities 
+n? ? A good authority is one that is pointed to by many good hubs 
+  
+8 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania R 
+HITS 
+S 
+n? ? Algorithm for a query Q: 
+1.? Start with a root set R, e.g., the t highest-ranked pages from 
+the IR-style ranking for Q 
+2.? For each p?R, add all the pages p points to, and up to d 
+pages that point to p. Call the resulting set S. 
+p
+3.? Assign each page p?S an authority weight x and a hub 
+p
+weight y ; initially, set all weights to be equal and sum to 1 
+p p 
+4.? For each p?S, compute new weights x and y as follows: 
+p q
+n? ? New x := Sum of all y such that q?p is an interdomain link 
+p q
+n? ? New y := Sum of all x such that p?q is an interdomain link 
+5.? Normalize the new weights such that both the sum of all the 
+p p 
+x and the sum of all the y are 1 
+6.? Repeat from step 4 until a fixpoint is reached 
+n? ? If A is adjacency matrix, fixpoints are principal eigenvectors of 
+T T
+A A and AA , respectively 
+9 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania Recap: HITS 
+n? ? Improves the ranking based on link structure 
+n? ? Intuition: Links confer some measure of authority 
+n? ? Overall ranking is a combination of IR ranking and this 
+n? ? Based on concept of hubs and authorities 
+n? ? Hub: Points to many good authorities 
+n? ? Authority: Is pointed to by many good hubs 
+n? ? Iterative algorithm to assign hub/authority scores 
+n? ? Query-specific 
+n? ? No notion of 'absolute quality' of a page; ranking needs to 
+be computed for each new query 
+10 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania Plan for today 
+n? ? HITS 
+n? ? Hubs and authorities 
+NEXT 
+n? ? PageRank 
+n? ? Iterative computation 
+n? ? Random-surfer model 
+n? ? Refinements: Sinks and Hogs 
+n? ? Google 
+n? ? How Google worked in 1998 
+n? ? Google over the years 
+n? ? SEOs 
+ 
+11 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania Google's PageRank (Brin/Page 98) 
+n? ? A technique for estimating page quality 
+n? ? Based on web link graph, just like HITS 
+n? ? Like HITS, relies on a fixpoint computation 
+n? ? Important differences to HITS: 
+n? ? No hubs/authorities distinction; just a single value per page 
+n? ? Query-independent 
+n? ? Results are combined with IR score 
+n? ? Think of it as: TotalScore = IR score * PageRank 
+n? ? In practice, search engines use many other factors 
+(for example, Google says it uses more than 200) 
+12 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania Shouldn't E's vote be  
+worth more than F's? 
+PageRank: Intuition 
+A
+G
+H B
+E
+How many levels 
+I 
+C
+should we consider? 
+F
+J 
+D
+n? ? Imagine a contest for The Web's Best Page 
+n? ? Initially, each page has one vote 
+n? ? Each page votes for all the pages it has a link to 
+n? ? To ensure fairness, pages voting for more than one page 
+must split their vote equally between them 
+n? ? Voting proceeds in rounds; in each round, each page has the 
+number of votes it received in the previous round 
+n? ? In practice, it's a little more complicated - but not much! 
+13 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania PageRank 
+n? ? Each page i is given a rank x 
+i
+n? ? Goal: Assign the x such that the rank of each 
+i
+page is governed by the ranks of the pages 
+linking to it: 
+1
+x = x
+i ∑ j
+N
+j?B
+j
+i
+Rank of page j 
+Rank of page i 
+Number of 
+links out 
+How do we compute 
+Every page 
+the rank values? 
+from page j 
+j that links to i 
+14 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania Iterative PageRank (simplified) 
+1
+(0)
+Initialize all ranks to 
+x =
+i
+be equal, e.g.: 
+n
+1
+(k+1) (k)
+Iterate until 
+x = x
+∑
+convergence i j
+N
+j?B
+j
+i
+15 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania Example: Step 0 
+1
+(0)
+Initialize all ranks 
+x =
+i
+to be equal 
+n
+0.33 
+0.33 
+0.33 
+16 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania Example: Step 1 
+Propagate weights 
+1
+(k+1) (k)
+x = x
+across out-edges 
+∑
+i j
+N
+j?B
+j
+i
+0.33 
+0.17 
+0.33 
+0.17 
+17 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania Example: Step 2 
+Compute weights 
+1
+(1) (0)
+x = x
+based on in-edges 
+∑
+i j
+N
+j?B
+j
+i
+0.50 
+0.17 
+0.33 
+18 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania Example: Convergence 
+1
+(k+1) (k)
+x = x
+∑
+i j
+N
+j?B
+j
+i
+0.40 
+0.2 
+0.4 
+19 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania Naïve PageRank Algorithm Restated 
+n? ? Let 
+n? ? N(p) = number outgoing links from page p 
+n? ? B(p) = number of back-links to page p 
+1
+PageRank(p)= PageRank(b)
+  
+∑
+N(b)
+b?B
+p
+ 
+n? ? Each page b distributes its importance to all of the 
+pages it points to (so we scale by 1/N(b)) 
+n? ? Page p’s importance is increased by the importance 
+of its back set 
+20 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania In Linear Algebra formulation 
+n? ? Create an m x m matrix M to capture links: 
+n? ? M(i, j)  = 1 / n  if page i is pointed to by page j  
+j
+ and page j has n outgoing links 
+j
+           = 0       otherwise 
+n? ? Initialize all PageRanks to 1, multiply by M repeatedly until 
+all values converge: 
+PageRank(p ') PageRank(p )
+?? ?? ?? ??
+1 1
+?? ?? ?? ??
+PageRank(p ') PageRank(p )
+2 2
+?? ?? ?? ??
+=M
+?? ... ?? ?? ... ??
+?? ?? ?? ??
+PageRank(p ') PageRank(p )
+?? m ?? ?? m ??
+ 
+n? ? Computes principal eigenvector via power iteration 
+21 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania A Brief Example 
+Google 
+g'  
+0 0.5 0.5 g 
+= 
+* 
+y’ 
+0 0 0.5 y 
+Amazon Yahoo 
+a’ 
+1 0.5 0 a 
+Running for multiple iterations: 
+g 1 
+1 1 
+1 
+= , , 
+y 1 
+0.5 0.75 , … 
+0.67 
+a 1 
+1.5 1.25 
+1.33 
+Total rank sums to number of pages 
+22 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania Oops #1 – PageRank Sinks 
+g'  
+0 0 0.5 g 
+Google 
+= 
+* 
+y’ 
+0.5 0 0.5 y 
+a’ 
+0.5 0 0 a 
+Amazon Yahoo 
+'dead end' - PageRank 
+is lost after each round 
+Running for multiple iterations: 
+g 1 0.5 
+0.25 0 
+= , , 
+y 1 1 , … , 
+0.5 0 
+a 1 0.5 
+0.25 0 
+23 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania Oops #2 – PageRank hogs 
+g'  
+0 0 0.5 g 
+Google 
+= 
+* 
+y’ 
+0.5 1 0.5 y 
+a’ 
+0.5 0 0 a 
+Amazon Yahoo 
+PageRank cannot flow 
+out and accumulates 
+Running for multiple iterations: 
+g 1 0.5 
+0.25 0 
+= , , 
+y 1 2 , … , 
+2.5 3 
+a 1 0.5 
+0.25 0 
+24 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania Improved PageRank 
+n? ? Remove out-degree 0 nodes (or consider them to 
+refer back to referrer) 
+n? ? Add decay factor d to deal with sinks 
+1
+PageRank(p)= (1?d)+d PageRank(b)
+∑
+N(b)
+b?B
+p
+n? ? Typical value: d=0.85 
+ 
+25 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania Random Surfer Model 
+n? ? PageRank has an intuitive basis in random 
+walks on graphs 
+n? ? Imagine a random surfer, who starts on a 
+random page and, in each step, 
+n? ? with probability d, klicks on a random link on the page 
+n? ? with probability 1-d, jumps to a random page (bored?) 
+n? ? The PageRank of a page can be interpreted 
+as the fraction of steps the surfer spends on 
+the corresponding page 
+n? ? Transition matrix can be interpreted as a Markov Chain 
+26 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania 
+ Stopping the Hog 
+g'  
+0 0 0.5 
+0.15 
+g 
+Google 
+y’ = 0.85 
++ 
+0.5 1 0.5 
+0.15 
+* y 
+a’ 
+0.5 0 0 
+0.15 
+a 
+Amazon Yahoo 
+Running for multiple iterations: 
+g 0.57 0.39 0.32 0.26 
+, 
+, 
+, … ,  , 
+y 1.85 2.21 2.36 2.48 
+= 
+a 0.57 0.39 0.32 0.26 
+… though does this seem right? 
+27 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania Search Engine Optimization (SEO) 
+n? ? Has become a big business 
+n? ? White-hat techniques 
+n? ? Google webmaster tools 
+n? ? Add meta tags to documents, etc. 
+n? ? Black-hat techniques 
+n? ? Link farms 
+n? ? Keyword stuffing, hidden text, meta-tag stuffing, ... 
+n? ? Spamdexing 
+n? ? Initial solution: <a rel="nofollow" href="...">...</a> 
+n? ? Some people started to abuse this to improve their own rankings 
+n? ? Doorway pages / cloaking 
+n? ? Special pages just for search engines 
+n? ? BMW Germany and Ricoh Germany banned in February 2006 
+n? ? Link buying 
+28 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania Recap: PageRank 
+n? ? Estimates absolute 'quality' or 'importance' of 
+a given page based on inbound links 
+n? ? Query-independent 
+n? ? Can be computed via fixpoint iteration 
+n? ? Can be interpreted as the fraction of time a 'random surfer' 
+would spend on the page 
+n? ? Several refinements, e.g., to deal with sinks 
+n? ? Considered relatively stable 
+n? ? But vulnerable to black-hat SEO 
+n? ? An important factor, but not the only one 
+n? ? Overall ranking is based on many factors (Google: >200) 
+29 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania What could be the other 200 factors? 
+Positive Negative 
+Links to 'bad neighborhood' 
+Keyword in title? URL? 
+Keyword stuffing 
+Keyword in domain name? 
+Over-optimization 
+Quality of HTML code 
+On-page Hidden content (text has  
+Page freshness 
+same color as background) 
+Rate of change 
+Automatic redirect/refresh 
+... 
+... 
+Fast increase in number of  
+High PageRank 
+inbound links (link buying?) 
+Anchor text of inbound links 
+Link farming 
+Links from authority sites 
+Off-page 
+Different pages user/spider 
+Links from well-known sites 
+Content duplication 
+Domain expiration date 
+... 
+... 
+n? ? Note: This is entirely speculative! 
+30 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania Source: Web Information Systems, Prof. Beat Signer, VU Brussels Beyond PageRank 
+n? ? PageRank assumes a “random surfer” who 
+starts at any node and estimates likelihood 
+that the surfer will end up at a particular page 
+n? ? A more general notion: label propagation 
+n? ? Take a set of start nodes each with a different label 
+n? ? Estimate, for every node, the distribution of arrivals from 
+each label 
+n? ? In essence, captures the relatedness or influence of nodes 
+n? ? Used in YouTube video matching, schema matching, … 
+31 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania Plan for today 
+n? ? HITS 
+n? ? Hubs and authorities 
+n? ? PageRank 
+n? ? Iterative computation 
+n? ? Random-surfer model 
+n? ? Refinements: Sinks and Hogs 
+NEXT 
+n? ? Google 
+n? ? How Google worked in 1998 
+n? ? Google over the years 
+n? ? SEOs 
+ 
+32 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania Google Architecture [Brin/Page 98] 
+Focus was on scalability 
+to the size of the Web 
+ 
+First to really exploit 
+Link Analysis 
+ 
+Started as an academic 
+project @ Stanford; 
+became a startup 
+ 
+Our discussion will be 
+on early Google – today 
+they keep things secret! 
+33 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania The Heart of Google Storage 
+n? ? “BigFile” system for storing indices, 
+tables 
+64
+n? ? Support for 2 bytes across multiple 
+drives, filesystems 
+n? ? Manages its own file descriptors, 
+resources 
+n? ? This was the predecessor to GFS 
+n? ? First use: Repository 
+n? ? Basically, a warehouse of every HTML page 
+(this is the 'cached page' entry), compressed 
+in zlib (faster than bzip) 
+n? ? Useful for doing additional processing, any 
+necessary rebuilds 
+n? ? Repository entry format: 
+[DocID][ECode][UrlLen][PageLen][Url][Page] 
+n? ? The repository is indexed (not inverted here) 
+34 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania Repository Index 
+n? ? One index for looking up documents by 
+DocID 
+n? ? Done in ISAM (think of this as a B+ Tree 
+without smart re-balancing) 
+n? ? Index points to repository entries (or to 
+URL entry if not crawled) 
+n? ? One index for mapping URL to DocID 
+n? ? Sorted by checksum of URL 
+n? ? Compute checksum of URL, then perform 
+binary search by checksum 
+n? ? Allows update by merge with another 
+similar file 
+n? ? Why is this done? 
+35 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania Lexicon 
+n? ? The list of searchable words 
+n? ? (Presumably, today it’s used to 
+suggest alternative words as well) 
+n? ? The “root” of the inverted index 
+n? ? As of 1998, 14 million “words” 
+n? ? Kept in memory (was 256MB) 
+n? ? Two parts: 
+n? ? Hash table of pointers to words and the 
+“barrels” (partitions) they fall into 
+n? ? List of words (null-separated) 
+36 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania Indices – Inverted and “Forward” 
+Lexicon: 293 MB
+WordID ndocs
+n? ? Inverted index divided into 
+WordID ndocs
+“barrels” (partitions by range) 
+WordID ndocs
+n? ? Indexed by the lexicon; for 
+each DocID, consists of a Hit 
+Inverted Barrels: 41 GB
+List of entries in the document 
+DocID: 27 nhits: 8 hit hit hit hit
+DocID: 27 nhits: 8 hit hit hit
+n? ? Two barrels: short (anchor and 
+DocID: 27 nhits: 8 hit hit hit hit
+title); full (all text) 
+DocID: 27 nhits: 8 hit hit
+n? ? Forward index uses the same 
+forward barrels: total 43 GB
+barrels 
+DocID WordID: 24 nhits: 8 hit hit hit
+WordID: 24 nhits: 8 hit hit
+n? ? Indexed by DocID, then a list of 
+NULL hit hit hit
+WordIDs in this barrel and this 
+DocID WordID: 24 nhits: 8 hit
+document, then Hit Lists 
+WordID: 24 nhits: 8 hit hit
+corresponding to the WordIDs 
+WordID: 24 nhits: 8 hit hit hit
+NULL hit
+original tables from 
+http://www.cs.huji.ac.il/~sdbi/2000/google/index.htm 
+37 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania Hit Lists (Not Mafia-Related) 
+n? ? Used in inverted and forward indices 
+n? ? Goal was to minimize the size – the bulk of 
+data is in hit entries 
+n? ? For 1998 version, made it down to 2 bytes per hit (though 
+that’s likely climbed since then): 
+Plain 
+cap 1 font: 3 position: 12 
+vs. 
+Fancy 
+cap 1 font: 7 type: 4         position: 8                      
+special-cased to: 
+Anchor 
+cap 1 font: 7 type: 4                     hash: 4                   pos: 4         
+38 
+© 2013 A. Haeberlen , Z. Ives University of Pennsylvania Google’s Distributed Crawler 
+n? ? Single U

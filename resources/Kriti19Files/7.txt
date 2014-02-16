@@ -1,0 +1,369 @@
+1/10 
+ 
+ 
+ 
+ 
+Spring 2014 
+ 
+ 
+Assignment 1: Web and Application Server 
+ 
+Milestone 1 due February 12, 2014, at 10:00pm EST 
+Milestone 2 due February 26, 2014, at 10:00pm EST 
+ 
+1		Background	
+We are all familiar with how one accesses a Web server via a browser. The big question is what is going 
+on under the covers of the Web server: how does it serve data?, what is necessary in order to provide the 
+notion of sessions?, how is it extended?, and so on.  
+ 
+This assignment focuses on developing an application server, i.e., a Web (HTTP) server that runs Java 
+servlets, in two stages. In the first stage, you will implement a simple HTTP server for static content (i.e., 
+files like images, style sheets, and HTML pages). In the second stage, you will expand this work to 
+emulate a full-fledged application server that runs servlets. Java servlets are a popular method for writing 
+dynamic Web applications. They provide a cleaner and much more powerful interface to the Web server 
+and Web browser than previous methods, such as CGI scripts. 
+ 
+If you have taken CIS 330 or 550, you should already be familiar with servlet programming; if you have 
+not, it should not be too difficult to catch up. A Java servlet is simply a Java class that extends the class 
+HttpServlet. It typically overrides the doGet and doPost methods from that class to generate a 
+web page in response to a request from a Web browser. An XML file, web.xml, lets the servlet 
+developer specify a mapping from URLs to class names; this is how the server knows which class to 
+invoke in response to an HTTP request. Further details about servlets, including links to tutorials and an 
+API reference, as well as sample servlets and a corresponding web.xml file, are available on the course 
+web site on the Assignments page. We have also given you code to parse web.xml. 
+2		Developing	and	running	your	code	
+We strongly recommend that you do the following before you start writing code: 
+ 
+1. Carefully read the entire assignment (both milestones) from front to back and make a list of the 
+features you need to implement. 
+2. Think about how the key features will work. For instance, before you start with MS2, go through 
+the steps the server will need to perform to handle a request. If you still have questions, have a 
+look at some of the extra material on the assignments page, or ask one of us during office hours. 
+3. Spend at least some time thinking about the design of your solution. What classes will you need? 
+How many threads will there be? What will their interfaces look like? Which data structures need 
+synchronization? And so on. 
+4. Regularly check your changes into the subversion repository. This will give you many useful 
+features, including a recent backup and the ability to roll back any changes that have mysteriously 
+broken your code. 
+CIS 455/555: Internet and Web Systems 
+2/10 
+ 
+We recommend that you continue using the VM image we have provided for HW0. This image should 
+already contain all the tools you will need for HW1. You can check out the framework code for HW1 
+using the same process as for HW0 (there should now be an additonal "HW1" folder). 
+ 
+Of course, you are free to use any other Java IDE you like, or no IDE at all, and you do not have to use 
+any of the tools we provide. However, to ensure efficient grading, your submission must meet the 
+requirements specified in 3.4 and 4.7 below - in particular, it must build and run correctly in the original 
+VM image and have an ant build script. The VM image, and ant, will be the 'gold standard' for grading. 
+  
+We strongly recommend that you regularly check the discussions on Piazza for clarifications and 
+solutions to common problems. 
+2.1	Testing	your	server	
+To test your server, you have several options: 
+ 
+? You can use the Web Console in Firefox to inspect the HTTP headers. Open the "Tools" menu, 
+choose "Web Developers", and click on "Web Console". This should pop up a new window, 
+which will list all the HTTP requests processed by Firefox (click on a request for extra details).  
+? If you want to check whether you are using the correct headers, you may find the site web-
+sniffer.net useful.  
+? You can use the telnet command to directly interact with the server. Just run telnet 
+localhost 80, type in the request, and hit Enter twice; you should see the server's response. 
+(If your server is running on a different port, replace '80' with the port number.) 
+? You may also want to consider using the curl command-line utility to do some automated 
+testing of your server. curl makes it easy to test HTTP/1.1 compliance by sending HTTP 
+requests that are purposefully invalid - e.g., sending an HTTP/1.1 request without a Host header. 
+'man curl' lists a great many flags. 
+? To stress-test your server, you can use Apachebench (the ab command, which is already pre-
+installed in the VM). Apachebench can be configured to make many requests concurrently, which 
+will help you find concurrency problems, deadlocks, etc.  
+ 
+We suggest that you use multiple options for testing; if you only use Firefox, for instance, there is a risk 
+that you hard-code assumptions about Firefox, so your solution won't work with curl or ab. You may 
+also want to compare your server's behavior with that of a known-good server, e.g., the CIS web server. 
+Please do test your solution carefully! 
+3		Milestone	1:	Multithreaded	HTTP	Server	(due	February	12th)	
+For the first milestone, your task is relatively simple. You will develop a Web server that can be 
+invoked from the command line, taking the following parameters, in this order: 
+ 
+1. Port to listen for connections on. Port 80 is the default HTTP port, but it is often blocked by 
+firewalls, so your server should be able to run on any other port (e.g., 8080) 
+ 
+2. Root directory of the static web pages. For example, if this is set to the directory /var/www, a 
+request for /mydir/index.html will return the file /var/www/mydir/index.html. 
+(do not hard-code any part of the path in your code - your server needs to work on a different 
+machine, which may have completely different directories!) 
+ 
+3/10 
+ 
+Note that the second milestone will add a third argument (see below). If your server is invoked without 
+any command-line arguments, it must output your full name and SEAS login name. 
+ 
+Your program will accept incoming GET and HEAD requests from a Web browser (such as the Firefox 
+browser in the VM image), and it will make use of a thread pool (as discussed in class) to invoke a worker 
+thread to process each request. The worker thread will parse the HTTP request, determine which file was 
+requested (relative to the root directory specified above) and return the file. If a directory was requested, 
+the request should return a listing of the files in the directory. Your server should return the correct MIME 
+types for some basic file formats, based on the extension (.jpg, .gif, .png, .txt, .html); keep in mind that 
+image files must be sent in binary form -- not with println or equivalent -- otherwise the browser will not 
+be able to read them. If a GET or HEAD request is made that is not a valid UNIX path specification, if no 
+file is found, or if the file is not accessible, you should return the appropriate HTTP error. See the HTTP 
+Made Really Easy paper for more details. 
+ 
+MAJOR SECURITY CONCERN: You should make sure that users are not allowed to request absolute 
+paths or paths outside the root directory. We will validate, e.g., that we can't get hold of /etc/passwd! 
+3.1	HTTP	protocol	version	and	features	
+Your application server must be HTTP 1.1 compliant, and it must support all the features described in 
+HTTP Made Really Easy. This means that it must be able to support HTTP 1.0 clients as well as 1.1 
+clients. Persistent connections are suggested but not required for HTTP 1.1 servers. If you do not wish to 
+support persistent connections, be sure to include “Connection: close” in the header of the 
+response. Chunked encoding (sometimes called chunking) is also not required. Support for persistent 
+connections and chunking is extra credit, described near the end of this assignment. 
+ 
+HTTP Made Really Easy is not a complete specification, so you will occasionally need to look at RFC 
+2616 (the 'real' HTTP specification; http://www.ietf.org/rfc/rfc2616.txt) for protocol 
+details. If you have a protocol-related question, please make an effort to find the answer in the spec before 
+you post the question to Piazza! 
+3.2	Special	URLs	
+Your application server should implement two special URLs. If someone issues a GET /shutdown, 
+your server should shut down immediately; however, any threads that are still busy handling requests 
+must be aborted properly (do not just call System.exit!). If someone issues a GET /control, your 
+server should return a 'control panel' web page, which must contain at least a) your full name and SEAS 
+login, b) a list of all the threads in the thread pool, c) the status of each thread ('waiting' or the URL it is 
+currently handling), and d) a button that shuts down the server, i.e., is linked to the special /shutdown 
+URL. It must be possible to open the special URLs in a normal web browser. 
+ 
+3.3	Implementation	techniques	
+For efficiency, your application server must be implemented using a thread pool that you implement, as 
+discussed in class. Specifically, there should be one thread that listens for incoming TCP requests and 
+enqueues them, and some number of threads that process the requests from the queue and return the 
+responses. We will examine your code to make sure it is free of race conditions and the potential for 
+deadlock, so code carefully!  
+ 
+We expect you to write your own thread pool code, not use one from the Java system library or an 
+external library. This includes the queue, which you should implement by yourself, using condition 
+variables to block and wake up threads. You may not use the BlockingQueue that comes with Java, or 
+any similar classes. 
+4/10 
+ 
+3.4	Requirements	
+Your solution must meet the following requirements (please read carefully!): 
+ 
+1. Your main class must be called HttpServer, and it must be located in a package called 
+edu.upenn.cis455.webserver. 
+2. Your submission must contain a) the entire source code, as well as any supplementary files 
+needed to build your solution, b) an ant build script called build.xml (a template is included 
+with the code in svn), and c) a README file. The README file must contain 1) your full name 
+and SEAS login name, 2) a description of features implemented, 3) any extra credit claimed, and 
+4) any special instructions for building or running. 
+3. When your submission is unpacked in the original VM image and the ant build script is run, 
+your solution must compile correctly. Please test this before submitting! 
+4. Your server must accept the two command-line arguments specified above, and it must output 
+your full name and SEAS login name when invoked without command-line arguments. 
+5. Your solution must be submitted via turnin (!) before 10:00pm on Feb 12, 2014 (MS1) and 
+10:00pm on Feb 26, 2014 (MS2), respectively. The only exception is if you have obtainend an 
+extension online, using the link on the course web page. The project name for turnin should be 
+hw1ms1 for the first milestone, and hw1ms2 for the second milestone. 
+6. Your code must contain a reasonable amount of useful documentation. 
+ 
+You may not use any third-party code other than the standard Java libraries (exceptions noted in the 
+assignment) and any code we provide.  
+4	Milestone	2:	Servlet	Engine	(due	February	26th)	
+The second milestone will build upon the Web server from Milestone 1, with support for POST and for 
+invoking servlet code. To ease implementation, your application server will need to support only one web 
+application at a time. Therefore, you can simply add the class files for the web application to the classpath 
+when you invoke you application server from the command line, and pass the location of the web.xml 
+file as an argument. Furthermore, you need not implement all of the methods in the various servlet classes; 
+details as to what is required may be found below. 
+4.1	The	Servlet	
+A servlet is typically stored in a special “war file” (extension .war) which is essentially a jar file with a 
+special layout. The configuration information for a servlet is specified in a file called web.xml, which is 
+typically in the WEB-INF directory. The servlet’s actual classes are typically in WEB-INF/classes. 
+The web.xml file contains information about the servlet class to be invoked, its name for the app server, 
+and various parameters to be passed to the servlet. See below for an example: 
+ 
+<web-app xmlns="http://java.sun.com/xml/ns/j2ee" version="2.4"> 
+  <servlet> 
+    <servlet-name>HelloWorld</servlet-name> 
+    <servlet-class>edu.upenn.HelloWorld</servlet-class> 
+    <init-param> 
+      <param-name>greeting</param-name> 
+      <param-value>Bonjour!</param-value> 
+    </init-param> 
+  </servlet> 
+  <servlet-mapping> 
+    <servlet-name>HelloWorld</servlet-name> 
+5/10 
+ 
+    <url-pattern>/Hello</url-pattern> 
+  </servlet-mapping> 
+  <context-param> 
+    <param-name>server</param-name> 
+    <param-value>my455server</param-value> 
+  </context-param> 
+</web-app> 
+ 
+The servlet and servlet-class elements are used to establish an internal name for your servlet, 
+and which class it binds to. The servlet-mapping associates the servlet with a particular sub-URL 
+(http://my-server/MyServlet or similar). There are two kinds of URL patterns to handle:  
+ 
+1. Exact pattern (must start with a /). This is the most common way of specifying a servlet. 
+2. Path mapping (starts with a / and ends with a *, meaning it should match on the prefix up to the *). 
+This is used in a certain Web service scheme called “REST” (which we discuss later in the term). 
+As a special case, /foo/* should match /foo (without the trailing forward slash). 
+ 
+There are two ways that parameters can be specified from “outside” the servlet, e.g., to describe setup 
+information such as usernames and passwords, servlet environment info, etc. These are through init-
+param elements, which appear within servlet elements and establish name-value pairs for the servlet 
+configuration, and the context-param elements, which establish name-value pairs for the servlet 
+context. We will discuss how these are accessed programmatically in a moment. 
+4.2	Basic	Servlet	Operation	
+All servlets implement the javax.servlet.http.HttpServlet interface, which extends the 
+Servlet interface. You will need to build the “wrapping” that invokes the HttpServlet instance, 
+calling the appropriate functions and passing in the appropriate objects. 
+ 
+Servlet initialization, config, and context. When the servlet is first activated (by starting it in the app 
+server), this calls the init() method, which is passed a ServletConfig object. This may request 
+certain resources, open persistent connections, etc. The ServletConfig details information about the 
+servlet setup, including its ServletContext. Both of these can be used to get parameters from web.xml. 
+ 
+ServletConfig represents the information a servlet knows about “itself”. Calling 
+getInitParameter() on the ServletConfig returns the servlet init-param parameters. The 
+method getParameterNames() returns the full set of these parameters. Finally, one can get the 
+servlet’s name (from web.xml) through this interface. ServletContext represents what the servlet 
+sees about its related Web application. Calling getInitParameter() on the ServletContext 
+returns the servlet context-param parameters. The method getParameterNames() returns the 
+full set of these parameters. Through the context, the servlet can also access resources that are within 
+the .war file, and determine the real path for a given “virtual” path (i.e., a path relative to the servlet). 
+Perhaps more important, the ServletContext provides a way of passing objects (“attributes” that are 
+name-object pairs) among different parts of a Web application. You may ignore the context’s logging 
+capabilities. 
+ 
+Service request and response. When a request is made of the servlet by an HTTP client, the app server 
+calls the service() method with a javax.servlet.ServletRequest parameter containing 
+request info, and a javax.servlet.ServletResponse parameter for return info. For an HTTP 
+servlet (the only kind we are implementing), service() typically calls a handler for the type of HTTP 
+request. The only ones we care about are doGet() for GET requests, and doPost() for POST requests. 
+6/10 
+ 
+(There are other kinds of calls, but these are seldom supported in practice.) Both doGet() and 
+doPost() are given parameter objects  implementing javax.servlet.HttpServletRequest 
+and javax.servlet.HttpServletResponse (which are subclassed from the original 
+ServletRequest and ServletResponse). HttpServletRequest, naturally, contains 
+information about the HTTP request, including headers, parameters, etc. You can get header information 
+from getHeader() and its related methods, and get form parameters through getParameter(). 
+HttpSession is used to store state across servlet invocations. The getAttribute() and related 
+methods support storing name-value pairs. The session should time-out after the designated amount of 
+time (specified as a default or in setMaxInactiveInterval()). HttpServletResponse 
+contains an object that is used to return information to the Web browser or HTTP client. The 
+getWriter() or getOutputStream() methods provide a means of directly sending data that goes 
+onto the socket to the client. Also important are addHeader(), which adds a name-value pair for the 
+response header, and its sibling methods for adding header information. Note that there are a variety of 
+important fields you can set this way, e.g., server, content-length, refresh rate, content-type, etc. Note that 
+you should ensure that an HTTP response code (e.g., “200 OK”) is sent to the client before any output 
+from the writer or output stream are returned. If the servlet throws an exception before sending output, 
+you should return an error code such as “500 Internal Server Error”. You should return a “302 Redirect” 
+if the servlet calls HttpServletResponse’s sendRedirect() method. 
+ 
+Servlet shutdown. When the servlet is deactivated, this calls the servlet’s destroy() method, which 
+should release resources allocated by init(). 
+4.3	Invocation	of	the	application	server	
+You should add a third command-line argument: the location of the web.xml file for your web 
+application. In your submission, this file should be located in the conf subdirectory. You may accept 
+additional optional arguments after the initial three (such as number of worker threads, for example), but 
+the application should run with reasonable defaults if they are omitted.  
+4.4	Special	URLs	
+You should now augment the special URLs you implemented for Milestone 1. The /shutdown URL 
+should properly shut down all the servlets, by invoking their destroy methods, and the /control 
+URL should now provide a way to view the error log. It may provide other (e.g., extra-credit) features as 
+you see fit. 
+4.5	Implementation	techniques	
+Dynamic loading of classes in Java — which you will need to do since a servlet can have any arbitrary 
+name, as specified in web.xml — can be a bit tricky. Start by calling the method Class.forName, 
+with the string name of the class as an argument, to get a Class object representing the class you want to 
+instantiate (i.e. a specific servlet). Since your servlets do not define a constructor, you can then call the 
+method newInstance() on that Class object, and typecast it to an instance of your servlet. Now you 
+can call methods on this instance. 
+4.6	Required	application	server	features	
+Your application server must provide functional implementations of all of the non-deprecated methods in 
+the interfaces HttpServletRequest, HttpServletResponse, ServletConfig, ServletContext, and HttpSession 
+of the Servlet interface version 2.4 (see the URL on the first page of this assignment), with the following 
+exceptions: 
+ 
+ 
+7/10 
+ 
+? ServletContext.log 
+? ServletContext.getMimeType (return null) 
+? ServletContext.getNamedDispatcher 
+? ServletContext.getResource 
+? ServletContext.getResourceAsStream 
+? ServletContext.getResourcePaths 
+? HttpServletRequest.getPathTranslated 
+? HttpServletRequest.getUserPrincipal 
+? HttpServletRequest.isUserInRole 
+? HttpServletRequest.getRequestDispatcher 
+? HttpServletRequest.getInputStream 
+? HttpServletResponse.getOutputStream 
+? HttpServletRequest.getLocales 
+? ServletContext.getNamedDispatcher 
+? ServletContext.getRequestDispatcher 
+ 
+You can return null for the output of all of the above methods, as well as all deprecated methods. 
+We will also make the following simplifications and clarifications of the spec: 
+ 
+? HttpRequest.getAuthType should always return BASIC AUTH (“BASIC”) 
+? HttpRequest.getPathInfo should always return the remainder of the URL request after 
+the portion matched by the url-pattern in web-xml. It starts with a “/”. 
+? HttpRequest.getQueryString should return the HTTP GET query string, i.e., the portion 
+after the “?” when a GET form is posted. 
+? HttpRequest.getCharacterEncoding should return “ISO-8859-1” by default, and the 
+results of setCharacterEncoding if it was previously called. 
+? HttpRequest.getScheme should return “http”. 
+? HttpResponse.getCharacterEncoding should return “ISO-8859-1”. 
+? HttpResponse.getContentType should return “text/html” by default, and the results 
+of setContentType if it was previously called. 
+? HttpServletRequest.getLocale should return null by default, or the results of 
+setLocale if it was previously called. 
+? HttpServletRequest.isRequestedSessionIdFromUrl should always return false. 
+ 
+This means that your application server will need to support cookies, sessions (using cookies — you don’t 
+need to provide a fall-back like path encoding if the client doesn’t support cookies), servlet contexts, 
+initialization parameters (from the web.xml file) - in other words, all of the infrastructure needed to 
+write real servlets. It also means that you won’t need to do HTTP-based authentication, or implement the 
+ServletInputStream and ServletOutputStream classes. 
+ 
+We suggest you start by determining what you need to implement: 
+ 
+1. Print the JavaDocs for HttpServletRequest, HttpServletResponse, Servlet-
+Config, ServletContext, and HttpSession, from the URL given previously. 
+2. Create a skeleton class for each of the above, with methods that temporarily return null for each 
+call. Be sure that your HttpServletRequest class inherits from the provided 
+javax.servlet.HttpServletRequest (in the .jar file), and so forth. 
+8/10 
+ 
+3. Print the sample web.xml from the extra/Servlets/web/WEB-INF directory. There is 
+very useful information in the comments, which will help you determine where certain methods 
+get their data. 
+ 
+You can find a simple parser for the web.xml file from the TestHarness code (see 5.1 and thecode in 
+extra/TestHarness). For the ServletConfig and ServletContext, note the following: 
+ 
+? There is a single ServletContext per “Web application,” and a single ServletConfig 
+per “servlet page.” (For the base version of Milestone 2, you will only need to run one application 
+at a time.) Assuming a single application will likely simplify some of what you need to 
+implement in ServletContext (e.g., getServletNames). 
+? Most of the important ServletConfig info—servlet name, init parameter names, and init 
+parameter list— come directly from web.xml. 
+? The ServletContext init parameters come from the context-param elements in web.xml. 
+? The ServletContext attributes are essentially a hash map from name to value, and can be 
+used, e.g., to communicate between multiple instances of the same servlet. By default, these can 
+only be created programmatically by servlets themselves, unlike the initialization parameters, 
+which are set in web.xml. The ServletContext name is set to the display name specified in 
+web.xml. 
+? The real path of a file can be getting the canonical path of the path relative to the Web root. It is 
+straightforward to return a stream to such a resource, as well. The URL to a relative path can 
+similarly be generated relative to the Servlet’s URL. 
+4.7	Requirements	
+Your solution must meet the same requirements as MS1 (see 3.4 above), with two exceptions. First, your 
+sol
