@@ -52,8 +52,8 @@ public class CallerClass {
 		int[] modes = new int[19];
 		for(int i=0;i<19;i++)
 			modes[i] = 1;
-		SkipItMainClass.APICall(inputFromDhyanam, numberOfLinesFromDhyanam, modes);
-
+		String summary = SkipItMainClass.APICall(inputFromDhyanam, numberOfLinesFromDhyanam, modes);
+		System.out.println(summary);
 
 	}
 }

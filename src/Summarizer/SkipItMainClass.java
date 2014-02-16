@@ -134,7 +134,8 @@ public class SkipItMainClass {
 		{
 			currSent.setFinalScore(currSent.getTopicWordScore() + currSent.getScore());
 		}
-
+		System.out.println("Scores have been assigned");
+		
 		Collections.sort(allInformation);
 
 		int numberOfLinesAdded = 0;
@@ -152,60 +153,15 @@ public class SkipItMainClass {
 			}
 		}
 
-		try
-		{
-			Thread.sleep(1000);
-		}
-		catch(Exception e)
-		{
-
-		}
-
-
-
-		/*
-		/*
-		 * We have all the sentences based on the scores we have
-		 */
-		/*		System.out.println("Trying to sort");
-		Collections.sort(allInformation);
-		System.out.println("SORTING DONE");
-		try
-		{
-			Thread.sleep(1000);
-		}
-		catch(InterruptedException e)
-		{
-			e.printStackTrace();
-		}
-
-		/*
-		 * We are just allowed to show a limited number of sentences based on the time the user has at his/her disposal
-		 */
-		/*		ArrayList<SentenceObject> importantSentences = new ArrayList<SentenceObject>();
-		for(int i=0;i<numberOfLinesFromDhyanam && i<allInformation.size();i++)
-		{
-			importantSentences.add(allInformation.get(i));
-		}
-		//		System.out.println(importantSentences);
-		//		System.out.println("Reduced number of sentences");
-		//		System.out.println(importantSentences.size());
-		try
-		{
-			Thread.sleep(1000);
-		}
-		catch(InterruptedException e)
-		{
-			e.printStackTrace();
-		}
-		 */
 		Collections.sort(linesAlreadyAdded, new IndexComparator());
-		
+		System.out.println("Summary is being returned");
 		StringBuffer returnBuffer = new StringBuffer();
+	
 		for(SentenceObject sentence : linesAlreadyAdded)
 		{
-			returnBuffer.append(sentence);
+			returnBuffer.append(sentence.content+"\n");
 		}
+//		System.out.println(returnBuffer);
 		return new String(returnBuffer);
 		
 	}
@@ -213,7 +169,7 @@ public class SkipItMainClass {
 			ArrayList<SentenceObject> linesAlreadyAdded,
 			HashMap<SentenceObject, ArrayList<Float>> userVectors) {
 
-		if(sentenceObject.content.split(" +").length < 5 || sentenceObject.content.split(" +").length > 25)
+		if(sentenceObject.content.split(" +").length < 8 || sentenceObject.content.split(" +").length > 25)
 			return false;
 
 		if(sentenceObject.content.matches(".*\\d.*")){
@@ -250,7 +206,6 @@ public class SkipItMainClass {
 		} else {
 			return 0.0f;
 		}
-		System.out.println(cosineSimilarity);
 		return (float) cosineSimilarity;
 	}
 	public static HashMap<SentenceObject, ArrayList<Float>> getVectorMap(ArrayList<SentenceObject> sentences, HashMap<String,Float> TFIDFMap, ArrayList<ReturnTopWords> topicWords){
@@ -318,11 +273,11 @@ public class SkipItMainClass {
 
 				while ((sCurrentLine = br.readLine()) != null) {
 					String[] vals = sCurrentLine.split(" ");
-					System.out.println(sCurrentLine);
+		//			System.out.println(sCurrentLine);
 					//System.out.println(vals);
 					topicWords.put(vals[0], Float.parseFloat(vals[1]));
 				}
-				System.out.println(topicWords);
+		//		System.out.println(topicWords);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}finally{
